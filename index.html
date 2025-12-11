@@ -2,419 +2,637 @@
 <html lang="it">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AutoMatch Pro - Live Feedback</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>AutoMatch Pro - iOS Dynamic</title>
     
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;500;700;900&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
     <style>
+        /* --- iOS DESIGN SYSTEM EVOLUTO --- */
         :root {
-            --primary: #2997ff;
-            --accent: #b0fb5d;
-            --warning: #ffab00; /* Arancione per stime */
-            --bg-dark: #050507;
-            --text-main: #ffffff;
-            --text-sub: #94a3b8;
-            --glass-bg: rgba(20, 20, 22, 0.9);
-            --glass-border: rgba(255, 255, 255, 0.1);
-            --glass-blur: blur(30px);
-            --input-bg: rgba(255, 255, 255, 0.05);
-            --card-bg: rgba(30, 30, 35, 0.7);
+            --ios-blue: #007AFF;
+            --ios-green: #34C759;
+            --ios-orange: #FF9500;
+            --ios-red: #FF3B30;
+            --ios-indigo: #5856D6;
+            --ios-bg: #F2F2F7;
+            --ios-card: #FFFFFF;
+            --ios-text: #000000;
+            --ios-text-sec: #8E8E93;
+            --ios-separator: rgba(60, 60, 67, 0.18);
+            --shadow-sm: 0 2px 8px rgba(0,0,0,0.04);
+            --shadow-float: 0 12px 30px rgba(0,0,0,0.12);
         }
 
-        body.light-mode {
-            --primary: #0066ff;
-            --bg-dark: #f0f2f5;
-            --text-main: #1a1a1a;
-            --text-sub: #666666;
-            --glass-bg: rgba(255, 255, 255, 0.95);
-            --glass-border: rgba(0, 0, 0, 0.1);
-            --input-bg: #ffffff;
-            --card-bg: #ffffff;
+        body.dark-mode {
+            --ios-bg: #000000;
+            --ios-card: #1C1C1E;
+            --ios-text: #FFFFFF;
+            --ios-text-sec: #98989D;
+            --ios-separator: rgba(84, 84, 88, 0.45);
         }
 
-        body, html { margin: 0; padding: 0; min-height: 100%; font-family: 'Inter', sans-serif; background: var(--bg-dark); color: var(--text-main); overflow-x: hidden; transition: 0.3s; scroll-behavior: smooth; }
-        h1, h2, h3, button { font-family: 'Outfit', sans-serif; }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body, html { 
+            margin: 0; padding: 0; height: 100%; 
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background: var(--ios-bg); color: var(--ios-text);
+            overflow-x: hidden; scroll-behavior: smooth;
+        }
 
-        /* BACKGROUND */
-        #warp-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -10; opacity: 0.5; pointer-events: none; }
-        .bg-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(circle at top, transparent 0%, var(--bg-dark) 90%); z-index: -9; pointer-events: none; }
+        /* TIPOGRAFIA & ANIMAZIONI */
+        h1, h2, h3 { letter-spacing: -0.02em; }
+        
+        /* Shake Animation per errori */
+        @keyframes shake { 0%, 100% {transform: translateX(0);} 25% {transform: translateX(-5px);} 75% {transform: translateX(5px);} }
+        .input-error { animation: shake 0.3s ease-in-out; border: 1px solid var(--ios-red) !important; }
 
-        /* NAVBAR */
+        /* NAVBAR BLUR */
         .nav-bar { 
-            position: fixed; top: 0; left: 0; width: 100%; padding: 20px 40px; 
+            position: fixed; top: 0; left: 0; width: 100%; height: 60px; padding: 0 20px; 
             display: flex; justify-content: space-between; align-items: center; 
-            z-index: 1000; box-sizing: border-box; 
-            background: linear-gradient(to bottom, rgba(0,0,0,0.8), transparent);
+            z-index: 1000; 
+            background: rgba(255,255,255,0.7); backdrop-filter: saturate(180%) blur(20px); -webkit-backdrop-filter: saturate(180%) blur(20px);
+            border-bottom: 0.5px solid var(--ios-separator);
+            transition: background 0.3s;
         }
-        .logo { font-weight: 800; font-size: 1.5rem; letter-spacing: -1px; cursor: pointer; }
-        .nav-controls { display: flex; gap: 15px; }
-        .icon-btn { 
-            width: 40px; height: 40px; border-radius: 50%; border: 1px solid var(--glass-border);
-            display: flex; align-items: center; justify-content: center; cursor: pointer;
-            background: var(--glass-bg); color: var(--text-main); transition: 0.2s; font-size: 1.2rem;
-            backdrop-filter: blur(10px);
-        }
-        .icon-btn:hover { border-color: var(--primary); color: var(--primary); transform: scale(1.1); }
+        body.dark-mode .nav-bar { background: rgba(28,28,30,0.7); }
 
-        /* LANDING PAGE */
-        #landing-page { transition: opacity 0.5s ease; width: 100%; }
-        #home-section { min-height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 20px; position: relative; }
-        .hero-title { font-size: 5rem; line-height: 0.95; margin-bottom: 20px; letter-spacing: -2px; z-index: 2; text-shadow: 0 0 30px rgba(41, 151, 255, 0.3); }
-        .hero-sub { font-size: 1.3rem; color: var(--text-sub); max-width: 600px; margin-bottom: 50px; font-weight: 300; z-index: 2; }
+        /* BUTTONS CON FEEDBACK */
+        .btn-main, .btn-pri, .btn-sec {
+            font-family: inherit; border: none; cursor: pointer; outline: none;
+            transition: all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1);
+            position: relative; overflow: hidden;
+        }
+        .btn-main:active, .btn-pri:active, .btn-sec:active { transform: scale(0.95); opacity: 0.8; }
+        
         .btn-main {
-            padding: 20px 50px; font-size: 1.2rem; font-weight: 700; text-transform: uppercase; letter-spacing: 2px;
-            color: #fff; background: var(--primary); border: none; border-radius: 50px; cursor: pointer; transition: 0.3s;
-            box-shadow: 0 10px 40px rgba(41, 151, 255, 0.4); z-index: 10; display: flex; align-items: center; gap: 10px;
+            padding: 16px 32px; font-size: 1.1rem; font-weight: 600;
+            background: var(--ios-blue); color: #fff; border-radius: 40px;
+            box-shadow: 0 4px 15px rgba(0, 122, 255, 0.4);
         }
-        .btn-main:hover { transform: scale(1.05) translateY(-3px); filter: brightness(1.1); }
-
-        .float-card { 
-            position: absolute; padding: 20px; width: 180px; border-radius: 20px; 
-            text-align: left; animation: float 8s ease-in-out infinite; z-index: 1;
-            background: var(--glass-bg); border: 1px solid var(--glass-border); backdrop-filter: blur(10px);
-            box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+        .btn-pri {
+            background: var(--ios-blue); color: #fff; padding: 16px; 
+            border-radius: 14px; font-weight: 600; width: 100%; font-size: 1rem;
         }
-        .fc-icon { font-size: 2rem; color: var(--primary); margin-bottom: 10px; }
-        .fc-1 { top: 20%; left: 10%; animation-delay: 0s; }
-        .fc-2 { bottom: 25%; right: 10%; animation-delay: 2s; }
-        .fc-3 { top: 15%; right: 20%; animation-delay: 4s; }
-        .fc-4 { bottom: 20%; left: 20%; animation-delay: 1.5s; }
-        .fc-5 { top: 50%; left: 5%; animation-delay: 3s; }
-        @keyframes float { 0%,100%{transform:translateY(0);} 50%{transform:translateY(-20px);} }
+        .btn-sec { background: rgba(120,120,128,0.12); color: var(--ios-blue); padding: 16px; border-radius: 14px; font-weight: 600; width: 100%; }
 
-        #details-section { max-width: 1200px; margin: 0 auto; padding: 50px 20px; position: relative; z-index: 2; background: transparent; }
-        .detail-block { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; margin-bottom: 150px; align-items: center; }
-        .detail-block.reverse { direction: rtl; } .detail-block.reverse > * { direction: ltr; }
-        .detail-text { padding: 40px; background: var(--glass-bg); border-radius: 30px; border: 1px solid var(--glass-border); backdrop-filter: blur(20px); }
-        .detail-text h2 { color: var(--primary); margin-bottom: 20px; font-size: 2.5rem; font-weight: 700; }
-        .detail-text p { font-size: 1.1rem; line-height: 1.8; color: var(--text-sub); }
-        .detail-img-box { height: 400px; border-radius: 30px; overflow: hidden; border: 1px solid var(--glass-border); transform: rotate(-2deg); transition: 0.5s; }
-        .detail-block.reverse .detail-img-box { transform: rotate(2deg); }
-        .detail-img-box:hover { transform: rotate(0) scale(1.02); }
-        .detail-img { width: 100%; height: 100%; object-fit: cover; }
-
-        /* --- APP WIZARD --- */
-        #app-section { display: none; min-height: 100vh; flex-direction: column; align-items: center; padding-top: 100px; opacity: 0; transition: opacity 0.8s; width: 100%; padding-bottom: 50px; }
-        .wizard-box {
-            width: 100%; max-width: 800px;
-            background: var(--glass-bg); backdrop-filter: var(--glass-blur); 
-            border: 1px solid var(--glass-border); border-radius: 30px;
-            padding: 40px; box-shadow: 0 25px 50px rgba(0,0,0,0.3);
-            position: relative; overflow: visible;
-        }
+        /* WIZARD & INPUTS */
+        #app-section { display: none; padding-top: 80px; min-height: 100vh; flex-direction: column; align-items: center; opacity: 0; transition: opacity 0.5s; padding-bottom: 100px; }
+        .wizard-container { width: 100%; max-width: 600px; padding: 0 20px; }
         
-        .progress-bar { width: 100%; height: 4px; background: rgba(255,255,255,0.1); border-radius: 2px; margin-bottom: 40px; overflow: hidden; }
-        .progress-fill { height: 100%; background: var(--primary); width: 33%; transition: width 0.5s ease; box-shadow: 0 0 15px var(--primary); }
-        
-        .step { display: none; animation: slideUp 0.4s ease forwards; }
+        .progress-dots { display: flex; justify-content: center; gap: 8px; margin-bottom: 30px; }
+        .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--ios-separator); transition: 0.3s; }
+        .dot.active { background: var(--ios-blue); transform: scale(1.2); }
+
+        .step { display: none; animation: slideUpFade 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
         .step.active { display: block; }
-        @keyframes slideUp { from {opacity:0; transform:translateY(20px);} to {opacity:1; transform:translateY(0);} }
+        @keyframes slideUpFade { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
-        .input-group { margin-bottom: 25px; position: relative; }
-        label { display: block; margin-bottom: 10px; font-weight: 600; font-size: 0.9rem; color: var(--text-sub); text-transform: uppercase; letter-spacing: 1px; font-family: 'Poppins', sans-serif;}
+        .ios-list { background: var(--ios-card); border-radius: 12px; overflow: hidden; box-shadow: var(--shadow-sm); margin-bottom: 25px; }
+        .ios-item { display: flex; align-items: center; padding: 16px 20px; border-bottom: 0.5px solid var(--ios-separator); transition: background 0.2s; }
+        .ios-item:active { background: rgba(0,0,0,0.03); }
+        .ios-item:last-child { border-bottom: none; }
+        .ios-item i { font-size: 1.4rem; color: var(--ios-blue); margin-right: 15px; width: 24px; text-align: center; }
+        .ios-content { flex: 1; }
         
-        input, select { 
-            width: 100%; padding: 18px 18px 18px 45px; border-radius: 14px; border: 1px solid var(--glass-border); 
-            background: var(--input-bg); color: var(--text-main); font-size: 1.1rem; outline: none; transition: 0.3s;
-            box-sizing: border-box; font-family: 'Inter', sans-serif;
+        input, select { width: 100%; border: none; background: transparent; font-size: 1.1rem; color: var(--ios-text); font-family: inherit; outline: none; padding: 0; margin-top: 2px; }
+        label { font-size: 0.75rem; color: var(--ios-text-sec); font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase; }
+
+        /* SUGGESTIONS */
+        .suggestions { background: var(--ios-card); border-radius: 12px; margin-top: 8px; max-height: 200px; overflow-y: auto; display: none; box-shadow: var(--shadow-float); position: absolute; width: calc(100% - 40px); z-index: 100; border: 0.5px solid var(--ios-separator); }
+        .s-item { padding: 14px 20px; border-bottom: 0.5px solid var(--ios-separator); font-size: 1rem; }
+        .s-item:last-child { border-bottom: none; }
+        .s-item:active { background: var(--ios-bg); }
+
+        /* RESULTS & WIDGETS */
+        #results-container { width: 100%; max-width: 1000px; display: none; padding: 0 20px 40px 20px; }
+        .widget-row { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px; }
+        
+        .glass-card {
+            background: var(--ios-card); padding: 20px; border-radius: 18px;
+            box-shadow: var(--shadow-sm); display: flex; flex-direction: column; justify-content: space-between;
+            border: 1px solid rgba(0,0,0,0.03);
         }
-        input:focus { border-color: var(--primary); background: rgba(255,255,255,0.08); }
         
-        /* STATE STYLES */
-        input.locked { border-color: var(--accent); color: var(--accent); font-weight: 700; cursor: not-allowed; opacity: 1; background: rgba(176, 251, 93, 0.05); }
-        input.warning { border-color: var(--warning); color: var(--warning); font-weight: 700; background: rgba(255, 171, 0, 0.05); cursor: not-allowed; }
+        .weather-widget { 
+            background: linear-gradient(135deg, #5AC8FA, #007AFF); color: white; 
+            border: none; position: relative; overflow: hidden;
+        }
+        .weather-icon { font-size: 2.5rem; margin-bottom: 5px; }
+        .weather-bg { position: absolute; top:-20px; right:-20px; font-size: 8rem; opacity: 0.2; transform: rotate(10deg); pointer-events: none; }
 
-        .input-icon { position: absolute; left: 15px; top: 48px; font-size: 1.2rem; color: var(--text-sub); }
-        .clear-icon { position: absolute; right: 15px; top: 48px; font-size: 1.4rem; color: var(--text-sub); cursor: pointer; display: none; transition: 0.2s; z-index: 50; }
-        .clear-icon:hover { color: var(--danger); transform: scale(1.1); }
+        .map-wrapper { height: 300px; border-radius: 18px; overflow: hidden; margin-bottom: 25px; box-shadow: var(--shadow-sm); z-index: 1; position: relative; }
+        
+        /* CAR CARDS */
+        .car-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
+        .car-card {
+            background: var(--ios-card); border-radius: 18px; overflow: hidden;
+            box-shadow: var(--shadow-sm); transition: 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            position: relative; border: 1px solid transparent;
+        }
+        .car-card:active { transform: scale(0.97); }
+        .car-img-box { height: 160px; overflow: hidden; position: relative; }
+        .car-img { width: 100%; height: 100%; object-fit: cover; transition: 0.5s; }
+        .car-card:hover .car-img { transform: scale(1.05); }
+        
+        .badge-rec {
+            position: absolute; top: 10px; right: 10px; background: rgba(255,255,255,0.9);
+            color: var(--ios-blue); font-size: 0.7rem; font-weight: 700; padding: 4px 10px;
+            border-radius: 20px; backdrop-filter: blur(10px); box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            display: flex; align-items: center; gap: 4px;
+        }
 
-        .suggestions { position: absolute; top: 105%; left: 0; width: 100%; background: #1a1a1a; border: 1px solid var(--primary); border-radius: 12px; z-index: 100; max-height: 250px; overflow-y: auto; display: none; }
-        .s-item { padding: 15px; cursor: pointer; color: #fff; border-bottom: 1px solid #333; }
-        .s-item:hover { background: var(--primary); color: #000; }
-        .s-pop { color: var(--accent); font-size: 0.8rem; margin-bottom: 5px; text-transform: uppercase; padding-left: 15px; padding-top: 10px; }
+        /* SKELETON LOADING */
+        .skeleton { background: linear-gradient(90deg, var(--ios-bg) 25%, rgba(200,200,200,0.1) 50%, var(--ios-bg) 75%); background-size: 200% 100%; animation: loading 1.5s infinite; border-radius: 8px; color: transparent !important; }
+        @keyframes loading { 0% {background-position: 200% 0;} 100% {background-position: -200% 0;} }
 
-        .btn-row { display: flex; gap: 15px; margin-top: 40px; }
-        .btn-sec { flex: 1; background: transparent; border: 1px solid var(--glass-border); color: var(--text-sub); padding: 16px; border-radius: 50px; cursor: pointer; transition:0.2s; font-weight:600; }
-        .btn-sec:hover { border-color: #fff; color: #fff; }
-        .btn-pri { flex: 2; background: var(--primary); color: #fff; border:none; padding: 16px; border-radius: 50px; font-weight: 700; cursor: pointer; transition:0.2s; box-shadow: 0 5px 20px rgba(41, 151, 255, 0.3); }
-        .btn-pri:hover { transform: translateY(-2px); filter: brightness(1.1); }
+        /* MODAL */
+        #modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+            z-index: 3000; display: none; align-items: flex-end; justify-content: center;
+            opacity: 0; transition: opacity 0.3s;
+        }
+        .sheet-modal {
+            background: var(--ios-card); width: 100%; max-width: 600px;
+            border-radius: 30px 30px 0 0; padding: 30px; padding-bottom: max(30px, env(safe-area-inset-bottom));
+            transform: translateY(100%); transition: transform 0.4s cubic-bezier(0.19, 1, 0.22, 1);
+        }
+        .sheet-handle { width: 40px; height: 5px; background: var(--ios-separator); border-radius: 10px; margin: 0 auto 25px auto; }
+        
+        /* Dark Mode Toggle Fancy */
+        .theme-tog { width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: rgba(120,120,128,0.15); transition: 0.3s; cursor: pointer; }
+        .theme-tog:active { transform: rotate(15deg) scale(0.9); }
 
-        /* RESULTS */
-        #results-container { width: 100%; max-width: 1200px; display: none; opacity: 0; transition: 0.5s; padding-bottom: 50px; }
-        .trip-card { background: var(--glass-bg); padding: 30px; border-radius: 24px; border: 1px solid var(--glass-border); margin-bottom: 30px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; text-align: center; }
-        .t-val { font-size: 1.5rem; font-weight: 800; color: var(--text-main); }
-        .t-lbl { font-size: 0.8rem; text-transform: uppercase; color: var(--text-sub); }
-        .map-box { height: 450px; border-radius: 24px; overflow: hidden; margin-bottom: 40px; border: 1px solid var(--glass-border); position: relative; z-index: 1; box-shadow: 0 20px 40px rgba(0,0,0,0.3); }
-        #map { width: 100%; height: 100%; }
-        .cards-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; }
-        .car-card { background: var(--card-bg); border: 1px solid var(--glass-border); border-radius: 24px; overflow: hidden; transition: 0.4s; position: relative; cursor: pointer; display: flex; flex-direction: column; }
-        .car-card:hover { transform: translateY(-10px); border-color: var(--primary); box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4); }
-        .car-img { width: 100%; height: 200px; object-fit: cover; }
-        .car-content { padding: 25px; color: var(--text-main); flex-grow: 1; display: flex; flex-direction: column; }
-        .car-title { font-size: 1.4rem; font-weight: 700; margin-bottom: 5px; color: #fff; }
-        .car-price { color: var(--primary); font-weight: 700; font-size: 1.1rem; display: block; margin-bottom: 15px; }
-        .spec-row { display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 0.9rem; border-bottom: 1px solid var(--glass-border); padding-bottom: 10px; color: var(--text-sub); }
-        .action-btn { margin-top: auto; padding: 12px; border: 1px solid var(--glass-border); background: transparent; color: #fff; border-radius: 12px; cursor: pointer; transition: 0.2s; font-weight: 600; width: 100%; }
-        .action-btn:hover { background: var(--primary); border-color: var(--primary); }
-        .market-bar { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 40px; }
-        .market-item { background: var(--input-bg); padding: 15px; border-radius: 15px; text-align: center; border: 1px solid var(--glass-border); }
-        .m-price { font-size: 1.5rem; font-weight: 700; color: var(--text-main); }
-        .m-lbl { font-size: 0.7rem; text-transform: uppercase; color: var(--text-sub); margin-bottom: 5px;}
-
-        #loader { position: fixed; top:0; left:0; width:100%; height:100%; background:var(--bg-dark); z-index:2000; display:none; flex-direction:column; align-items:center; justify-content:center; }
-        .spinner { width: 50px; height: 50px; border: 4px solid var(--glass-border); border-top-color: var(--primary); border-radius: 50%; animation: spin 1s infinite linear; }
-        @keyframes spin { to {transform: rotate(360deg);} }
-
-        #modal-overlay { position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); z-index:3000; display:none; justify-content:center; align-items:center; backdrop-filter:blur(10px); }
-        .modal-content { background: #1a1a1a; padding: 40px; border-radius: 24px; max-width: 500px; width: 90%; border: 1px solid var(--glass-border); position: relative; color: #fff; }
-
-        @media(max-width: 768px) { .hero-title {font-size: 3.5rem;} .detail-block, .trip-card { grid-template-columns: 1fr; } .btn-row { flex-direction: column-reverse; } .feature-card { display: none; } }
     </style>
 </head>
 <body>
 
-    <canvas id="warp-canvas"></canvas>
-    <div class="bg-overlay"></div>
-
     <nav class="nav-bar">
-        <div class="logo" onclick="location.reload()">AUTOMATCH 🇮🇹</div>
-        <div class="nav-controls">
-            <div class="icon-btn" onclick="document.body.classList.toggle('light-mode')"><i class="ph ph-sun"></i></div>
+        <div class="logo" onclick="haptic(); location.reload()" style="font-weight: 700; font-size: 1.2rem; display: flex; align-items: center; gap: 6px;">
+            <i class="ph-fill ph-steering-wheel" style="color:var(--ios-blue); font-size:1.6rem;"></i>
+            <span>AutoMatch</span>
+        </div>
+        <div class="theme-tog" onclick="haptic(); document.body.classList.toggle('dark-mode')">
+            <i class="ph-fill ph-moon-stars" style="font-size: 1.2rem;"></i>
         </div>
     </nav>
 
-    <div id="landing-page">
-        <section id="home-section">
-            <div class="float-card fc-1"><div class="fc-icon"><i class="ph ph-wallet"></i></div><b>Risparmio</b><br><small>Analisi costi reali.</small></div>
-            <div class="float-card fc-2"><div class="fc-icon"><i class="ph ph-map-trifold"></i></div><b>Viaggi</b><br><small>Pianifica ricariche.</small></div>
-            <div class="float-card fc-3"><div class="fc-icon"><i class="ph ph-lightning"></i></div><b>Elettrico</b><br><small>Il futuro è oggi.</small></div>
-            <div class="float-card fc-4"><div class="fc-icon"><i class="ph ph-chart-bar"></i></div><b>Dati</b><br><small>Statistiche precise.</small></div>
-            <div class="float-card fc-5"><div class="fc-icon"><i class="ph ph-globe"></i></div><b>Eco</b><br><small>Scelta sostenibile.</small></div>
-            <h1 class="hero-title">GUIDA IL<br><span style="color:var(--primary)">FUTURO.</span></h1>
-            <p class="hero-sub">Piattaforma intelligente per la scelta del tuo veicolo. <br>Calcola i costi reali e trova l'auto perfetta.</p>
-            <button class="btn-main" onclick="goToApp()">INIZIA CONFIGURAZIONE <i class="ph-bold ph-arrow-right"></i></button>
-        </section>
-        <section id="details-section">
-            <div class="detail-block"><div class="detail-text"><h2>Analisi Costi Reale</h2><p>AutoMatch calcola il costo totale di possesso (TCO) basandosi sul tuo utilizzo reale.</p></div><div class="detail-img-box"><img src="https://images.unsplash.com/photo-1593941707882-a5bba14938c7?q=80&w=1000&auto=format&fit=crop" class="detail-img"></div></div>
-            <div class="detail-block reverse"><div class="detail-text"><h2>Mappa Ricarica</h2><p>Pianifica i tuoi viaggi lunghi e visualizza immediatamente le stazioni di ricarica compatibili.</p></div><div class="detail-img-box"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c2/Plug_in_hybrid_charging.jpg/800px-Plug_in_hybrid_charging.jpg" class="detail-img"></div></div>
-        </section>
+    <div id="landing-page" style="padding-top:100px; text-align:center; padding-bottom: 40px;">
+        <div style="max-width:800px; margin:0 auto; padding:20px;">
+            <span style="color:var(--ios-blue); font-weight:700; letter-spacing:1px; font-size:0.8rem; text-transform:uppercase; margin-bottom:15px; display:block;">Pianificatore Intelligente</span>
+            <h1 style="font-size:3rem; line-height:1.1; margin-bottom:20px;">Viaggia meglio.<br>Spendi meno.</h1>
+            <p style="color:var(--ios-text-sec); font-size:1.2rem; margin-bottom:40px; max-width: 500px; margin-left:auto; margin-right:auto;">
+                Calcola il costo reale del tuo viaggio, controlla il meteo e confronta le auto migliori.
+            </p>
+            <button class="btn-main" onclick="haptic(); goToApp()">Inizia Configurazione</button>
+            
+            <div style="display:flex; justify-content:center; gap:30px; margin-top:60px; opacity:0.6;">
+                <div style="text-align:center;"><i class="ph ph-map-pin" style="font-size:2rem; margin-bottom:10px;"></i><br><small>Route</small></div>
+                <div style="text-align:center;"><i class="ph ph-lightning" style="font-size:2rem; margin-bottom:10px;"></i><br><small>Energy</small></div>
+                <div style="text-align:center;"><i class="ph ph-coins" style="font-size:2rem; margin-bottom:10px;"></i><br><small>Cost</small></div>
+            </div>
+        </div>
     </div>
 
     <section id="app-section">
-        <div class="wizard-box" id="wizard-box">
-            <div class="progress-bar"><div class="progress-fill" id="p-bar"></div></div>
-            <div class="step active" id="step-1">
-                <h2>Il tuo Viaggio 🇮🇹</h2>
-                <div class="input-group">
-                    <label>📍 Partenza</label>
-                    <i class="ph ph-map-pin input-icon"></i>
-                    <input type="text" id="originInput" placeholder="Città..." autocomplete="off"><div id="list-origin" class="suggestions"></div>
-                </div>
-                <div class="input-group">
-                    <label>🏁 Destinazione (Opzionale)</label>
-                    <i class="ph ph-flag input-icon"></i>
-                    <i class="ph-bold ph-x clear-icon" id="clearDest" onclick="clearDestination()"></i>
-                    <input type="text" id="destInput" placeholder="Seleziona..." autocomplete="off"><div id="list-dest" class="suggestions"></div>
-                </div>
-                <div class="btn-row"><span></span><button class="btn-pri" onclick="validateStep1()">Avanti <i class="ph-bold ph-caret-right"></i></button></div>
+        <div class="wizard-container" id="wizard-box">
+            
+            <div class="progress-dots">
+                <div class="dot active" id="d1"></div><div class="dot" id="d2"></div><div class="dot" id="d3"></div>
             </div>
+            
+            <div class="step active" id="step-1">
+                <h2>Il tuo Viaggio</h2>
+                <p>Da dove parti e dove vuoi andare?</p>
+                
+                <div class="ios-list">
+                    <div class="ios-item">
+                        <i class="ph-fill ph-navigation-arrow"></i>
+                        <div class="ios-content">
+                            <label>Partenza</label>
+                            <input type="text" id="originInput" placeholder="Città..." autocomplete="off">
+                        </div>
+                    </div>
+                    <div class="ios-item">
+                        <i class="ph-fill ph-flag-checkered"></i>
+                        <div class="ios-content">
+                            <label>Destinazione</label>
+                            <input type="text" id="destInput" placeholder="Città..." autocomplete="off">
+                        </div>
+                        <i class="ph-bold ph-x-circle" id="clearDest" onclick="haptic(); clearDestination()" style="display:none; color:var(--ios-text-sec); cursor:pointer;"></i>
+                    </div>
+                </div>
+                <div id="list-origin" class="suggestions"></div>
+                <div id="list-dest" class="suggestions"></div>
+
+                <button class="btn-pri" onclick="haptic(); validateStep1()">Avanti</button>
+            </div>
+
             <div class="step" id="step-2">
                 <h2>Abitudini</h2>
-                <p id="km-desc" style="color:var(--text-sub); margin-bottom:20px; font-size:0.9rem;">Definisci l'uso del veicolo.</p>
-                <div class="input-group">
-                    <label id="lbl-km">🛣️ Km Previsti</label>
-                    <i class="ph ph-road-horizon input-icon"></i>
-                    <input type="number" id="kmInput" placeholder="Es. 50">
-                    <small id="km-msg" style="display:none; margin-top:8px; font-weight:700;"></small>
+                <p>Dettagli per una stima precisa.</p>
+
+                <div class="ios-list">
+                    <div class="ios-item">
+                        <i class="ph-fill ph-road-horizon"></i>
+                        <div class="ios-content">
+                            <label>Distanza (KM)</label>
+                            <input type="number" id="kmInput" placeholder="--">
+                            <small id="km-msg" style="display:none; font-weight:600; margin-top:5px;"></small>
+                        </div>
+                    </div>
+                    <div class="ios-item">
+                        <i class="ph-fill ph-house-line"></i>
+                        <div class="ios-content">
+                            <label>Hai un garage?</label>
+                            <select id="chargingInput">
+                                <option value="no">No, ricarica pubblica</option>
+                                <option value="yes">Sì, ricarica domestica</option>
+                            </select>
+                        </div>
+                    </div>
                 </div>
-                <div class="input-group">
-                    <label>⚡ Ricarica</label>
-                    <select id="chargingInput"><option value="no">Solo Pubblica</option><option value="yes">Box Privato</option></select>
+
+                <div style="display: flex; gap: 15px;">
+                    <button class="btn-sec" onclick="haptic(); prevStep(1)">Indietro</button>
+                    <button class="btn-pri" onclick="haptic(); nextStep(3)">Avanti</button>
                 </div>
-                <div class="btn-row"><button class="btn-sec" onclick="prevStep(1)">Indietro</button><button class="btn-pri" onclick="nextStep(3)">Avanti <i class="ph-bold ph-caret-right"></i></button></div>
             </div>
+
             <div class="step" id="step-3">
-                <h2>Investimento</h2>
-                <div class="input-group">
-                    <label>💰 Budget (€)</label>
-                    <i class="ph ph-currency-eur input-icon"></i>
-                    <input type="number" id="budgetInput" placeholder="35000" value="35000">
+                <h2>Budget</h2>
+                <p>Quanto vuoi spendere per l'auto?</p>
+
+                <div class="ios-list">
+                    <div class="ios-item">
+                        <i class="ph-fill ph-wallet"></i>
+                        <div class="ios-content">
+                            <label>Budget (€)</label>
+                            <input type="number" id="budgetInput" value="35000">
+                        </div>
+                    </div>
                 </div>
-                <div class="btn-row"><button class="btn-sec" onclick="prevStep(2)">Indietro</button><button class="btn-pri" style="background:var(--accent); color:#000;" onclick="runAnalysis()">Lancia Analisi 🚀</button></div>
+
+                <div style="display: flex; gap: 15px;">
+                    <button class="btn-sec" onclick="haptic(); prevStep(2)">Indietro</button>
+                    <button class="btn-pri" onclick="haptic(); runAnalysis()">Calcola Tutto</button>
+                </div>
             </div>
+        </div>
+
+        <div id="skeleton-loader" style="display:none; width:100%; max-width:800px; padding:20px;">
+            <div class="skeleton" style="height:300px; width:100%; margin-bottom:20px; border-radius:18px;"></div>
+            <div style="display:flex; gap:15px; margin-bottom:20px;">
+                <div class="skeleton" style="height:100px; flex:1; border-radius:18px;"></div>
+                <div class="skeleton" style="height:100px; flex:1; border-radius:18px;"></div>
+            </div>
+            <div class="skeleton" style="height:60px; width:100%; margin-bottom:10px; border-radius:12px;"></div>
         </div>
 
         <div id="results-container">
-            <div id="trip-details" class="trip-card">
-                <div><div class="t-lbl">Partenza</div><div class="t-val" id="t-start">--</div></div>
-                <div><div class="t-lbl">Arrivo</div><div class="t-val" id="t-end">--</div></div>
-                <div><div class="t-lbl">Distanza</div><div class="t-val" id="t-km">--</div></div>
-                <div><div class="t-lbl">Tempo</div><div class="t-val" id="t-time">--</div></div>
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+                <h2>Il tuo Viaggio</h2>
+                <button onclick="haptic(); location.reload()" style="background:var(--ios-separator); border:none; width:36px; height:36px; border-radius:50%; display:flex; align-items:center; justify-content:center;"><i class="ph-bold ph-arrow-counter-clockwise"></i></button>
             </div>
-            <div class="market-bar">
-                <div class="market-item"><div class="m-lbl">Benzina</div><div class="m-price" id="p-petrol">€0.00</div></div>
-                <div class="market-item"><div class="m-lbl">Diesel</div><div class="m-price" id="p-diesel">€0.00</div></div>
-                <div class="market-item"><div class="m-lbl">Elettrico</div><div class="m-price" id="p-ev">€0.00</div></div>
+            
+            <div class="map-wrapper" id="map-container">
+                <div id="map"></div>
             </div>
-            <div class="map-box" id="map-container"><div id="map"></div></div>
-            <h2 style="margin-bottom:20px; text-align:center;">Veicoli Consigliati</h2>
-            <div id="car-results" class="cards-grid"></div>
-            <button class="btn-sec" onclick="location.reload()" style="margin: 40px auto; width: 200px; display:block;">Nuova Ricerca</button>
+
+            <div class="widget-row">
+                <div class="glass-card">
+                    <label>Distanza</label>
+                    <div style="font-size:1.8rem; font-weight:700;" id="t-km">--</div>
+                    <small style="color:var(--ios-text-sec);" id="t-start-end">--</small>
+                </div>
+                <div class="glass-card weather-widget" id="weather-box">
+                    <i class="ph-fill ph-cloud-sun weather-bg"></i>
+                    <div>
+                        <label style="color:rgba(255,255,255,0.8);">Meteo Arrivo</label>
+                        <div id="w-temp" style="font-size:2rem; font-weight:700;">--°</div>
+                    </div>
+                    <div style="display:flex; align-items:center; gap:5px; font-size:0.9rem;">
+                        <i class="ph-fill ph-thermometer" id="w-icon"></i> <span id="w-desc">Loading...</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="ios-list" style="padding: 10px 0;">
+                <div class="ios-item" style="border:none;">
+                    <div class="ios-content"><span style="font-weight:600;">Benzina</span></div>
+                    <div style="font-weight:700;" id="p-petrol">€0.00</div>
+                </div>
+                <div class="ios-item" style="border:none;">
+                    <div class="ios-content"><span style="font-weight:600; color:var(--ios-blue);">Elettrico</span></div>
+                    <div style="font-weight:700; color:var(--ios-blue);" id="p-ev">€0.00</div>
+                </div>
+            </div>
+
+            <h3 style="margin: 30px 0 15px 0;">Veicoli Suggeriti</h3>
+            <div id="car-results" class="car-grid"></div>
         </div>
     </section>
 
-    <div id="loader"><div class="spinner"></div><p style="margin-top:20px; color:var(--primary);">ELABORAZIONE...</p></div>
-    <div id="modal-overlay"><div class="modal-content"><span style="position:absolute; top:20px; right:20px; font-size:2rem; cursor:pointer;" onclick="document.getElementById('modal-overlay').style.display='none'">&times;</span><h2 id="m-title">Title</h2><div style="margin-top:20px; line-height:1.6; color:#ccc;"><div style="display:flex; justify-content:space-between; border-bottom:1px solid #333; padding:10px 0;"><span>Carburante:</span> <b id="m-fuel" style="color:#fff">--</b></div><div style="display:flex; justify-content:space-between; border-bottom:1px solid #333; padding:10px 0;"><span>Manutenzione:</span> <b id="m-maint" style="color:#fff">--</b></div><div style="display:flex; justify-content:space-between; padding-top:15px; font-size:1.2rem;"><span>Totale:</span> <b id="m-total" style="color:var(--success)">--</b></div></div></div></div>
+    <div id="modal-overlay" onclick="closeModal(event)">
+        <div class="sheet-modal" id="sheet-content">
+            <div class="sheet-handle"></div>
+            <div style="display:flex; justify-content:space-between; align-items:start; margin-bottom:20px;">
+                <div>
+                    <span style="font-size:0.8rem; color:var(--ios-text-sec); text-transform:uppercase; letter-spacing:1px;" id="m-brand">BRAND</span>
+                    <h2 id="m-title" style="margin:0; font-size:1.8rem;">Model</h2>
+                </div>
+                <span id="m-price-tag" style="background:var(--ios-bg); padding:5px 10px; border-radius:10px; font-weight:600; font-size:0.9rem;">€0</span>
+            </div>
+            
+            <div class="ios-list">
+                <div class="ios-item">
+                    <div class="ios-content">Costo Carburante (Viaggio)</div>
+                    <b id="m-fuel">--</b>
+                </div>
+                <div class="ios-item" id="savings-row" style="display:none; background:rgba(52, 199, 89, 0.1);">
+                    <div class="ios-content" style="color:var(--ios-green); font-weight:600;">Risparmio vs Benzina</div>
+                    <b id="m-savings" style="color:var(--ios-green)">--</b>
+                </div>
+            </div>
+
+            <div style="background:var(--ios-bg); padding:20px; border-radius:18px; margin-bottom:20px;">
+                <label>Stima Totale (Carburante + Usura)</label>
+                <div id="m-total" style="font-size:2rem; font-weight:700; color:var(--ios-text);">--</div>
+            </div>
+            
+            <button class="btn-pri" onclick="haptic(); forceCloseModal()">Chiudi Scheda</button>
+        </div>
+    </div>
 
     <script>
-        // GLOBALS
-        window.startCoords = null; window.endCoords = null; window.calculatedKm = 0; window.routeDataGlobal = null; window.isEstimate = false;
-        const POPULAR_CITIES = ["Roma", "Milano", "Napoli", "Torino", "Palermo", "Genova", "Bologna", "Firenze"];
-        const CARS_DB = [{ brand: "Tesla", model: "Model 3", price: 42990, type: "Elettrica", range: 513, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/8/82/2019_Tesla_Model_3_Long_Range_AWD_Front.jpg/800px-2019_Tesla_Model_3_Long_Range_AWD_Front.jpg" }, { brand: "Fiat", model: "500e", price: 29950, type: "Elettrica", range: 320, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7f/Fiat_500_Electric_La_Prima_Genf_2020_1X7A5372.jpg/800px-Fiat_500_Electric_La_Prima_Genf_2020_1X7A5372.jpg" }, { brand: "VW", model: "Golf 8", price: 34500, type: "Diesel", range: 1100, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c9/2020_Volkswagen_Golf_Style_2.0_Front.jpg/800px-2020_Volkswagen_Golf_Style_2.0_Front.jpg" }, { brand: "Jeep", model: "Avenger", price: 26300, type: "Benzina", range: 700, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/2/27/Jeep_Avenger_1.2_Turbo_Summit_%E2%80%93_f_%E2%80%93_16042023.jpg/800px-Jeep_Avenger_1.2_Turbo_Summit_%E2%80%93_f_%E2%80%93_16042023.jpg" }, { brand: "MG", model: "MG4", price: 30790, type: "Elettrica", range: 350, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/6/64/MG4_EV_Dabok.jpg/800px-MG4_EV_Dabok.jpg" }];
-        const BASE_PRICES = { petrol: 1.84, diesel: 1.71, kwh_public: 0.58, kwh_home: 0.25 }; const CONSUMPTION = { ev: 16, diesel: 5.5, petrol: 7.0 }; const FALLBACK_IMG = "https://placehold.co/600x400/222/FFF?text=Auto";
+        // --- LOGICA CORE ---
+        window.startCoords = null; window.endCoords = null; window.calculatedKm = 0; window.routeDataGlobal = null; 
+        const POPULAR_CITIES = ["Roma", "Milano", "Napoli", "Torino", "Bologna", "Firenze", "Venezia", "Bari"];
+        const BASE_PRICES = { petrol: 1.84, diesel: 1.71, kwh_public: 0.58, kwh_home: 0.25 };
+        const CARS_DB = [
+            { brand: "Tesla", model: "Model 3", price: 42990, type: "Elettrica", img: "https://upload.wikimedia.org/wikipedia/commons/thumb/9/91/2018_Tesla_Model_3_Performance_AWD_Front.jpg/800px-2018_Tesla_Model_3_Performance_AWD_Front.jpg" },
+            { brand: "Fiat", model: "500e", price: 29950, type: "Elettrica", img: "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7f/Fiat_500_Electric_La_Prima_Genf_2020_1X7A5372.jpg/800px-Fiat_500_Electric_La_Prima_Genf_2020_1X7A5372.jpg" },
+            { brand: "Volkswagen", model: "Golf 8", price: 34500, type: "Diesel", img: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c9/2020_Volkswagen_Golf_Style_2.0_Front.jpg/800px-2020_Volkswagen_Golf_Style_2.0_Front.jpg" },
+            { brand: "Jeep", model: "Avenger", price: 24300, type: "Benzina", img: "https://upload.wikimedia.org/wikipedia/commons/thumb/2/27/Jeep_Avenger_1.2_Turbo_Summit_%E2%80%93_f_%E2%80%93_16042023.jpg/800px-Jeep_Avenger_1.2_Turbo_Summit_%E2%80%93_f_%E2%80%93_16042023.jpg" },
+            { brand: "MG", model: "MG4", price: 30790, type: "Elettrica", img: "https://upload.wikimedia.org/wikipedia/commons/thumb/6/64/MG4_EV_Dabok.jpg/800px-MG4_EV_Dabok.jpg" },
+            { brand: "Dacia", model: "Spring", price: 21000, type: "Elettrica", img: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/53/Dacia_Spring_2022.jpg/800px-Dacia_Spring_2022.jpg" }
+        ];
+
+        // HAPTIC FEEDBACK HELPER
+        function haptic() { if(navigator.vibrate) navigator.vibrate(12); }
+
+        // MAP SETUP
         let map, markersLayer, routeLayer;
-
-        const canvas = document.getElementById('warp-canvas'); const ctx = canvas.getContext('2d'); let w, h, stars = [];
-        const initStars = () => { w = canvas.width = window.innerWidth; h = canvas.height = window.innerHeight; stars = Array(150).fill().map(() => ({x: Math.random()*w, y: Math.random()*h, z: Math.random()*w})); };
-        const drawStars = () => { ctx.clearRect(0,0,w,h); ctx.fillStyle = '#888'; stars.forEach(s => { s.z -= 5; if(s.z<=0) s.z=w; let x = (s.x-w/2)*(w/s.z)*2 + w/2; let y = (s.y-h/2)*(w/s.z)*2 + h/2; if(x>0 && x<w && y>0 && y<h) ctx.fillRect(x,y,2,2); }); requestAnimationFrame(drawStars); };
-        window.addEventListener('resize', initStars); initStars(); drawStars();
-
         window.onload = function() {
-            map = L.map('map').setView([41.9, 12.5], 5); L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: 'OSM' }).addTo(map); markersLayer = L.layerGroup().addTo(map); routeLayer = L.layerGroup().addTo(map);
+            map = L.map('map', {zoomControl: false, dragging: !L.Browser.mobile, tap: !L.Browser.mobile}).setView([41.9, 12.5], 5);
+            L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', { attribution: '' }).addTo(map);
+            markersLayer = L.layerGroup().addTo(map); routeLayer = L.layerGroup().addTo(map);
             initAutocomplete('originInput', 'list-origin', true); initAutocomplete('destInput', 'list-dest', false);
-            document.getElementById('destInput').addEventListener('input', function() { document.getElementById('clearDest').style.display = this.value.length > 0 ? 'block' : 'none'; });
+            
+            // Check dest input clear button
+            document.getElementById('destInput').addEventListener('input', function() { 
+                document.getElementById('clearDest').style.display = this.value.length > 0 ? 'block' : 'none'; 
+            });
         };
 
-        function goToApp() { document.getElementById('landing-page').style.opacity = '0'; setTimeout(() => { document.getElementById('landing-page').style.display = 'none'; document.getElementById('app-section').style.display = 'flex'; setTimeout(() => document.getElementById('app-section').style.opacity = '1', 50); map.invalidateSize(); }, 500); }
-        function goToHome() { location.reload(); }
-        function toggleTheme() { document.body.classList.toggle('light-mode'); }
-        function nextStep(step) { document.querySelectorAll('.step').forEach(s => s.classList.remove('active')); document.getElementById(`step-${step}`).classList.add('active'); document.getElementById('p-bar').style.width = step === 1 ? '33%' : step === 2 ? '66%' : '100%'; }
+        // NAVIGATION
+        function goToApp() {
+            document.getElementById('landing-page').style.opacity = '0';
+            setTimeout(() => {
+                document.getElementById('landing-page').style.display = 'none';
+                document.getElementById('app-section').style.display = 'flex';
+                setTimeout(() => document.getElementById('app-section').style.opacity = '1', 50);
+                map.invalidateSize();
+            }, 400);
+        }
+
+        function updateDots(step) {
+            [1,2,3].forEach(i => document.getElementById(`d${i}`).classList.remove('active'));
+            document.getElementById(`d${step}`).classList.add('active');
+        }
+
+        function nextStep(step) {
+            document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+            document.getElementById(`step-${step}`).classList.add('active');
+            updateDots(step);
+        }
         function prevStep(step) { nextStep(step); }
 
+        // INPUT LOGIC
         function clearDestination() {
             document.getElementById('destInput').value = ''; document.getElementById('clearDest').style.display = 'none';
-            window.endCoords = null; window.routeDataGlobal = null; window.calculatedKm = 0; window.isEstimate = false;
-            const kmInput = document.getElementById('kmInput'); kmInput.value = ''; kmInput.className = ''; kmInput.removeAttribute('readonly'); 
+            window.endCoords = null; window.routeDataGlobal = null; window.calculatedKm = 0;
+            const kmInput = document.getElementById('kmInput'); 
+            kmInput.value = ''; kmInput.classList.remove('locked', 'warning'); kmInput.removeAttribute('readonly');
             document.getElementById('km-msg').style.display = 'none';
         }
 
         async function validateStep1() {
-            const origin = document.getElementById('originInput').value; const dest = document.getElementById('destInput').value; const kmInput = document.getElementById('kmInput'); const kmMsg = document.getElementById('km-msg');
-            if(!origin) return alert("Inserisci la partenza!");
-            document.getElementById('loader').style.display='flex';
-            if(!window.startCoords) window.startCoords = await resolveCity(origin);
-            if(!window.startCoords) { alert("Partenza non valida!"); document.getElementById('loader').style.display='none'; return; }
+            const originInp = document.getElementById('originInput');
+            const destInp = document.getElementById('destInput');
             
-            if(dest.trim() !== "") {
-                if(!window.endCoords) window.endCoords = await resolveCity(dest);
-                if(!window.endCoords) { alert("Destinazione non trovata!"); document.getElementById('loader').style.display='none'; return; }
-                
-                // TRY REAL ROUTE
-                let routeData = null;
-                try { routeData = await fetchRoute(window.startCoords, window.endCoords); } catch(e){}
+            if(!originInp.value) { originInp.parentElement.parentElement.classList.add('input-error'); setTimeout(()=>originInp.parentElement.parentElement.classList.remove('input-error'),400); haptic(); return; }
 
-                if(routeData) {
-                    // SUCCESS: Real Route
-                    window.isEstimate = false;
-                    window.routeDataGlobal = routeData; 
-                    window.calculatedKm = Math.round(routeData.distance/1000);
-                    kmInput.className = 'locked'; 
-                    kmMsg.style.color = 'var(--accent)';
-                    kmMsg.innerHTML = `✅ Percorso Stradale Preciso rilevato`;
-                } else {
-                    // FAIL: Fallback Math
-                    window.isEstimate = true;
-                    const distMath = getDistanceFromLatLonInKm(window.startCoords.lat, window.startCoords.lon, window.endCoords.lat, window.endCoords.lon);
-                    window.calculatedKm = Math.round(distMath);
-                    window.routeDataGlobal = null; // No geojson
-                    
-                    kmInput.className = 'warning'; // Orange style
-                    kmMsg.style.color = 'var(--warning)';
-                    kmMsg.innerHTML = `⚠️ Server occupato: Distanza stimata in linea d'aria (+30%)`;
+            // Show mini loading on button? For now just await
+            if(!window.startCoords) window.startCoords = await resolveCity(originInp.value);
+            if(!window.startCoords) { alert("Città di partenza non trovata!"); return; }
+
+            if(destInp.value.trim() !== "") {
+                if(!window.endCoords) window.endCoords = await resolveCity(destInp.value);
+                if(window.endCoords) {
+                    // Fetch Route
+                    try { window.routeDataGlobal = await fetchRoute(window.startCoords, window.endCoords); } catch(e){}
+                    const kmMsg = document.getElementById('km-msg');
+                    const kmInput = document.getElementById('kmInput');
+
+                    if(window.routeDataGlobal) {
+                        window.calculatedKm = Math.round(window.routeDataGlobal.distance/1000);
+                        kmInput.classList.add('locked'); kmMsg.style.color = 'var(--ios-green)'; kmMsg.innerText = "Percorso calcolato con precisione";
+                    } else {
+                        // Fallback Haversine
+                        window.calculatedKm = Math.round(getDistanceFromLatLonInKm(window.startCoords.lat, window.startCoords.lon, window.endCoords.lat, window.endCoords.lon));
+                        kmInput.classList.add('warning'); kmMsg.style.color = 'var(--ios-orange)'; kmMsg.innerText = "Stima linea d'aria (+30%)";
+                    }
+                    kmInput.value = window.calculatedKm; kmInput.setAttribute('readonly', true); kmMsg.style.display = 'block';
                 }
-
-                kmInput.value = window.calculatedKm;
-                kmInput.setAttribute('readonly', true);
-                kmMsg.style.display = 'block';
-
             } else {
                 clearDestination();
             }
-            document.getElementById('loader').style.display='none'; nextStep(2);
+            nextStep(2);
         }
 
-        // Haversine + 30% padding for road approximation
-        function getDistanceFromLatLonInKm(lat1,lon1,lat2,lon2) {
-            var R = 6371; var dLat = deg2rad(lat2-lat1); var dLon = deg2rad(lon2-lon1); 
-            var a = Math.sin(dLat/2) * Math.sin(dLat/2) + Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) * Math.sin(dLon/2) * Math.sin(dLon/2); 
-            var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)); 
-            return R * c * 1.3; 
-        }
-        function deg2rad(deg) { return deg * (Math.PI/180); }
-
-        async function resolveCity(name) { try { const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(name)}&limit=1&countrycodes=it`); const data = await res.json(); if(data.length>0) return {lat: parseFloat(data[0].lat), lon: parseFloat(data[0].lon)}; } catch(e){} return null; }
-        async function fetchRoute(start, end) { try { const res = await fetch(`https://router.project-osrm.org/route/v1/driving/${start.lon},${start.lat};${end.lon},${end.lat}?overview=full&geometries=geojson`); if(!res.ok) return null; const data = await res.json(); return (data.routes && data.routes.length > 0) ? data.routes[0] : null; } catch(e) { return null; } }
-        function initAutocomplete(inputId, listId, isStart) { const inp = document.getElementById(inputId); const list = document.getElementById(listId); let timer; inp.addEventListener('focus', ()=>{ if(inp.value=='') showList(list, POPULAR_CITIES, inp, isStart, true); }); inp.addEventListener('input', ()=>{ clearTimeout(timer); if(inputId==='destInput') document.getElementById('clearDest').style.display=inp.value.length>0?'block':'none'; if(inp.value.length<3){list.style.display='none'; return;} timer=setTimeout(async()=>{ try{ const res=await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(inp.value)}&limit=5&countrycodes=it`); const data=await res.json(); showList(list, data, inp, isStart, false); }catch(e){} },300); }); document.addEventListener('click', e=>{ if(e.target!==inp) list.style.display='none'; }); }
-        function showList(list, data, inp, isStart, isPop) { list.innerHTML=''; list.style.display='block'; data.forEach(d => { const div=document.createElement('div'); div.className='s-item'; div.innerText=isPop?d:d.display_name.split(',')[0]; div.onclick=()=>{ inp.value=div.innerText; list.style.display='none'; if(isStart) window.startCoords=null; else window.endCoords=null; }; list.appendChild(div); }); }
-
+        // ANALYSIS & DYNAMIC WEATHER
         async function runAnalysis() {
-            let km = window.calculatedKm > 0 ? window.calculatedKm : parseFloat(document.getElementById('kmInput').value); const budget = parseFloat(document.getElementById('budgetInput').value);
+            const km = window.calculatedKm > 0 ? window.calculatedKm : parseFloat(document.getElementById('kmInput').value);
+            const budget = parseFloat(document.getElementById('budgetInput').value);
+            
             if(!km) return alert("Inserisci i Km!");
-            document.getElementById('loader').style.display='flex'; document.getElementById('wizard-box').style.display='none';
-            setTimeout(() => {
-                document.getElementById('results-container').style.display='block'; setTimeout(()=>document.getElementById('results-container').style.opacity='1',50);
-                document.getElementById('t-start').innerText = document.getElementById('originInput').value; document.getElementById('t-end').innerText = document.getElementById('destInput').value || "N/D";
-                animateValue("t-km", 0, km, 2000, "", " km");
-                const pPetrol = (km/100)*CONSUMPTION.petrol*BASE_PRICES.petrol; const pDiesel = (km/100)*CONSUMPTION.diesel*BASE_PRICES.diesel; const pEv = (km/100)*CONSUMPTION.ev*BASE_PRICES.kwh_public;
-                animateValue("p-petrol", 0, pPetrol, 1500, "€", "", true); animateValue("p-diesel", 0, pDiesel, 1500, "€", "", true); animateValue("p-ev", 0, pEv, 1500, "€", "", true);
+
+            // UI SWITCH TO LOADING
+            document.getElementById('wizard-box').style.display='none';
+            document.getElementById('skeleton-loader').style.display='block';
+            
+            // SIMULATE PROCESSING + API CALLS
+            setTimeout(async () => {
+                // Fetch Weather if destination exists
+                if(window.endCoords) await fetchWeather(window.endCoords.lat, window.endCoords.lon);
+                else document.getElementById('weather-box').style.display = 'none';
+
+                // Setup Dashboard
+                document.getElementById('skeleton-loader').style.display='none';
+                document.getElementById('results-container').style.display='block';
                 
-                // Time logic
-                if(window.routeDataGlobal && window.routeDataGlobal.duration) { const m = Math.round(window.routeDataGlobal.duration/60); document.getElementById('t-time').innerText = Math.floor(m/60)+"h "+(m%60)+"m"; } 
-                else if(window.isEstimate) { document.getElementById('t-time').innerText = "~" + Math.round(km/80) + "h (Stima)"; }
-                else document.getElementById('t-time').innerText = "--";
-                
-                document.getElementById('map-container').style.display='block'; map.invalidateSize(); markersLayer.clearLayers(); routeLayer.clearLayers();
-                if(window.startCoords) { 
-                    L.marker(window.startCoords).addTo(markersLayer); 
-                    if(window.endCoords) { 
-                        L.marker(window.endCoords).addTo(markersLayer); 
-                        if(window.routeDataGlobal && window.routeDataGlobal.geometry) {
-                             // Real Route
-                             L.geoJSON(window.routeDataGlobal.geometry, {style:{color:'#00f2ff', weight:5}}).addTo(routeLayer);
-                             map.fitBounds(L.latLngBounds([window.startCoords, window.endCoords]), {padding:[50,50]});
-                             const pts = window.routeDataGlobal.geometry.coordinates; 
-                             for(let i=1; i<4; i++) { let idx = Math.floor((pts.length/4)*i); L.circleMarker([pts[idx][1], pts[idx][0]], {radius:6, color:'#ffd700', fillOpacity:1}).addTo(markersLayer).bindPopup("Colonnina"); } 
-                        } else {
-                             // Fallback Straight Line (Dotted)
-                             L.polyline([window.startCoords, window.endCoords], {color:'orange', dashArray:'10,10', weight: 4}).addTo(routeLayer);
-                             map.fitBounds(L.latLngBounds([window.startCoords, window.endCoords]), {padding:[50,50]});
-                        }
-                    } else { map.setView(window.startCoords, 10); } 
+                // Map
+                map.invalidateSize(); markersLayer.clearLayers(); routeLayer.clearLayers();
+                if(window.startCoords) {
+                    L.circleMarker(window.startCoords, {radius:6, color:'#34C759', fillOpacity:1}).addTo(markersLayer);
+                    if(window.endCoords) {
+                         L.circleMarker(window.endCoords, {radius:6, color:'#FF3B30', fillOpacity:1}).addTo(markersLayer);
+                         if(window.routeDataGlobal) L.geoJSON(window.routeDataGlobal.geometry, {style:{color:'#007AFF', weight:5, opacity:0.8}}).addTo(routeLayer);
+                         else L.polyline([window.startCoords, window.endCoords], {color:'#FF9500', dashArray:'8,8', weight:4}).addTo(routeLayer);
+                         map.fitBounds(L.latLngBounds([window.startCoords, window.endCoords]), {padding:[50,50]});
+                    } else map.setView(window.startCoords, 10);
                 }
-                renderGrid(budget, km); document.getElementById('loader').style.display='none';
-            }, 800);
+
+                // Data Text
+                document.getElementById('t-km').innerText = km + " km";
+                document.getElementById('t-start-end').innerText = `${document.getElementById('originInput').value} -> ${document.getElementById('destInput').value || '?'}`;
+                
+                // Calc Costs
+                const pPetrol = (km/100)*7.0*BASE_PRICES.petrol;
+                const pEv = (km/100)*16.0*(document.getElementById('chargingInput').value==='yes'?BASE_PRICES.kwh_home:BASE_PRICES.kwh_public);
+                animateValue("p-petrol", 0, pPetrol, 1000);
+                animateValue("p-ev", 0, pEv, 1000, true);
+
+                renderCars(budget, km, pPetrol);
+            }, 1200); // Fake delay for realism
         }
 
-        function animateValue(id, start, end, duration, prefix = "", suffix = "", isFloat = false) {
-            const obj = document.getElementById(id); if(start === end) { obj.innerText = prefix + (isFloat ? end.toFixed(2) : end) + suffix; return; }
-            const range = end - start; let startTime = null;
-            function step(timestamp) { if (!startTime) startTime = timestamp; const progress = Math.min((timestamp - startTime) / duration, 1); const ease = 1 - Math.pow(1 - progress, 3); let currentVal = start + (range * ease); obj.innerText = prefix + (isFloat ? currentVal.toFixed(2) : Math.floor(currentVal)) + suffix; if (progress < 1) window.requestAnimationFrame(step); else obj.innerText = prefix + (isFloat ? end.toFixed(2) : end) + suffix; }
-            window.requestAnimationFrame(step);
+        // WEATHER API (Open-Meteo Free)
+        async function fetchWeather(lat, lon) {
+            try {
+                const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true`);
+                const data = await res.json();
+                const temp = Math.round(data.current_weather.temperature);
+                const code = data.current_weather.weathercode;
+                document.getElementById('w-temp').innerText = temp + "°";
+                
+                // Simple Icon mapping
+                let icon = "ph-sun"; let desc = "Sereno";
+                if(code > 3) { icon = "ph-cloud"; desc = "Nuvoloso"; }
+                if(code > 50) { icon = "ph-drop"; desc = "Pioggia"; }
+                if(code > 70) { icon = "ph-snowflake"; desc = "Neve"; }
+                
+                document.getElementById('w-icon').className = `ph-fill ${icon}`;
+                document.getElementById('w-desc').innerText = desc;
+                
+                // Dynamic Gradient based on weather
+                const box = document.getElementById('weather-box');
+                if(code < 3) box.style.background = "linear-gradient(135deg, #FFCC00, #FF9500)"; // Sunny
+                else if(code > 50) box.style.background = "linear-gradient(135deg, #5856D6, #007AFF)"; // Rain
+                else box.style.background = "linear-gradient(135deg, #8E8E93, #3A3A3C)"; // Cloudy
+            } catch(e) {
+                console.log("Weather error", e);
+                document.getElementById('w-desc').innerText = "N/A";
+            }
         }
 
-        function renderGrid(budget, km) {
-            const container = document.getElementById('car-results'); const homeCharge = document.getElementById('chargingInput').value === 'yes'; const filtered = CARS_DB.filter(c => c.price <= budget);
-            if(filtered.length === 0) { container.innerHTML = '<p style="text-align:center; grid-column:span 3; color:#aaa;">Nessuna auto trovata.</p>'; return; }
-            container.innerHTML = filtered.map((c, i) => {
-                let cost = 0; if(c.type === 'Elettrica') { const rate = homeCharge ? BASE_PRICES.kwh_home : BASE_PRICES.kwh_public; cost = (km/100) * CONSUMPTION.ev * rate; } else if (c.type === 'Diesel') cost = (km/100) * CONSUMPTION.diesel * BASE_PRICES.diesel; else cost = (km/100) * CONSUMPTION.petrol * BASE_PRICES.petrol;
-                return `<div class="glass-panel car-card" onclick="openModal('${c.brand} ${c.model}', '${cost.toFixed(2)}')"><img src="${c.img}" class="car-img" onerror="this.src='${FALLBACK_IMG}'"><div class="car-content"><h3 class="car-title">${c.brand} ${c.model}</h3><span class="car-price">€${c.price.toLocaleString()}</span><div class="spec-row"><span>Costo Viaggio:</span><span style="color:var(--accent)">€${cost.toFixed(2)}</span></div><button class="action-btn">Dettagli</button></div></div>`;
+        function renderCars(budget, km, refPetrolPrice) {
+            const container = document.getElementById('car-results');
+            const homeCharge = document.getElementById('chargingInput').value === 'yes';
+            
+            // Sort by price best match
+            const validCars = CARS_DB.filter(c => c.price <= (budget * 1.2)); // Show slightly over budget too
+            
+            if(validCars.length === 0) { container.innerHTML = "<div style='grid-column:1/-1; text-align:center; padding:20px;'>Nessun veicolo trovato. Prova ad alzare il budget.</div>"; return; }
+
+            container.innerHTML = validCars.map((c, i) => {
+                // Cost Calculation
+                let cost = 0;
+                if(c.type === 'Elettrica') {
+                    const rate = homeCharge ? BASE_PRICES.kwh_home : BASE_PRICES.kwh_public;
+                    cost = (km/100) * 16 * rate;
+                } else if(c.type === 'Diesel') {
+                    cost = (km/100) * 5.5 * BASE_PRICES.diesel;
+                } else {
+                    cost = (km/100) * 7.0 * BASE_PRICES.petrol;
+                }
+                
+                // Best Choice Logic (Simple: EV within budget)
+                const isRec = (c.type === 'Elettrica' && c.price <= budget);
+                const badge = isRec ? `<div class="badge-rec"><i class="ph-fill ph-star" style="color:#FF9500"></i> Consigliata</div>` : '';
+
+                return `
+                <div class="car-card" onclick="haptic(); openModal('${c.brand}', '${c.model}', ${c.price}, ${cost.toFixed(2)}, ${refPetrolPrice.toFixed(2)}, '${c.type}')">
+                    ${badge}
+                    <div class="car-img-box"><img src="${c.img}" class="car-img" loading="lazy"></div>
+                    <div style="padding:15px;">
+                        <div style="font-weight:700; font-size:1.1rem; margin-bottom:4px;">${c.brand} ${c.model}</div>
+                        <div style="color:var(--ios-text-sec); font-size:0.9rem;">€${c.price.toLocaleString()}</div>
+                        <div style="margin-top:15px; padding-top:15px; border-top:1px solid var(--ios-separator); display:flex; justify-content:space-between; align-items:center;">
+                            <span style="font-size:0.8rem; font-weight:600; color:var(--ios-text-sec);">COSTO VIAGGIO</span>
+                            <span style="font-weight:700; color:${c.type==='Elettrica'? 'var(--ios-green)':'var(--ios-text)'}">€${cost.toFixed(2)}</span>
+                        </div>
+                    </div>
+                </div>`;
             }).join('');
         }
-        function openModal(title, cost) { document.getElementById('m-title').innerText = title; document.getElementById('m-fuel').innerText = "€" + cost; document.getElementById('m-total').innerText = "€" + (parseFloat(cost) * 1.2).toFixed(2); document.getElementById('modal-overlay').style.display = 'flex'; }
+
+        // DYNAMIC MODAL
+        function openModal(brand, model, price, cost, refPetrol, type) {
+            document.getElementById('m-brand').innerText = brand;
+            document.getElementById('m-title').innerText = model;
+            document.getElementById('m-price-tag').innerText = "€" + price.toLocaleString();
+            document.getElementById('m-fuel').innerText = "€" + cost;
+            document.getElementById('m-total').innerText = "€" + (parseFloat(cost) * 1.15).toFixed(2); // Mock total with wear
+            
+            // Comparison Logic
+            const savingsRow = document.getElementById('savings-row');
+            if(type === 'Elettrica' && parseFloat(cost) < parseFloat(refPetrol)) {
+                const save = parseFloat(refPetrol) - parseFloat(cost);
+                savingsRow.style.display = 'flex';
+                document.getElementById('m-savings').innerText = "- €" + save.toFixed(2);
+            } else {
+                savingsRow.style.display = 'none';
+            }
+
+            const overlay = document.getElementById('modal-overlay');
+            const sheet = document.getElementById('sheet-content');
+            overlay.style.display = 'flex';
+            setTimeout(() => { overlay.style.opacity = '1'; sheet.style.transform = 'translateY(0)'; }, 10);
+        }
+
+        function forceCloseModal() {
+            const overlay = document.getElementById('modal-overlay');
+            const sheet = document.getElementById('sheet-content');
+            sheet.style.transform = 'translateY(100%)';
+            overlay.style.opacity = '0';
+            setTimeout(() => { overlay.style.display = 'none'; }, 300);
+        }
+        function closeModal(e) { if(e.target.id === 'modal-overlay') forceCloseModal(); }
+
+        // UTILS
+        function animateValue(id, start, end, duration, colorChange=false) {
+            const obj = document.getElementById(id); const range = end - start; let startTime = null;
+            function step(timestamp) {
+                if (!startTime) startTime = timestamp; const progress = Math.min((timestamp - startTime) / duration, 1);
+                obj.innerText = "€" + (start + (range * (1 - Math.pow(1 - progress, 3)))).toFixed(2);
+                if (progress < 1) window.requestAnimationFrame(step);
+            }
+            window.requestAnimationFrame(step);
+        }
+        
+        // Geo Utils
+        function getDistanceFromLatLonInKm(lat1,lon1,lat2,lon2) { var R = 6371; var dLat = deg2rad(lat2-lat1); var dLon = deg2rad(lon2-lon1); var a = Math.sin(dLat/2) * Math.sin(dLat/2) + Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) * Math.sin(dLon/2) * Math.sin(dLon/2); var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)); return R * c * 1.3; }
+        function deg2rad(deg) { return deg * (Math.PI/180); }
+        async function resolveCity(name) { try { const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(name)}&limit=1&countrycodes=it`); const data = await res.json(); if(data.length>0) return {lat: parseFloat(data[0].lat), lon: parseFloat(data[0].lon)}; } catch(e){} return null; }
+        async function fetchRoute(start, end) { const res = await fetch(`https://router.project-osrm.org/route/v1/driving/${start.lon},${start.lat};${end.lon},${end.lat}?overview=full&geometries=geojson`); if(!res.ok) return null; const data = await res.json(); return data.routes[0]; }
+        function initAutocomplete(inputId, listId, isStart) { const inp = document.getElementById(inputId); const list = document.getElementById(listId); let timer; inp.addEventListener('focus', ()=>{ if(inp.value=='') showList(list, POPULAR_CITIES, inp, isStart, true); }); inp.addEventListener('input', ()=>{ clearTimeout(timer); if(inp.value.length<3){list.style.display='none'; return;} timer=setTimeout(async()=>{ try{ const res=await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(inp.value)}&limit=5&countrycodes=it`); const data=await res.json(); showList(list, data, inp, isStart, false); }catch(e){} },300); }); document.addEventListener('click', e=>{ if(e.target!==inp) list.style.display='none'; }); }
+        function showList(list, data, inp, isStart, isPop) { list.innerHTML=''; list.style.display='block'; data.forEach(d => { const div=document.createElement('div'); div.className='s-item'; div.innerText=isPop?d:d.display_name.split(',')[0]; div.onclick=()=>{ haptic(); inp.value=div.innerText; list.style.display='none'; if(isStart) window.startCoords=null; else window.endCoords=null; }; list.appendChild(div); }); }
     </script>
 </body>
 </html>
