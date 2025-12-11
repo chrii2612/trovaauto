@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AutoMatch Pro - Turbo</title>
+    <title>AutoMatch Pro - Real Route</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;500;700;900&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
@@ -14,14 +14,15 @@
     <style>
         :root {
             --primary: #2997ff;
-            --accent: #00d68f;
+            --accent: #b0fb5d;
             --bg-dark: #050507;
             --text-main: #ffffff;
             --text-sub: #94a3b8;
-            --glass-bg: rgba(20, 20, 22, 0.95);
-            --glass-border: rgba(255, 255, 255, 0.15);
-            --input-bg: rgba(255, 255, 255, 0.08);
-            --card-bg: rgba(30, 30, 35, 0.9);
+            --glass-bg: rgba(20, 20, 22, 0.85);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --glass-blur: blur(30px);
+            --input-bg: rgba(255, 255, 255, 0.05);
+            --card-bg: rgba(30, 30, 35, 0.7);
         }
 
         body.light-mode {
@@ -29,70 +30,154 @@
             --bg-dark: #f0f2f5;
             --text-main: #1a1a1a;
             --text-sub: #666666;
-            --glass-bg: rgba(255, 255, 255, 0.95);
+            --glass-bg: rgba(255, 255, 255, 0.9);
             --glass-border: rgba(0, 0, 0, 0.1);
             --input-bg: #ffffff;
             --card-bg: #ffffff;
         }
 
-        body, html { margin: 0; padding: 0; min-height: 100%; font-family: 'Inter', sans-serif; background: var(--bg-dark); color: var(--text-main); overflow-x: hidden; transition: 0.2s; scroll-behavior: smooth; }
+        body, html { margin: 0; padding: 0; min-height: 100%; font-family: 'Inter', sans-serif; background: var(--bg-dark); color: var(--text-main); overflow-x: hidden; transition: 0.3s; scroll-behavior: smooth; }
         h1, h2, h3, button { font-family: 'Outfit', sans-serif; }
 
-        /* BACKGROUND */
+        /* --- BACKGROUND --- */
         #warp-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -10; opacity: 0.5; pointer-events: none; }
         .bg-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(circle at top, transparent 0%, var(--bg-dark) 90%); z-index: -9; pointer-events: none; }
 
-        /* NAVBAR */
-        .nav-bar { position: fixed; top: 0; left: 0; width: 100%; padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; z-index: 1000; box-sizing: border-box; background: rgba(0,0,0,0.8); backdrop-filter: blur(10px); border-bottom: 1px solid var(--glass-border); }
+        /* --- NAVBAR --- */
+        .nav-bar { 
+            position: fixed; top: 0; left: 0; width: 100%; padding: 20px 40px; 
+            display: flex; justify-content: space-between; align-items: center; 
+            z-index: 1000; box-sizing: border-box; 
+            background: linear-gradient(to bottom, rgba(0,0,0,0.8), transparent);
+        }
         .logo { font-weight: 800; font-size: 1.5rem; letter-spacing: -1px; cursor: pointer; }
         .nav-controls { display: flex; gap: 15px; }
-        .icon-btn { width: 40px; height: 40px; border-radius: 12px; border: 1px solid var(--glass-border); display: flex; align-items: center; justify-content: center; cursor: pointer; background: var(--glass-bg); color: var(--text-main); transition: 0.2s; font-size: 1.2rem; }
-        .icon-btn:hover { border-color: var(--primary); color: var(--primary); }
-
-        /* DASHBOARD BAR */
-        #dashboard-bar {
-            width: 100%; padding: 20px 40px; background: var(--glass-bg); border-bottom: 1px solid var(--glass-border);
-            display: none; justify-content: center; gap: 40px; align-items: center; flex-wrap: wrap;
-            position: relative; z-index: 900; margin-top: 75px; box-sizing: border-box;
+        .icon-btn { 
+            width: 40px; height: 40px; border-radius: 50%; border: 1px solid var(--glass-border);
+            display: flex; align-items: center; justify-content: center; cursor: pointer;
+            background: var(--glass-bg); color: var(--text-main); transition: 0.2s; font-size: 1.2rem;
+            backdrop-filter: blur(10px);
         }
-        .dash-item { display: flex; flex-direction: column; align-items: center; min-width: 100px; }
-        .dash-label { font-size: 0.75rem; text-transform: uppercase; color: var(--text-sub); margin-bottom: 5px; font-weight: 600; }
-        .dash-val { font-size: 1.5rem; font-weight: 800; display: flex; align-items: center; gap: 8px; }
-        .val-good { color: var(--accent); } .val-bad { color: #ff453a; } .val-warn { color: #ffaa00; }
+        .icon-btn:hover { border-color: var(--primary); color: var(--primary); transform: scale(1.1); }
 
-        /* MAIN LAYOUT */
-        #app-container { width: 100%; max-width: 1200px; margin: 0 auto; padding: 40px 20px; display: flex; flex-direction: column; gap: 40px; }
-        .main-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; align-items: start; }
+        /* --- LANDING PAGE --- */
+        #landing-page { transition: opacity 0.5s ease; width: 100%; }
+        
+        #home-section { min-height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 20px; position: relative; }
+        .hero-title { font-size: 5rem; line-height: 0.95; margin-bottom: 20px; letter-spacing: -2px; z-index: 2; text-shadow: 0 0 30px rgba(41, 151, 255, 0.3); }
+        .hero-sub { font-size: 1.3rem; color: var(--text-sub); max-width: 600px; margin-bottom: 50px; font-weight: 300; z-index: 2; }
+        .btn-main {
+            padding: 20px 50px; font-size: 1.2rem; font-weight: 700; text-transform: uppercase; letter-spacing: 2px;
+            color: #fff; background: var(--primary); border: none; border-radius: 50px; cursor: pointer; transition: 0.3s;
+            box-shadow: 0 10px 40px rgba(41, 151, 255, 0.4); z-index: 10; display: flex; align-items: center; gap: 10px;
+        }
+        .btn-main:hover { transform: scale(1.05) translateY(-3px); filter: brightness(1.1); }
 
-        /* FORM */
-        .wizard-box { background: var(--glass-bg); padding: 30px; border-radius: 24px; border: 1px solid var(--glass-border); }
-        .input-group { margin-bottom: 20px; position: relative; }
-        label { display: block; margin-bottom: 8px; font-weight: 600; font-size: 0.9rem; color: var(--text-sub); }
-        input, select { width: 100%; padding: 15px; background: var(--input-bg); border: 1px solid var(--glass-border); border-radius: 12px; color: var(--text-main); font-size: 1rem; box-sizing: border-box; transition: 0.3s; font-family: 'Inter', sans-serif; }
-        input:focus { border-color: var(--primary); background: rgba(255,255,255,0.1); outline: none; }
-        .suggestions { position: absolute; top: 100%; left: 0; width: 100%; background: #1a1a1a; border: 1px solid var(--primary); border-radius: 12px; z-index: 100; max-height: 200px; overflow-y: auto; display: none; }
-        .s-item { padding: 12px; cursor: pointer; color: #fff; border-bottom: 1px solid #333; }
+        /* Floating Cards */
+        .float-card { 
+            position: absolute; padding: 20px; width: 180px; border-radius: 20px; 
+            text-align: left; animation: float 8s ease-in-out infinite; z-index: 1;
+            background: var(--glass-bg); border: 1px solid var(--glass-border); backdrop-filter: blur(10px);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+        }
+        .fc-icon { font-size: 2rem; color: var(--primary); margin-bottom: 10px; }
+        .fc-1 { top: 20%; left: 10%; animation-delay: 0s; }
+        .fc-2 { bottom: 25%; right: 10%; animation-delay: 2s; }
+        .fc-3 { top: 15%; right: 20%; animation-delay: 4s; }
+        .fc-4 { bottom: 20%; left: 20%; animation-delay: 1.5s; }
+        .fc-5 { top: 50%; left: 5%; animation-delay: 3s; }
+        @keyframes float { 0%,100%{transform:translateY(0);} 50%{transform:translateY(-20px);} }
+
+        /* Details */
+        #details-section { max-width: 1200px; margin: 0 auto; padding: 50px 20px; position: relative; z-index: 2; background: transparent; }
+        .detail-block { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; margin-bottom: 150px; align-items: center; }
+        .detail-block.reverse { direction: rtl; } .detail-block.reverse > * { direction: ltr; }
+        .detail-text { padding: 40px; background: var(--glass-bg); border-radius: 30px; border: 1px solid var(--glass-border); backdrop-filter: blur(20px); }
+        .detail-text h2 { color: var(--primary); margin-bottom: 20px; font-size: 2.5rem; font-weight: 700; }
+        .detail-text p { font-size: 1.1rem; line-height: 1.8; color: var(--text-sub); }
+        .detail-img-box { height: 400px; border-radius: 30px; overflow: hidden; border: 1px solid var(--glass-border); transform: rotate(-2deg); transition: 0.5s; }
+        .detail-block.reverse .detail-img-box { transform: rotate(2deg); }
+        .detail-img-box:hover { transform: rotate(0) scale(1.02); }
+        .detail-img { width: 100%; height: 100%; object-fit: cover; }
+
+        /* --- APP WIZARD --- */
+        #app-section { display: none; min-height: 100vh; flex-direction: column; align-items: center; padding-top: 100px; opacity: 0; transition: opacity 0.8s; width: 100%; padding-bottom: 50px; }
+        .wizard-box {
+            width: 100%; max-width: 800px;
+            background: var(--glass-bg); backdrop-filter: var(--glass-blur); 
+            border: 1px solid var(--glass-border); border-radius: 30px;
+            padding: 40px; box-shadow: 0 25px 50px rgba(0,0,0,0.3);
+            position: relative; overflow: visible;
+        }
+        
+        .progress-bar { width: 100%; height: 4px; background: rgba(255,255,255,0.1); border-radius: 2px; margin-bottom: 40px; overflow: hidden; }
+        .progress-fill { height: 100%; background: var(--primary); width: 33%; transition: width 0.5s ease; box-shadow: 0 0 15px var(--primary); }
+        
+        .step { display: none; animation: slideUp 0.4s ease forwards; }
+        .step.active { display: block; }
+        @keyframes slideUp { from {opacity:0; transform:translateY(20px);} to {opacity:1; transform:translateY(0);} }
+
+        .input-group { margin-bottom: 25px; position: relative; }
+        label { display: block; margin-bottom: 10px; font-weight: 600; font-size: 0.9rem; color: var(--text-sub); text-transform: uppercase; letter-spacing: 1px; font-family: 'Poppins', sans-serif;}
+        
+        input, select { 
+            width: 100%; padding: 18px 18px 18px 45px; border-radius: 14px; border: 1px solid var(--glass-border); 
+            background: var(--input-bg); color: var(--text-main); font-size: 1.1rem; outline: none; transition: 0.3s;
+            box-sizing: border-box; font-family: 'Inter', sans-serif;
+        }
+        input:focus { border-color: var(--primary); background: rgba(255,255,255,0.08); }
+        
+        /* Auto Filled Style */
+        input.auto-filled { border-color: var(--accent); color: var(--accent); font-weight: 700; }
+        .input-icon { position: absolute; left: 15px; top: 48px; font-size: 1.2rem; color: var(--text-sub); }
+
+        .suggestions { position: absolute; top: 105%; left: 0; width: 100%; background: #1a1a1a; border: 1px solid var(--primary); border-radius: 12px; z-index: 100; max-height: 250px; overflow-y: auto; display: none; }
+        .s-item { padding: 15px; cursor: pointer; color: #fff; border-bottom: 1px solid #333; }
         .s-item:hover { background: var(--primary); color: #000; }
+        .s-pop { color: var(--accent); font-size: 0.8rem; margin-bottom: 5px; text-transform: uppercase; padding-left: 15px; padding-top: 10px; }
 
-        /* MAP */
-        .map-wrapper { height: 500px; border-radius: 24px; overflow: hidden; border: 1px solid var(--glass-border); position: relative; box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
+        .btn-row { display: flex; gap: 15px; margin-top: 40px; }
+        .btn-sec { flex: 1; background: transparent; border: 1px solid var(--glass-border); color: var(--text-sub); padding: 16px; border-radius: 50px; cursor: pointer; transition:0.2s; font-weight:600; }
+        .btn-sec:hover { border-color: #fff; color: #fff; }
+        .btn-pri { flex: 2; background: var(--primary); color: #fff; border:none; padding: 16px; border-radius: 50px; font-weight: 700; cursor: pointer; transition:0.2s; box-shadow: 0 5px 20px rgba(41, 151, 255, 0.3); }
+        .btn-pri:hover { transform: translateY(-2px); filter: brightness(1.1); }
+
+        /* --- RESULTS --- */
+        #results-container { width: 100%; max-width: 1200px; display: none; opacity: 0; transition: 0.5s; padding-bottom: 50px; }
+        
+        .trip-card { background: var(--glass-bg); padding: 30px; border-radius: 24px; border: 1px solid var(--glass-border); margin-bottom: 30px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; text-align: center; }
+        .t-val { font-size: 1.5rem; font-weight: 800; color: var(--text-main); }
+        .t-lbl { font-size: 0.8rem; text-transform: uppercase; color: var(--text-sub); }
+
+        .map-box { height: 500px; border-radius: 24px; overflow: hidden; margin-bottom: 40px; border: 1px solid var(--glass-border); position: relative; z-index: 1; box-shadow: 0 20px 40px rgba(0,0,0,0.3); }
         #map { width: 100%; height: 100%; }
 
-        /* RESULTS */
-        .results-section { display: none; margin-top: 40px; }
-        .car-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 25px; }
-        .car-card { background: var(--card-bg); border-radius: 20px; border: 1px solid var(--glass-border); overflow: hidden; transition: 0.3s; cursor: pointer; position: relative; }
-        .car-card:hover { transform: translateY(-5px); border-color: var(--primary); }
-        .car-img { width: 100%; height: 180px; object-fit: cover; }
-        .car-body { padding: 20px; }
-        .car-title { font-size: 1.3rem; font-weight: 700; margin-bottom: 5px; }
-        .car-price { color: var(--primary); font-weight: 700; font-size: 1.1rem; }
-        .spec-row { display: flex; justify-content: space-between; margin-top: 15px; font-size: 0.9rem; border-top: 1px solid var(--glass-border); padding-top: 10px; color: var(--text-sub); }
+        .cards-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; }
+        .car-card { background: var(--card-bg); border: 1px solid var(--glass-border); border-radius: 24px; overflow: hidden; transition: 0.4s; position: relative; cursor: pointer; display: flex; flex-direction: column; }
+        .car-card:hover { transform: translateY(-10px); border-color: var(--primary); box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4); }
+        .car-img { width: 100%; height: 200px; object-fit: cover; }
+        .car-content { padding: 25px; color: var(--text-main); flex-grow: 1; display: flex; flex-direction: column; }
+        .car-title { font-size: 1.4rem; font-weight: 700; margin-bottom: 5px; color: #fff; }
+        .car-price { color: var(--primary); font-weight: 700; font-size: 1.1rem; display: block; margin-bottom: 15px; }
+        .spec-row { display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 0.9rem; border-bottom: 1px solid var(--glass-border); padding-bottom: 10px; color: var(--text-sub); }
+        .action-btn { margin-top: auto; padding: 12px; border: 1px solid var(--glass-border); background: transparent; color: #fff; border-radius: 12px; cursor: pointer; transition: 0.2s; font-weight: 600; width: 100%; }
+        .action-btn:hover { background: var(--primary); border-color: var(--primary); }
 
-        .btn-main { width: 100%; padding: 15px; background: var(--primary); border: none; border-radius: 12px; color: #fff; font-weight: 700; cursor: pointer; margin-top: 20px; font-size: 1.1rem; transition: 0.1s;}
-        .btn-main:active { transform: scale(0.98); }
+        .market-bar { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 40px; }
+        .market-item { background: var(--input-bg); padding: 15px; border-radius: 15px; text-align: center; border: 1px solid var(--glass-border); }
+        .m-price { font-size: 1.5rem; font-weight: 700; color: var(--text-main); }
+        .m-lbl { font-size: 0.7rem; text-transform: uppercase; color: var(--text-sub); }
 
-        @media(max-width: 800px) { .main-grid { grid-template-columns: 1fr; } .map-wrapper { height: 300px; order: -1; } #dashboard-bar { margin-top: 70px; gap: 20px; justify-content: space-around; } }
+        /* LOADER */
+        #loader { position: fixed; top:0; left:0; width:100%; height:100%; background:var(--bg-dark); z-index:2000; display:none; flex-direction:column; align-items:center; justify-content:center; }
+        .spinner { width: 50px; height: 50px; border: 4px solid var(--glass-border); border-top-color: var(--primary); border-radius: 50%; animation: spin 1s infinite linear; }
+        @keyframes spin { to {transform: rotate(360deg);} }
+
+        /* MODAL */
+        #modal-overlay { position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); z-index:3000; display:none; justify-content:center; align-items:center; backdrop-filter:blur(10px); }
+        .modal-content { background: #1a1a1a; padding: 40px; border-radius: 24px; max-width: 500px; width: 90%; border: 1px solid var(--glass-border); position: relative; color: #fff; }
+
+        @media(max-width: 768px) { .hero-title {font-size: 3.5rem;} .detail-block, .trip-card { grid-template-columns: 1fr; } .btn-row { flex-direction: column-reverse; } .feature-card { display: none; } }
     </style>
 </head>
 <body>
@@ -101,211 +186,368 @@
     <div class="bg-overlay"></div>
 
     <nav class="nav-bar">
-        <div class="logo" onclick="location.reload()">AUTOMATCH ⚡</div>
+        <div class="logo" onclick="location.reload()">AUTOMATCH 🇮🇹</div>
         <div class="nav-controls">
             <div class="icon-btn" onclick="document.body.classList.toggle('light-mode')"><i class="ph ph-sun"></i></div>
+            <div class="icon-btn"><i class="ph ph-user"></i></div>
         </div>
     </nav>
 
-    <div id="dashboard-bar">
-        <div class="dash-item"><span class="dash-label">Distanza</span><div class="dash-val" id="d-km">-- km</div></div>
-        <div class="dash-item"><span class="dash-label">Benzina</span><div class="dash-val val-bad"><i class="ph-fill ph-gas-pump"></i> <span id="d-petrol">--</span></div></div>
-        <div class="dash-item"><span class="dash-label">Diesel</span><div class="dash-val val-warn"><i class="ph-fill ph-truck"></i> <span id="d-diesel">--</span></div></div>
-        <div class="dash-item"><span class="dash-label">Elettrico</span><div class="dash-val val-good"><i class="ph-fill ph-lightning"></i> <span id="d-ev">--</span></div></div>
+    <div id="landing-page">
+        <section id="home-section">
+            <div class="float-card fc-1"><div class="fc-icon"><i class="ph ph-wallet"></i></div><b>Risparmio</b><br><small>Analisi costi reali.</small></div>
+            <div class="float-card fc-2"><div class="fc-icon"><i class="ph ph-map-trifold"></i></div><b>Viaggi</b><br><small>Pianifica ricariche.</small></div>
+            <div class="float-card fc-3"><div class="fc-icon"><i class="ph ph-lightning"></i></div><b>Elettrico</b><br><small>Il futuro è oggi.</small></div>
+            <div class="float-card fc-4"><div class="fc-icon"><i class="ph ph-chart-bar"></i></div><b>Dati</b><br><small>Statistiche precise.</small></div>
+            <div class="float-card fc-5"><div class="fc-icon"><i class="ph ph-globe"></i></div><b>Eco</b><br><small>Scelta sostenibile.</small></div>
+
+            <h1 class="hero-title">GUIDA IL<br><span style="color:var(--primary)">FUTURO.</span></h1>
+            <p class="hero-sub">Piattaforma intelligente per la scelta del tuo veicolo. <br>Calcola i costi reali e trova l'auto perfetta.</p>
+            
+            <button class="btn-main" onclick="goToApp()">INIZIA CONFIGURAZIONE <i class="ph-bold ph-arrow-right"></i></button>
+        </section>
+
+        <section id="details-section">
+            <div class="detail-block">
+                <div class="detail-text">
+                    <h2>Analisi Costi Reale</h2>
+                    <p>Non limitarti al prezzo di listino. AutoMatch calcola il costo totale di possesso (TCO) basandosi sul tuo utilizzo reale. Inserisci i tuoi km giornalieri e scopri quanto risparmieresti davvero passando all'elettrico.</p>
+                </div>
+                <div class="detail-img-box"><img src="https://images.unsplash.com/photo-1593941707882-a5bba14938c7?q=80&w=1000&auto=format&fit=crop" class="detail-img"></div>
+            </div>
+            <div class="detail-block reverse">
+                <div class="detail-text">
+                    <h2>Mappa Ricarica</h2>
+                    <p>L'ansia da autonomia è un ricordo del passato. Pianifica i tuoi viaggi lunghi e visualizza immediatamente le stazioni di ricarica compatibili lungo il percorso.</p>
+                </div>
+                <div class="detail-img-box"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c2/Plug_in_hybrid_charging.jpg/800px-Plug_in_hybrid_charging.jpg" class="detail-img"></div>
+            </div>
+        </section>
     </div>
 
-    <div id="app-container">
-        <div class="main-grid">
-            <div class="wizard-box">
-                <h2 style="margin-bottom:20px;">Configura Viaggio</h2>
+    <section id="app-section">
+        <div class="wizard-box" id="wizard-box">
+            <div class="progress-bar"><div class="progress-fill" id="p-bar"></div></div>
+
+            <div class="step active" id="step-1">
+                <h2>Il tuo Viaggio 🇮🇹</h2>
                 <div class="input-group">
                     <label>📍 Partenza</label>
-                    <input type="text" id="originInput" placeholder="Città..." autocomplete="off">
+                    <input type="text" id="originInput" placeholder="Seleziona città..." autocomplete="off">
                     <div id="list-origin" class="suggestions"></div>
                 </div>
                 <div class="input-group">
-                    <label>🏁 Destinazione</label>
-                    <input type="text" id="destInput" placeholder="Dove vai?" autocomplete="off">
+                    <label>🏁 Destinazione (Opzionale)</label>
+                    <input type="text" id="destInput" placeholder="Seleziona destinazione..." autocomplete="off">
                     <div id="list-dest" class="suggestions"></div>
                 </div>
-                <div class="input-group">
-                    <label>🛣️ Km (Auto-Calcolo)</label>
-                    <input type="number" id="kmInput" placeholder="...">
+                <div class="btn-row">
+                    <span></span>
+                    <button class="btn-pri" onclick="nextStep(2)">Avanti <i class="ph-bold ph-caret-right"></i></button>
                 </div>
-                <div class="input-group">
-                    <label>💰 Budget (€)</label>
-                    <input type="number" id="budgetInput" value="35000">
-                </div>
-                <div class="input-group">
-                    <label>🔌 Ricarica</label>
-                    <select id="chargingInput">
-                        <option value="no">Pubblica</option>
-                        <option value="yes">Casa</option>
-                    </select>
-                </div>
-                <button class="btn-main" onclick="runFastAnalysis()">Analizza Ora 🚀</button>
             </div>
 
-            <div class="map-wrapper">
-                <div id="map"></div>
+            <div class="step" id="step-2">
+                <h2>Abitudini</h2>
+                <div class="input-group">
+                    <label>🛣️ Km Previsti</label>
+                    <input type="number" id="kmInput" placeholder="Es. 50">
+                    <small id="km-hint" style="color:var(--text-sub); display:block; margin-top:5px;">Autocalcolo se destinazione inserita.</small>
+                </div>
+                <div class="input-group">
+                    <label>⚡ Ricarica</label>
+                    <select id="chargingInput">
+                        <option value="no">Solo Pubblica</option>
+                        <option value="yes">Box Privato</option>
+                    </select>
+                </div>
+                <div class="btn-row">
+                    <button class="btn-sec" onclick="nextStep(1)">Indietro</button>
+                    <button class="btn-pri" onclick="nextStep(3)">Avanti <i class="ph-bold ph-caret-right"></i></button>
+                </div>
+            </div>
+
+            <div class="step" id="step-3">
+                <h2>Investimento</h2>
+                <div class="input-group">
+                    <label>💰 Budget (€)</label>
+                    <input type="number" id="budgetInput" placeholder="35000" value="35000">
+                </div>
+                <div class="btn-row">
+                    <button class="btn-sec" onclick="nextStep(2)">Indietro</button>
+                    <button class="btn-pri" style="background:var(--accent); color:#000;" onclick="runAnalysis()">Lancia Analisi 🚀</button>
+                </div>
             </div>
         </div>
 
-        <div id="results" class="results-section">
-            <h2 style="margin-bottom:20px;">Veicoli Consigliati</h2>
-            <div id="car-list" class="car-grid"></div>
+        <div id="results-container">
+            
+            <div id="trip-details" class="trip-card">
+                <div><div class="t-lbl">Partenza</div><div class="t-val" id="t-start">--</div></div>
+                <div><div class="t-lbl">Arrivo</div><div class="t-val" id="t-end">--</div></div>
+                <div><div class="t-lbl">Distanza</div><div class="t-val" id="t-km">--</div></div>
+                <div><div class="t-lbl">Tempo Stimato</div><div class="t-val" id="t-time">--</div></div>
+            </div>
+
+            <div class="market-bar">
+                <div class="market-item"><div class="m-lbl">Benzina</div><div class="m-price" id="p-petrol">€1.84</div></div>
+                <div class="market-item"><div class="m-lbl">Diesel</div><div class="m-price" id="p-diesel">€1.71</div></div>
+                <div class="market-item"><div class="m-lbl">Elettrico</div><div class="m-price" id="p-ev">€0.58</div></div>
+            </div>
+
+            <div class="map-box" id="map-container"><div id="map"></div></div>
+            
+            <h2 style="margin-bottom:20px; text-align:center;">Veicoli Consigliati</h2>
+            <div id="car-results" class="cards-grid"></div>
+            
+            <button class="btn-sec" onclick="location.reload()" style="margin: 40px auto; width: 200px; display:block;">Nuova Ricerca</button>
+        </div>
+
+    </section>
+
+    <div id="loader"><div class="spinner"></div><p style="margin-top:20px; color:var(--primary);">ELABORAZIONE...</p></div>
+
+    <div id="modal-overlay">
+        <div class="modal-content">
+            <span style="position:absolute; top:20px; right:20px; font-size:2rem; cursor:pointer;" onclick="document.getElementById('modal-overlay').style.display='none'">&times;</span>
+            <h2 id="m-title">Title</h2>
+            <div style="margin-top:20px; line-height:1.6; color:#ccc;">
+                <div style="display:flex; justify-content:space-between; border-bottom:1px solid #333; padding:10px 0;"><span>Carburante:</span> <b id="m-fuel" style="color:#fff">--</b></div>
+                <div style="display:flex; justify-content:space-between; border-bottom:1px solid #333; padding:10px 0;"><span>Manutenzione:</span> <b id="m-maint" style="color:#fff">--</b></div>
+                <div style="display:flex; justify-content:space-between; padding-top:15px; font-size:1.2rem;"><span>Totale:</span> <b id="m-total" style="color:var(--success)">--</b></div>
+            </div>
         </div>
     </div>
 
     <script>
-        // --- DATA ---
-        const CARS = [
+        // --- GLOBALS ---
+        window.startCoords = null;
+        window.endCoords = null;
+        const POPULAR_CITIES = ["Roma", "Milano", "Napoli", "Torino", "Palermo", "Genova", "Bologna", "Firenze", "Bari", "Catania", "Venezia", "Verona"];
+        
+        const CARS_DB = [
             { brand: "Tesla", model: "Model 3", price: 42990, type: "Elettrica", range: 513, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/8/82/2019_Tesla_Model_3_Long_Range_AWD_Front.jpg/800px-2019_Tesla_Model_3_Long_Range_AWD_Front.jpg" },
             { brand: "Fiat", model: "500e", price: 29950, type: "Elettrica", range: 320, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7f/Fiat_500_Electric_La_Prima_Genf_2020_1X7A5372.jpg/800px-Fiat_500_Electric_La_Prima_Genf_2020_1X7A5372.jpg" },
             { brand: "VW", model: "Golf 8", price: 34500, type: "Diesel", range: 1100, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c9/2020_Volkswagen_Golf_Style_2.0_Front.jpg/800px-2020_Volkswagen_Golf_Style_2.0_Front.jpg" },
             { brand: "Jeep", model: "Avenger", price: 26300, type: "Benzina", range: 700, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/2/27/Jeep_Avenger_1.2_Turbo_Summit_%E2%80%93_f_%E2%80%93_16042023.jpg/800px-Jeep_Avenger_1.2_Turbo_Summit_%E2%80%93_f_%E2%80%93_16042023.jpg" },
-            { brand: "MG", model: "MG4", price: 30000, type: "Elettrica", range: 350, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/6/64/MG4_EV_Dabok.jpg/800px-MG4_EV_Dabok.jpg" }
+            { brand: "MG", model: "MG4", price: 30790, type: "Elettrica", range: 350, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/6/64/MG4_EV_Dabok.jpg/800px-MG4_EV_Dabok.jpg" }
         ];
-        const PRICES = { petrol: 1.85, diesel: 1.72, ev: 0.55 }; 
-        const CONS = { petrol: 7.0, diesel: 5.5, ev: 16.0 };
+        const BASE_PRICES = { petrol: 1.84, diesel: 1.71, kwh_public: 0.58, kwh_home: 0.25 };
+        const CONSUMPTION = { ev: 16, diesel: 5.5, petrol: 7.0 };
+        const FALLBACK_IMG = "https://placehold.co/600x400/222/FFF?text=Auto";
 
-        let map, routeLayer;
-        let startPos = null, endPos = null;
+        let map, markersLayer, routeLayer;
+
+        // --- BACKGROUND ---
+        const canvas = document.getElementById('warp-canvas');
+        const ctx = canvas.getContext('2d');
+        let w, h, stars = [];
+        const initStars = () => { w = canvas.width = window.innerWidth; h = canvas.height = window.innerHeight; stars = Array(150).fill().map(() => ({x: Math.random()*w, y: Math.random()*h, z: Math.random()*w})); };
+        const drawStars = () => {
+            ctx.clearRect(0,0,w,h); ctx.fillStyle = '#888';
+            stars.forEach(s => { s.z -= 5; if(s.z<=0) s.z=w; let x = (s.x-w/2)*(w/s.z)*2 + w/2; let y = (s.y-h/2)*(w/s.z)*2 + h/2; if(x>0 && x<w && y>0 && y<h) ctx.fillRect(x,y,2,2); });
+            requestAnimationFrame(drawStars);
+        };
+        window.addEventListener('resize', initStars); initStars(); drawStars();
 
         // --- INIT ---
-        window.onload = () => {
-            initMap();
-            initAutocomplete('originInput', 'list-origin', true);
-            initAutocomplete('destInput', 'list-dest', false);
-            // Stars
-            const canvas=document.getElementById('warp-canvas'), ctx=canvas.getContext('2d');
-            let w=canvas.width=innerWidth, h=canvas.height=innerHeight, stars=Array(100).fill().map(()=>({x:Math.random()*w,y:Math.random()*h,z:Math.random()*w}));
-            (function anim(){ ctx.clearRect(0,0,w,h); ctx.fillStyle='#888'; stars.forEach(s=>{s.z-=10;if(s.z<=0)s.z=w; let x=(s.x-w/2)*(w/s.z)*2+w/2, y=(s.y-h/2)*(w/s.z)*2+h/2; if(x>0&&x<w&&y>0&&y<h) ctx.fillRect(x,y,2,2)}); requestAnimationFrame(anim); })();
-            window.onresize=()=>{w=canvas.width=innerWidth; h=canvas.height=innerHeight;};
-        };
-
-        function initMap() {
+        window.onload = function() {
+            // Map Init (Hidden initially)
             map = L.map('map').setView([41.9, 12.5], 5);
             L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: 'OSM' }).addTo(map);
-            routeLayer = L.layerGroup().addTo(map);
+            markersLayer = L.layerGroup().addTo(map); routeLayer = L.layerGroup().addTo(map);
+
+            initAutocomplete('originInput', 'list-origin', true);
+            initAutocomplete('destInput', 'list-dest', false);
+        };
+
+        function goToApp() {
+            document.getElementById('landing-page').style.opacity = '0';
+            setTimeout(() => {
+                document.getElementById('landing-page').style.display = 'none';
+                document.getElementById('app-section').style.display = 'flex';
+                setTimeout(() => document.getElementById('app-section').style.opacity = '1', 50);
+                map.invalidateSize();
+            }, 500);
+        }
+        function goToHome() { location.reload(); }
+        function nextStep(step) {
+            document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+            document.getElementById(`step-${step}`).classList.add('active');
+            document.getElementById('p-bar').style.width = step === 1 ? '33%' : step === 2 ? '66%' : '100%';
         }
 
+        // --- AUTOCOMPLETE & LOGIC ---
         function initAutocomplete(inputId, listId, isStart) {
             const inp = document.getElementById(inputId);
             const list = document.getElementById(listId);
             let timer;
+
+            inp.addEventListener('focus', () => {
+                if(inp.value.length === 0) showSuggestions(list, POPULAR_CITIES.map(c=>({display_name: c, type:'pop'})), inp, isStart);
+            });
+
             inp.addEventListener('input', () => {
                 clearTimeout(timer);
-                if(inp.value.length < 3) { list.style.display='none'; return; }
+                if(inp.value.length === 0) {
+                    showSuggestions(list, POPULAR_CITIES.map(c=>({display_name: c, type:'pop'})), inp, isStart);
+                    return;
+                }
                 timer = setTimeout(async () => {
                     try {
                         const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(inp.value)}&limit=5&countrycodes=it`);
                         const data = await res.json();
-                        list.innerHTML = ''; list.style.display = 'block';
-                        data.forEach(d => {
-                            const div = document.createElement('div'); div.className = 's-item';
-                            div.innerText = d.display_name.split(',')[0];
-                            div.onclick = () => {
-                                inp.value = d.display_name.split(',')[0];
-                                list.style.display = 'none';
-                                const coords = { lat: parseFloat(d.lat), lon: parseFloat(d.lon) };
-                                if(isStart) startPos = coords;
-                                else { endPos = coords; calculateRoute(); } // Auto Calc Trigger
-                            };
-                            list.appendChild(div);
-                        });
-                    } catch(e){}
+                        showSuggestions(list, data, inp, isStart);
+                    } catch(e) {}
                 }, 300);
             });
+
             document.addEventListener('click', e => { if(e.target !== inp) list.style.display='none'; });
         }
 
-        async function calculateRoute() {
-            if(!startPos || !endPos) return;
-            const kmInp = document.getElementById('kmInput');
-            kmInp.placeholder = "Calcolo...";
-
-            try {
-                // Route OSRM
-                const url = `https://router.project-osrm.org/route/v1/driving/${startPos.lon},${startPos.lat};${endPos.lon},${endPos.lat}?overview=full&geometries=geojson`;
-                const res = await fetch(url);
-                const data = await res.json();
-
-                if(data.routes && data.routes.length > 0) {
-                    const route = data.routes[0];
-                    const km = Math.round(route.distance / 1000);
-                    kmInp.value = km;
-
-                    // Draw Map immediately
-                    routeLayer.clearLayers();
-                    L.marker(startPos).addTo(routeLayer).bindPopup("Partenza");
-                    L.marker(endPos).addTo(routeLayer).bindPopup("Arrivo").openPopup();
-                    L.geoJSON(route.geometry, {style: {color: '#2997ff', weight: 5}}).addTo(routeLayer);
-                    
-                    // Simulate Chargers
-                    const pts = route.geometry.coordinates;
-                    for(let i=1; i<4; i++) {
-                        let idx = Math.floor((pts.length/4)*i);
-                        L.circleMarker([pts[idx][1], pts[idx][0]], {radius:5, color:'#ffd700', fillOpacity:1}).addTo(routeLayer);
-                    }
-                    map.fitBounds(L.latLngBounds([startPos, endPos]), {padding:[50,50]});
-                }
-            } catch(e) {
-                // Fallback Line
-                routeLayer.clearLayers();
-                L.polyline([startPos, endPos], {color:'red', dashArray:'5,5'}).addTo(routeLayer);
-                map.fitBounds(L.latLngBounds([startPos, endPos]));
-                kmInp.value = 100; // Fallback
-            }
+        function showSuggestions(list, data, inp, isStart) {
+            list.innerHTML = '';
+            if(data.length > 0) {
+                list.style.display = 'block';
+                if(data[0].type === 'pop') list.innerHTML = '<div class="s-pop">Città Popolari</div>';
+                
+                data.forEach(d => {
+                    const div = document.createElement('div'); div.className = 's-item';
+                    const name = d.display_name.split(',')[0];
+                    div.innerText = name;
+                    div.onclick = () => {
+                        inp.value = name;
+                        list.style.display = 'none';
+                        // Geocoding & Logic
+                        if(d.lat) { // From API
+                            const c = { lat: parseFloat(d.lat), lon: parseFloat(d.lon) };
+                            if(isStart) window.startCoords = c; else { window.endCoords = c; calculateRoute(); }
+                        } else { // From Pop List
+                            fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(name)}&limit=1&countrycodes=it`)
+                                .then(r=>r.json()).then(res=>{
+                                    if(res.length>0) {
+                                        const c = { lat: parseFloat(res[0].lat), lon: parseFloat(res[0].lon) };
+                                        if(isStart) window.startCoords = c; else { window.endCoords = c; calculateRoute(); }
+                                    }
+                                });
+                        }
+                    };
+                    list.appendChild(div);
+                });
+            } else { list.style.display = 'none'; }
         }
 
-        function runFastAnalysis() {
+        async function calculateRoute() {
+            if(!window.startCoords || !window.endCoords) return;
+            const kmField = document.getElementById('kmInput');
+            kmField.placeholder = "Calcolo...";
+            
+            try {
+                // REAL ROUTE via OSRM
+                const url = `https://router.project-osrm.org/route/v1/driving/${window.startCoords.lon},${window.startCoords.lat};${window.endCoords.lon},${window.endCoords.lat}?overview=full&geometries=geojson`;
+                const res = await fetch(url);
+                const data = await res.json();
+                
+                if(data.routes && data.routes.length > 0) {
+                    const r = data.routes[0];
+                    const km = Math.round(r.distance / 1000);
+                    const mins = Math.round(r.duration / 60);
+                    const hrs = Math.floor(mins/60);
+                    const m = mins%60;
+                    
+                    kmField.value = km;
+                    kmField.classList.add('auto-filled');
+                    document.getElementById('km-hint').innerText = `✅ Distanza: ${km} km`;
+                    document.getElementById('km-hint').style.color = "var(--accent)";
+
+                    // Update Trip Card
+                    document.getElementById('t-start').innerText = document.getElementById('originInput').value;
+                    document.getElementById('t-end').innerText = document.getElementById('destInput').value;
+                    document.getElementById('t-km').innerText = km + " km";
+                    document.getElementById('t-time').innerText = `${hrs}h ${m}m`;
+
+                    // Pre-draw Map for visual feedback
+                    markersLayer.clearLayers(); routeLayer.clearLayers();
+                    L.marker(window.startCoords).addTo(markersLayer); L.marker(window.endCoords).addTo(markersLayer);
+                    L.geoJSON(r.geometry, {style:{color:'#00f2ff', weight:5}}).addTo(routeLayer);
+                    
+                    // Simulate Chargers along route geometry points
+                    const coords = r.geometry.coordinates;
+                    for(let i=1; i<4; i++) {
+                        let idx = Math.floor((coords.length/4)*i);
+                        L.circleMarker([coords[idx][1], coords[idx][0]], {radius:6, color:'#ffd700', fillOpacity:1}).addTo(markersLayer).bindPopup("Colonnina Fast");
+                    }
+                    
+                    // Delay map fit until container visible
+                    window.routeBounds = L.latLngBounds([window.startCoords, window.endCoords]);
+                }
+            } catch(e) { console.warn("Route fail"); }
+        }
+
+        async function runAnalysis() {
             const km = parseFloat(document.getElementById('kmInput').value);
             const budget = parseFloat(document.getElementById('budgetInput').value);
             
             if(!km) return alert("Inserisci i Km!");
 
-            // 1. Dashboard
-            document.getElementById('dashboard-bar').style.display = 'flex';
-            document.getElementById('d-km').innerText = km + ' km';
-            document.getElementById('d-petrol').innerText = "€" + ((km/100) * CONS.petrol * PRICES.petrol).toFixed(2);
-            document.getElementById('d-diesel').innerText = "€" + ((km/100) * CONS.diesel * PRICES.diesel).toFixed(2);
-            document.getElementById('d-ev').innerText = "€" + ((km/100) * CONS.ev * PRICES.ev).toFixed(2);
+            document.getElementById('loader').style.display = 'flex';
+            await new Promise(r => setTimeout(r, 1000));
 
-            // 2. Cars
-            const resSection = document.getElementById('results');
-            const carList = document.getElementById('car-list');
-            resSection.style.display = 'block';
+            // Switch Views
+            document.getElementById('wizard-box').style.display = 'none';
+            const resultsContainer = document.getElementById('results-container');
+            resultsContainer.style.display = 'block';
+            setTimeout(() => resultsContainer.style.opacity = '1', 50);
+
+            // Fix Map
+            document.getElementById('map-container').style.display = 'block';
+            map.invalidateSize();
+            if(window.routeBounds) map.fitBounds(window.routeBounds, {padding:[50,50]});
+            else if(window.startCoords) map.setView(window.startCoords, 10);
+
+            // Render Cars
+            renderGrid(budget, km);
             
-            const filtered = CARS.filter(c => c.price <= budget);
+            document.getElementById('loader').style.display = 'none';
+        }
+
+        function renderGrid(budget, km) {
+            const container = document.getElementById('car-results');
+            const homeCharge = document.getElementById('chargingInput').value === 'yes';
+            const filtered = CARS_DB.filter(c => c.price <= budget);
+
             if(filtered.length === 0) {
-                carList.innerHTML = "<p style='color:#aaa; text-align:center; width:100%;'>Nessuna auto nel budget.</p>";
+                container.innerHTML = '<p style="text-align:center; grid-column:span 3; color:#aaa;">Nessuna auto trovata.</p>';
                 return;
             }
 
-            carList.innerHTML = filtered.map(c => {
+            container.innerHTML = filtered.map((c, i) => {
                 let cost = 0;
-                if(c.type === 'Elettrica') cost = (km/100) * CONS.ev * PRICES.ev;
-                else if(c.type === 'Diesel') cost = (km/100) * CONS.diesel * PRICES.diesel;
-                else cost = (km/100) * CONS.petrol * PRICES.petrol;
+                if(c.type === 'Elettrica') {
+                    const rate = homeCharge ? BASE_PRICES.kwh_home : BASE_PRICES.kwh_public;
+                    cost = (km/100) * CONSUMPTION.ev * rate;
+                } else if (c.type === 'Diesel') cost = (km/100) * CONSUMPTION.diesel * BASE_PRICES.diesel;
+                else cost = (km/100) * CONSUMPTION.petrol * BASE_PRICES.petrol;
 
                 return `
-                <div class="car-card">
-                    <img src="${c.img}" class="car-img">
-                    <div class="car-body">
+                <div class="glass-panel car-card" onclick="openModal('${c.brand} ${c.model}', '${cost.toFixed(2)}')">
+                    <img src="${c.img}" class="car-img" onerror="this.src='${FALLBACK_IMG}'">
+                    <div class="car-content">
                         <h3 class="car-title">${c.brand} ${c.model}</h3>
                         <span class="car-price">€${c.price.toLocaleString()}</span>
-                        <div class="spec-row"><span>Costo Viaggio:</span><b style="color:${c.type==='Elettrica'?'var(--accent)':'#fff'}">€${cost.toFixed(2)}</b></div>
-                        <div class="spec-row"><span>Tipo:</span><span>${c.type}</span></div>
+                        <div class="spec-row"><span>Costo Viaggio:</span><span style="color:var(--accent)">€${cost.toFixed(2)}</span></div>
+                        <div class="spec-row"><span>Range:</span><span>${c.range || '-'} km</span></div>
+                        <button class="action-btn">Dettagli</button>
                     </div>
                 </div>`;
             }).join('');
+        }
 
-            // 3. Scroll
-            window.scrollTo({ top: document.getElementById('dashboard-bar').offsetTop - 80, behavior: 'smooth' });
-            
-            // 4. Force map resize
-            setTimeout(() => map.invalidateSize(), 300);
+        function openModal(title, cost) {
+            document.getElementById('m-title').innerText = title;
+            document.getElementById('m-fuel').innerText = "€" + cost;
+            document.getElementById('m-total').innerText = "€" + (parseFloat(cost) * 1.2).toFixed(2);
+            document.getElementById('modal-overlay').style.display = 'flex';
         }
     </script>
 </body>
