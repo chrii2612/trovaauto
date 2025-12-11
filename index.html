@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AutoMatch Pro - Italy Edition</title>
+    <title>AutoMatch Pro - Intelligent</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;500;700;900&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
@@ -59,10 +59,12 @@
         }
         .icon-btn:hover { border-color: var(--primary); color: var(--primary); transform: scale(1.1); }
 
-        /* --- HERO SECTION --- */
+        /* --- HERO --- */
         #home-section { min-height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 20px; position: relative; }
+        
         .hero-title { font-size: 5rem; line-height: 0.95; margin-bottom: 20px; letter-spacing: -2px; z-index: 2; text-shadow: 0 0 30px rgba(41, 151, 255, 0.3); }
         .hero-sub { font-size: 1.3rem; color: var(--text-sub); max-width: 600px; margin-bottom: 50px; font-weight: 300; z-index: 2; }
+        
         .btn-main {
             padding: 20px 50px; font-size: 1.2rem; font-weight: 700; text-transform: uppercase; letter-spacing: 2px;
             color: #fff; background: var(--primary); border: none; border-radius: 50px; cursor: pointer; transition: 0.3s;
@@ -70,7 +72,7 @@
         }
         .btn-main:hover { transform: scale(1.05) translateY(-3px); filter: brightness(1.1); }
 
-        /* Floating Cards */
+        /* FLOATING CARDS */
         .float-card { 
             position: absolute; padding: 20px; width: 180px; border-radius: 20px; 
             text-align: left; animation: float 8s ease-in-out infinite; z-index: 1;
@@ -85,8 +87,8 @@
         .fc-5 { top: 50%; left: 5%; animation-delay: 3s; }
         @keyframes float { 0%,100%{transform:translateY(0);} 50%{transform:translateY(-20px);} }
 
-        /* Details */
-        #details-section { max-width: 1200px; margin: 0 auto; padding: 50px 20px; position: relative; z-index: 2; background: transparent; }
+        /* DETAILS SECTION */
+        #details-section { max-width: 1200px; margin: 0 auto; padding: 50px 20px; position: relative; z-index: 2; }
         .detail-block { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; margin-bottom: 150px; align-items: center; }
         .detail-block.reverse { direction: rtl; } .detail-block.reverse > * { direction: ltr; }
         .detail-text { padding: 40px; background: var(--glass-bg); border-radius: 30px; border: 1px solid var(--glass-border); backdrop-filter: blur(20px); }
@@ -97,8 +99,9 @@
         .detail-img-box:hover { transform: rotate(0) scale(1.02); }
         .detail-img { width: 100%; height: 100%; object-fit: cover; }
 
-        /* --- APP WIZARD --- */
+        /* --- APP SECTION --- */
         #app-section { display: none; min-height: 100vh; flex-direction: column; align-items: center; padding-top: 100px; opacity: 0; transition: opacity 0.8s; width: 100%; padding-bottom: 50px; }
+        
         .wizard-box {
             width: 100%; max-width: 800px;
             background: var(--glass-bg); backdrop-filter: var(--glass-blur); 
@@ -106,7 +109,7 @@
             padding: 40px; box-shadow: 0 25px 50px rgba(0,0,0,0.3);
             position: relative; overflow: visible;
         }
-        
+
         .progress-bar { width: 100%; height: 4px; background: rgba(255,255,255,0.1); border-radius: 2px; margin-bottom: 40px; overflow: hidden; }
         .progress-fill { height: 100%; background: var(--primary); width: 33%; transition: width 0.5s ease; box-shadow: 0 0 15px var(--primary); }
         
@@ -118,20 +121,16 @@
         label { display: block; margin-bottom: 10px; font-weight: 600; font-size: 0.9rem; color: var(--text-sub); text-transform: uppercase; letter-spacing: 1px; font-family: 'Poppins', sans-serif;}
         
         input, select { 
-            width: 100%; padding: 18px 18px 18px 45px; border-radius: 14px; border: 1px solid var(--glass-border); 
+            width: 100%; padding: 18px; border-radius: 14px; border: 1px solid var(--glass-border); 
             background: var(--input-bg); color: var(--text-main); font-size: 1.1rem; outline: none; transition: 0.3s;
             box-sizing: border-box; font-family: 'Inter', sans-serif;
         }
         input:focus { border-color: var(--primary); background: rgba(255,255,255,0.08); }
-        
-        /* Icon inside input */
-        .input-icon { position: absolute; left: 15px; top: 48px; font-size: 1.2rem; color: var(--text-sub); }
-        .italy-flag { position: absolute; right: 15px; top: 48px; font-size: 1.2rem; }
+        input.auto-filled { border-color: var(--accent); color: var(--accent); font-weight: 700; }
 
         .suggestions { position: absolute; top: 105%; left: 0; width: 100%; background: #1a1a1a; border: 1px solid var(--primary); border-radius: 12px; z-index: 100; max-height: 250px; overflow-y: auto; display: none; }
         .s-item { padding: 15px; cursor: pointer; color: #fff; border-bottom: 1px solid #333; }
         .s-item:hover { background: var(--primary); color: #000; }
-        .s-popular { font-size: 0.8rem; color: var(--accent); margin-bottom: 5px; text-transform: uppercase; padding-left: 15px; padding-top:10px;}
 
         .btn-row { display: flex; gap: 15px; margin-top: 40px; }
         .btn-sec { flex: 1; background: transparent; border: 1px solid var(--glass-border); color: var(--text-sub); padding: 16px; border-radius: 50px; cursor: pointer; transition:0.2s; font-weight:600; }
@@ -160,11 +159,6 @@
         .action-btn { margin-top: auto; padding: 12px; border: 1px solid var(--glass-border); background: transparent; color: #fff; border-radius: 12px; cursor: pointer; transition: 0.2s; font-weight: 600; width: 100%; }
         .action-btn:hover { background: var(--primary); border-color: var(--primary); }
 
-        .market-bar { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 40px; }
-        .market-item { background: var(--input-bg); padding: 15px; border-radius: 15px; text-align: center; border: 1px solid var(--glass-border); }
-        .m-price { font-size: 1.5rem; font-weight: 700; color: var(--text-main); }
-        .m-lbl { font-size: 0.7rem; text-transform: uppercase; color: var(--text-sub); }
-
         /* LOADER */
         #loader { position: fixed; top:0; left:0; width:100%; height:100%; background:var(--bg-dark); z-index:2000; display:none; flex-direction:column; align-items:center; justify-content:center; }
         .spinner { width: 50px; height: 50px; border: 4px solid var(--glass-border); border-top-color: var(--primary); border-radius: 50%; animation: spin 1s infinite linear; }
@@ -173,7 +167,7 @@
         /* MODAL */
         #modal-overlay { position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); z-index:3000; display:none; justify-content:center; align-items:center; backdrop-filter:blur(10px); }
         .modal-content { background: #1a1a1a; padding: 40px; border-radius: 24px; max-width: 500px; width: 90%; border: 1px solid var(--glass-border); position: relative; color: #fff; }
-        
+
         @media(max-width: 768px) { .hero-title {font-size: 3.5rem;} .detail-block, .trip-card { grid-template-columns: 1fr; } .btn-row { flex-direction: column-reverse; } .feature-card { display: none; } }
     </style>
 </head>
@@ -183,9 +177,10 @@
     <div class="bg-overlay"></div>
 
     <nav class="nav-bar">
-        <div class="logo" onclick="location.reload()">AUTOMATCH 🇮🇹</div>
+        <div class="logo" onclick="location.reload()">AUTOMATCH</div>
         <div class="nav-controls">
             <div class="icon-btn" onclick="document.body.classList.toggle('light-mode')"><i class="ph ph-sun"></i></div>
+            <div class="icon-btn"><i class="ph ph-user"></i></div>
         </div>
     </nav>
 
@@ -198,7 +193,7 @@
             <div class="float-card fc-5"><div class="fc-icon"><i class="ph ph-globe"></i></div><b>Eco</b><br><small>Scelta sostenibile.</small></div>
 
             <h1 class="hero-title">GUIDA IL<br><span style="color:var(--primary)">FUTURO.</span></h1>
-            <p class="hero-sub">Non scegliere solo un'auto. Scegli il viaggio perfetto. <br>Analisi costi, autonomia e ricariche in tempo reale.</p>
+            <p class="hero-sub">Piattaforma intelligente per la scelta del tuo veicolo.</p>
             
             <button class="btn-main" onclick="goToApp()">INIZIA CONFIGURAZIONE <i class="ph-bold ph-arrow-right"></i></button>
         </section>
@@ -233,20 +228,16 @@
             <div class="progress-bar"><div class="progress-fill" id="p-bar"></div></div>
 
             <div class="step active" id="step-1">
-                <h2>Il tuo Viaggio 🇮🇹</h2>
+                <h2>Il tuo Viaggio</h2>
                 <div class="input-group">
                     <label>📍 Partenza</label>
-                    <i class="ph ph-map-pin input-icon"></i>
-                    <input type="text" id="originInput" placeholder="Seleziona o scrivi città italiana..." autocomplete="off">
-                    <div class="italy-flag">🇮🇹</div>
-                    <div id="list-origin" class="suggestions"></div>
+                    <input type="text" id="originInput" placeholder="Città o Indirizzo..." autocomplete="off">
+                    <div id="sugg-origin" class="suggestions"></div>
                 </div>
                 <div class="input-group">
                     <label>🏁 Destinazione (Opzionale)</label>
-                    <i class="ph ph-flag input-icon"></i>
-                    <input type="text" id="destInput" placeholder="Seleziona o scrivi destinazione..." autocomplete="off">
-                    <div class="italy-flag">🇮🇹</div>
-                    <div id="list-dest" class="suggestions"></div>
+                    <input type="text" id="destInput" placeholder="Dove vuoi andare?" autocomplete="off">
+                    <div id="sugg-dest" class="suggestions"></div>
                 </div>
                 <div class="btn-row">
                     <span></span>
@@ -258,7 +249,6 @@
                 <h2>Abitudini</h2>
                 <div class="input-group">
                     <label>🛣️ Km Previsti</label>
-                    <i class="ph ph-road-horizon input-icon"></i>
                     <input type="number" id="kmInput" placeholder="Es. 50">
                     <small id="km-hint" style="color:var(--text-sub); display:block; margin-top:5px;">Calcolato automaticamente se inserisci destinazione.</small>
                 </div>
@@ -279,7 +269,6 @@
                 <h2>Investimento</h2>
                 <div class="input-group">
                     <label>💰 Budget (€)</label>
-                    <i class="ph ph-currency-eur input-icon"></i>
                     <input type="number" id="budgetInput" placeholder="35000" value="35000">
                 </div>
                 <div class="btn-row">
@@ -296,12 +285,6 @@
                 <div><div class="t-lbl">Arrivo</div><div class="t-val" id="t-end">--</div></div>
                 <div><div class="t-lbl">Distanza</div><div class="t-val" id="t-km">--</div></div>
                 <div><div class="t-lbl">Tempo Stimato</div><div class="t-val" id="t-time">--</div></div>
-            </div>
-
-            <div class="market-bar">
-                <div class="market-item"><div class="m-lbl">Benzina</div><div class="m-price" id="p-petrol">€1.84</div></div>
-                <div class="market-item"><div class="m-lbl">Diesel</div><div class="m-price" id="p-diesel">€1.71</div></div>
-                <div class="market-item"><div class="m-lbl">Elettrico</div><div class="m-price" id="p-ev">€0.58</div></div>
             </div>
 
             <div class="map-box" id="map-container"><div id="map"></div></div>
@@ -332,13 +315,6 @@
         // --- GLOBALS ---
         window.startCoords = null;
         window.endCoords = null;
-        
-        // Città Popolari Italiane per Autocomplete Veloce
-        const POPULAR_CITIES = [
-            "Roma", "Milano", "Napoli", "Torino", "Palermo", "Genova", "Bologna", "Firenze", "Bari", "Catania", 
-            "Venezia", "Verona", "Messina", "Padova", "Trieste", "Brescia", "Taranto", "Parma", "Prato", "Modena"
-        ];
-
         const CARS_DB = [
             { brand: "Tesla", model: "Model 3", price: 42990, type: "Elettrica", range: 513, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/8/82/2019_Tesla_Model_3_Long_Range_AWD_Front.jpg/800px-2019_Tesla_Model_3_Long_Range_AWD_Front.jpg" },
             { brand: "Fiat", model: "500e", price: 29950, type: "Elettrica", range: 320, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7f/Fiat_500_Electric_La_Prima_Genf_2020_1X7A5372.jpg/800px-Fiat_500_Electric_La_Prima_Genf_2020_1X7A5372.jpg" },
@@ -348,8 +324,6 @@
         ];
         const BASE_PRICES = { petrol: 1.84, diesel: 1.71, kwh_public: 0.58, kwh_home: 0.25 };
         const CONSUMPTION = { ev: 16, diesel: 5.5, petrol: 7.0 };
-        const FALLBACK_IMG = "https://placehold.co/600x400/222/FFF?text=Auto";
-
         let map, markersLayer, routeLayer;
 
         // --- BACKGROUND ---
@@ -364,107 +338,59 @@
         };
         window.addEventListener('resize', initStars); initStars(); drawStars();
 
-        // --- INIT ---
-        window.onload = function() {
-            // Map Init
-            map = L.map('map').setView([41.9, 12.5], 5);
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: 'OSM' }).addTo(map);
-            markersLayer = L.layerGroup().addTo(map); routeLayer = L.layerGroup().addTo(map);
-
-            initAutocomplete('originInput', 'list-origin');
-            initAutocomplete('destInput', 'list-dest');
-        };
-
+        // --- APP LOGIC ---
         function goToApp() {
             document.getElementById('landing-page').style.opacity = '0';
             setTimeout(() => {
                 document.getElementById('landing-page').style.display = 'none';
                 document.getElementById('app-section').style.display = 'flex';
                 setTimeout(() => document.getElementById('app-section').style.opacity = '1', 50);
-                map.invalidateSize();
+                
+                if(!map) {
+                    map = L.map('map').setView([41.9, 12.5], 5);
+                    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: 'OSM' }).addTo(map);
+                    markersLayer = L.layerGroup().addTo(map); routeLayer = L.layerGroup().addTo(map);
+                }
+                initAutocomplete('originInput', 'sugg-origin');
+                initAutocomplete('destInput', 'sugg-dest');
             }, 500);
         }
+        
         function goToHome() { location.reload(); }
+
         function nextStep(step) {
             document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
             document.getElementById(`step-${step}`).classList.add('active');
             document.getElementById('p-bar').style.width = step === 1 ? '33%' : step === 2 ? '66%' : '100%';
         }
-        function toggleTheme() { document.body.classList.toggle('light-mode'); }
 
-        // --- NEW AUTOCOMPLETE LOGIC (HYBRID) ---
         function initAutocomplete(inputId, listId) {
             const inp = document.getElementById(inputId);
             const list = document.getElementById(listId);
             let timer;
-
-            // 1. Show Popular Cities on Focus
-            inp.addEventListener('focus', () => {
-                if(inp.value.length === 0) {
-                    showSuggestions(list, POPULAR_CITIES.map(c => ({display_name: c, type: 'pop'})), inp);
-                }
-            });
-
-            // 2. API Search on Typing
             inp.addEventListener('input', () => {
                 clearTimeout(timer);
-                if(inp.value.length === 0) {
-                    showSuggestions(list, POPULAR_CITIES.map(c => ({display_name: c, type: 'pop'})), inp);
-                    return;
-                }
-                
-                inp.style.borderColor = "#ffcc00"; // Loading state
+                if(inp.value.length < 3) { list.style.display='none'; return; }
                 timer = setTimeout(async () => {
                     try {
-                        // FORCE ITALY SEARCH
                         const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(inp.value)}&limit=5&addressdetails=1&countrycodes=it`);
                         const data = await res.json();
-                        showSuggestions(list, data, inp);
-                        inp.style.borderColor = "#00f2ff";
-                    } catch(e) { console.error(e); }
+                        list.innerHTML = ''; list.style.display = 'block';
+                        data.forEach(d => {
+                            const div = document.createElement('div'); div.className = 's-item';
+                            div.innerText = d.display_name.split(',')[0];
+                            div.onclick = () => { 
+                                inp.value = d.display_name.split(',')[0]; list.style.display='none';
+                                const coords = { lat: parseFloat(d.lat), lon: parseFloat(d.lon) };
+                                if(inputId === 'originInput') window.startCoords = coords;
+                                if(inputId === 'destInput') { window.endCoords = coords; calculateRoute(); }
+                            };
+                            list.appendChild(div);
+                        });
+                    } catch(e) {}
                 }, 300);
             });
-
             document.addEventListener('click', e => { if(e.target !== inp) list.style.display='none'; });
-        }
-
-        function showSuggestions(list, data, inp) {
-            list.innerHTML = '';
-            if(data.length > 0) {
-                list.style.display = 'block';
-                if(data[0].type === 'pop') list.innerHTML = '<div class="s-popular">Città Popolari</div>';
-                
-                data.forEach(d => {
-                    const div = document.createElement('div'); div.className = 's-item';
-                    const name = d.display_name.split(',')[0];
-                    const details = d.address ? (d.address.city || d.address.town || d.address.state || '') : '';
-                    
-                    div.innerHTML = `<b>${name}</b>${details ? ` <small>(${details})</small>` : ''}`;
-                    
-                    div.onclick = () => {
-                        inp.value = name;
-                        list.style.display = 'none';
-                        inp.style.borderColor = "#00e676"; // Success green
-                        
-                        // Handle Coords logic
-                        if(d.lat) { // From API
-                            const coords = { lat: parseFloat(d.lat), lon: parseFloat(d.lon) };
-                            if(inp.id === 'originInput') window.startCoords = coords;
-                            if(inp.id === 'destInput') { window.endCoords = coords; calculateRoute(); }
-                        } else { // From Popular List (Need fetch)
-                            fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(name)}&limit=1&countrycodes=it`)
-                                .then(r=>r.json()).then(res => {
-                                    if(res.length>0) {
-                                        const coords = { lat: parseFloat(res[0].lat), lon: parseFloat(res[0].lon) };
-                                        if(inp.id === 'originInput') window.startCoords = coords;
-                                        if(inp.id === 'destInput') { window.endCoords = coords; calculateRoute(); }
-                                    }
-                                });
-                        }
-                    };
-                    list.appendChild(div);
-                });
-            } else { list.style.display = 'none'; }
         }
 
         async function calculateRoute() {
@@ -508,13 +434,13 @@
             setTimeout(() => resultsContainer.style.opacity = '1', 50);
 
             // MAP RENDER
-            document.getElementById('map-container').style.display = 'block';
-            map.invalidateSize();
             if(window.startCoords) {
                 markersLayer.clearLayers(); routeLayer.clearLayers();
                 L.marker(window.startCoords).addTo(markersLayer);
+                
                 if(window.endCoords) {
                     L.marker(window.endCoords).addTo(markersLayer);
+                    // Try Route Drawing
                     try {
                         const r = await fetch(`https://router.project-osrm.org/route/v1/driving/${window.startCoords.lon},${window.startCoords.lat};${window.endCoords.lon},${window.endCoords.lat}?overview=full&geometries=geojson`);
                         const d = await r.json();
@@ -529,14 +455,17 @@
                             }
                         }
                     } catch(e) {
+                         // Fallback Line
                          L.polyline([window.startCoords, window.endCoords], {color:'red', dashArray:'5,10'}).addTo(routeLayer);
                          map.fitBounds(L.latLngBounds([window.startCoords, window.endCoords]));
                     }
                 } else {
                     map.setView(window.startCoords, 10);
                 }
+                map.invalidateSize();
             }
 
+            // CARS RENDER
             const container = document.getElementById('car-results');
             const homeCharge = document.getElementById('chargingInput').value === 'yes';
             const filtered = CARS_DB.filter(c => c.price <= budget);
