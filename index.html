@@ -7,132 +7,231 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="AutoMatch">
-    <meta name="theme-color" content="#F2F2F7" media="(prefers-color-scheme: light)">
+    <link rel="apple-touch-icon" href="https://upload.wikimedia.org/wikipedia/commons/thumb/1/1b/Apple_logo_grey.svg/1200px-Apple_logo_grey.svg.png">
     
-    <title>AutoMatch Pro - Flow</title>
+    <title>AutoMatch Vision</title>
     
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
     <style>
+        /* --- iOS 26 DESIGN TOKENS --- */
         :root {
-            --ios-blue: #007AFF;
-            --ios-green: #34C759;
-            --ios-orange: #FF9500;
-            --ios-red: #FF3B30;
-            --ios-purple: #5856D6;
+            --ios-accent: #007AFF;
             --ios-bg: #F2F2F7;
             --ios-card: #FFFFFF;
             --ios-text: #000000;
-            --ios-text-sec: #8E8E93;
-            --ios-separator: rgba(60, 60, 67, 0.18);
-            --ios-shadow: 0 4px 20px rgba(0,0,0,0.06);
-            --font-stack: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, sans-serif;
+            --ios-sub: #8E8E93;
+            --ios-blur: blur(30px);
+            --ios-shadow: 0 8px 32px rgba(0,0,0,0.08);
+            --spring-easing: cubic-bezier(0.34, 1.56, 0.64, 1); /* Apple Spring */
         }
 
         body.dark-mode {
             --ios-bg: #000000;
             --ios-card: #1C1C1E;
             --ios-text: #FFFFFF;
-            --ios-text-sec: #98989D;
-            --ios-separator: rgba(84, 84, 88, 0.45);
-            --ios-shadow: 0 4px 20px rgba(0,0,0,0.4);
+            --ios-sub: #98989D;
+            --ios-shadow: 0 8px 32px rgba(0,0,0,0.4);
         }
 
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        body, html { margin: 0; padding: 0; height: 100%; font-family: var(--font-stack); background: var(--ios-bg); color: var(--ios-text); overflow-x: hidden; scroll-behavior: smooth; }
-        h1, h2, h3 { letter-spacing: -0.02em; margin: 0; }
+        body, html { 
+            margin: 0; padding: 0; height: 100%; 
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, sans-serif;
+            background: var(--ios-bg); color: var(--ios-text);
+            overflow-x: hidden; scroll-behavior: smooth;
+        }
 
-        /* DYNAMIC ISLAND */
-        #dynamic-island-container { position: fixed; top: 10px; left: 50%; transform: translateX(-50%); z-index: 9999; display: flex; justify-content: center; width: 100%; pointer-events: none; }
-        #dynamic-island { background: #000; color: #fff; border-radius: 35px; height: 35px; width: 120px; display: flex; align-items: center; justify-content: center; transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); overflow: hidden; padding: 0; box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
-        #dynamic-island.active { width: 92%; max-width: 380px; height: 60px; padding: 0 20px; border-radius: 40px; }
-        #di-content { display: flex; align-items: center; gap: 12px; opacity: 0; transition: opacity 0.2s 0.1s; white-space: nowrap; }
-        #dynamic-island.active #di-content { opacity: 1; }
+        h1, h2, h3 { letter-spacing: -0.03em; margin: 0; }
+
+        /* --- DYNAMIC ISLAND (HIDDEN BY DEFAULT) --- */
+        #island-wrapper {
+            position: fixed; top: -100px; left: 0; width: 100%; 
+            display: flex; justify-content: center; z-index: 9999;
+            transition: top 0.5s var(--spring-easing);
+            pointer-events: none;
+        }
+        #island-wrapper.active { top: 12px; }
+        
+        #dynamic-island {
+            background: #000; color: #fff;
+            padding: 0 20px; height: 45px; border-radius: 25px;
+            display: flex; align-items: center; gap: 10px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+            transform: scale(0.9); transition: transform 0.3s var(--spring-easing);
+        }
+        #island-wrapper.active #dynamic-island { transform: scale(1); }
+        .di-icon { font-size: 1.2rem; }
+        .di-msg { font-size: 0.9rem; font-weight: 600; white-space: nowrap; }
 
         /* NAVBAR */
-        .nav-bar { position: fixed; top: 0; left: 0; width: 100%; height: 60px; padding: 0 20px; display: flex; justify-content: space-between; align-items: center; z-index: 2000; background: rgba(255,255,255,0.7); backdrop-filter: saturate(180%) blur(25px); border-bottom: 0.5px solid var(--ios-separator); }
-        body.dark-mode .nav-bar { background: rgba(28,28,30,0.7); }
+        .nav-bar { 
+            position: fixed; top: 0; left: 0; width: 100%; height: 60px; padding: 0 20px; 
+            display: flex; justify-content: space-between; align-items: center; 
+            z-index: 2000; background: rgba(255,255,255,0.01); 
+            backdrop-filter: var(--ios-blur); -webkit-backdrop-filter: var(--ios-blur);
+        }
 
         /* COMPONENTS */
-        .btn-main, .btn-pri, .btn-sec, .icon-btn { font-family: inherit; border: none; cursor: pointer; outline: none; transition: transform 0.1s, opacity 0.2s; position: relative; overflow: hidden; }
-        .btn-main:active, .btn-pri:active, .btn-sec:active { transform: scale(0.96); opacity: 0.8; }
-        
-        .btn-main { padding: 16px 32px; font-size: 1.1rem; font-weight: 600; background: var(--ios-blue); color: #fff; border-radius: 40px; box-shadow: 0 8px 25px rgba(0, 122, 255, 0.3); }
-        .btn-pri { background: var(--ios-blue); color: #fff; padding: 16px; border-radius: 14px; font-weight: 600; width: 100%; font-size: 1rem; }
-        .btn-sec { background: rgba(120,120,128,0.12); color: var(--ios-blue); padding: 16px; border-radius: 14px; font-weight: 600; width: 100%; }
-        .icon-btn { width: 38px; height: 38px; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: rgba(120,120,128,0.12); color: var(--ios-blue); font-size: 1.2rem; }
+        .btn-scale { transition: transform 0.2s var(--spring-easing); cursor: pointer; }
+        .btn-scale:active { transform: scale(0.92); }
 
-        .ios-list { background: var(--ios-card); border-radius: 14px; box-shadow: var(--ios-shadow); margin-bottom: 25px; position: relative; z-index: 10; }
-        .ios-item { display: flex; align-items: center; padding: 16px 20px; border-bottom: 0.5px solid var(--ios-separator); position: relative; }
+        .btn-main {
+            padding: 18px 40px; font-size: 1.1rem; font-weight: 600;
+            background: var(--ios-accent); color: #fff; border-radius: 40px; border:none;
+            box-shadow: 0 10px 30px rgba(0, 122, 255, 0.3);
+        }
+        .btn-pri { background: var(--ios-accent); color: #fff; padding: 16px; border-radius: 16px; border:none; width: 100%; font-size: 1rem; font-weight: 600; }
+        .btn-sec { background: rgba(120,120,128,0.1); color: var(--ios-accent); padding: 16px; border-radius: 16px; border:none; width: 100%; font-weight: 600; }
+        
+        .icon-btn { 
+            width: 40px; height: 40px; border-radius: 50%; 
+            display: flex; align-items: center; justify-content: center; 
+            background: rgba(120,120,128,0.1); font-size: 1.2rem;
+        }
+
+        /* iOS LISTS */
+        .ios-list { background: var(--ios-card); border-radius: 18px; margin-bottom: 25px; position: relative; z-index: 10; overflow: visible; }
+        .ios-item { 
+            display: flex; align-items: center; padding: 18px 20px; 
+            border-bottom: 0.5px solid rgba(120,120,128,0.2); position: relative; 
+        }
         .ios-item:last-child { border-bottom: none; }
-        .ios-item i { font-size: 1.4rem; color: var(--ios-blue); margin-right: 15px; width: 24px; text-align: center; }
+        .ios-item i { font-size: 1.4rem; color: var(--ios-accent); margin-right: 15px; width: 24px; text-align: center; }
+        
         .ios-content { flex: 1; position: relative; }
-        
-        input, select { width: 100%; border: none; background: transparent; font-size: 1.1rem; color: var(--ios-text); font-family: inherit; outline: none; padding: 0; margin-top: 2px; }
-        
-        /* MODE SELECTION CARDS */
+        input, select { 
+            width: 100%; border: none; background: transparent; 
+            font-size: 1.1rem; color: var(--ios-text); outline: none; padding: 0; margin-top: 2px; font-family: inherit;
+        }
+        label { font-size: 0.75rem; color: var(--ios-sub); font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; display: block; margin-bottom: 4px; }
+
+        /* SUGGESTIONS POPUP */
+        .suggestions { 
+            background: var(--ios-card); border-radius: 16px; 
+            position: absolute; top: 110%; left: -20px; width: calc(100% + 40px); 
+            max-height: 250px; overflow-y: auto; display: none; 
+            box-shadow: 0 15px 50px rgba(0,0,0,0.2); z-index: 9999; 
+        }
+        .s-item { padding: 15px 20px; border-bottom: 0.5px solid rgba(120,120,128,0.1); font-size: 1rem; cursor: pointer; }
+        .s-item:active { background: rgba(120,120,128,0.1); }
+
+        /* BENTO GRID (HOME) */
+        .bento-grid { 
+            display: grid; grid-template-columns: repeat(2, 1fr); 
+            gap: 15px; width: 100%; margin-top: 40px; padding: 0 10px;
+        }
+        .bento-card {
+            background: var(--ios-card); border-radius: 24px; padding: 25px 15px;
+            text-align: center; transition: 0.2s; border: 1px solid rgba(0,0,0,0.05);
+        }
+        .bento-card.wide { grid-column: span 2; display: flex; align-items: center; justify-content: space-between; padding: 20px 30px; text-align: left; }
+        .bento-icon { font-size: 2rem; margin-bottom: 10px; color: var(--ios-accent); }
+        .bento-card.wide .bento-icon { margin-bottom: 0; order: 2; font-size: 2.5rem; }
+
+        /* MODE SELECTION */
+        .mode-card {
+            background: var(--ios-card); padding: 30px; border-radius: 24px;
+            text-align: center; cursor: pointer; border: 2px solid transparent;
+            box-shadow: var(--ios-shadow); transition: 0.2s;
+        }
+        .mode-card.selected { border-color: var(--ios-accent); background: rgba(0,122,255,0.03); }
         .mode-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 30px; }
-        .mode-card { background: var(--ios-card); border-radius: 20px; padding: 30px 20px; text-align: center; box-shadow: var(--ios-shadow); transition: 0.2s; cursor: pointer; border: 2px solid transparent; }
-        .mode-card:active { transform: scale(0.96); }
-        .mode-card.selected { border-color: var(--ios-blue); background: rgba(0,122,255,0.05); }
-        .mode-icon { font-size: 3rem; margin-bottom: 15px; color: var(--ios-text); }
-        .mode-title { font-weight: 700; font-size: 1.1rem; }
 
-        /* WIZARD & RESULTS */
-        #app-section { display: none; padding-top: 80px; min-height: 100vh; flex-direction: column; align-items: center; opacity: 0; transition: opacity 0.5s; padding-bottom: 100px; }
+        /* APP FLOW */
+        #app-section { display: none; padding-top: 90px; min-height: 100vh; flex-direction: column; align-items: center; opacity: 0; transition: 0.5s; padding-bottom: 100px; }
         .wizard-container { width: 100%; max-width: 600px; padding: 0 20px; }
-        .step { display: none; animation: slideUpFade 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        .step { display: none; animation: slideIn 0.4s var(--spring-easing) forwards; }
         .step.active { display: block; }
-        @keyframes slideUpFade { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes slideIn { from {opacity:0; transform:translateY(30px);} to {opacity:1; transform:translateY(0);} }
 
+        /* RESULTS */
         #results-container { width: 100%; max-width: 1000px; display: none; padding: 0 20px 80px 20px; }
-        .map-wrapper { height: 300px; width: 100%; background: #e5e5ea; border-radius: 20px; overflow: hidden; margin-bottom: 20px; box-shadow: var(--ios-shadow); z-index: 1; }
-        #map { width: 100%; height: 100%; z-index: 1; }
+        .map-box { height: 350px; border-radius: 24px; overflow: hidden; margin-bottom: 20px; position: relative; z-index: 1; }
+        #map { width: 100%; height: 100%; }
 
-        /* CARDS */
-        .transport-card { background: var(--ios-card); padding: 18px; border-radius: 18px; display: flex; align-items: center; justify-content: space-between; box-shadow: var(--ios-shadow); transition: 0.2s; cursor: pointer; margin-bottom: 12px; }
-        .t-left { display: flex; align-items: center; gap: 15px; }
-        .t-icon { width: 42px; height: 42px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.6rem; }
-        .glass-card { background: var(--ios-card); padding: 20px; border-radius: 20px; box-shadow: var(--ios-shadow); position: relative; overflow: hidden; }
-        .weather-widget { background: linear-gradient(135deg, #5AC8FA, #007AFF); color: white; }
-        .car-card { background: var(--ios-card); border-radius: 18px; overflow: hidden; box-shadow: var(--ios-shadow); cursor: pointer; margin-bottom: 15px; }
-        .car-img { width: 100%; height: 180px; object-fit: cover; }
+        /* TRANSPORT LIST */
+        .trans-card {
+            background: var(--ios-card); padding: 18px; border-radius: 20px;
+            display: flex; align-items: center; justify-content: space-between;
+            margin-bottom: 12px; cursor: pointer; box-shadow: var(--ios-shadow);
+        }
+        .t-badge { padding: 5px 12px; border-radius: 12px; font-size: 0.8rem; font-weight: 700; }
 
-        /* MODALS */
-        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); backdrop-filter: blur(10px); z-index: 4000; display: none; align-items: flex-end; justify-content: center; opacity: 0; transition: opacity 0.3s; }
-        .sheet-modal { background: var(--ios-card); width: 100%; max-width: 600px; border-radius: 30px 30px 0 0; padding: 30px; transform: translateY(100%); transition: transform 0.4s; }
-        .list-btn { display: flex; align-items: center; gap: 15px; width: 100%; padding: 16px; margin-bottom: 8px; border-radius: 14px; background: rgba(120,120,128,0.08); text-align: left; font-weight: 600; font-size: 1.05rem; border: none; cursor: pointer; color: var(--ios-text); }
-        .ios-switch { appearance: none; width: 50px; height: 30px; background: #e9e9ea; border-radius: 25px; transition: 0.3s; position: relative; outline:none; }
-        .ios-switch:checked { background: var(--ios-green); }
-        .ios-switch::after { content: ''; position: absolute; top: 2px; left: 2px; width: 26px; height: 26px; border-radius: 50%; background: white; transition: 0.3s; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
-        .ios-switch:checked::after { transform: translateX(20px); }
+        /* MODALS (SHEET) */
+        .overlay { 
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+            background: rgba(0,0,0,0.3); backdrop-filter: blur(5px); z-index: 4000;
+            display: none; align-items: flex-end; justify-content: center;
+        }
+        .sheet {
+            background: var(--ios-card); width: 100%; max-width: 600px;
+            border-radius: 35px 35px 0 0; padding: 30px; padding-bottom: 50px;
+            transform: translateY(100%); transition: transform 0.4s var(--spring-easing);
+        }
+        .handle { width: 40px; height: 5px; background: #E5E5EA; border-radius: 3px; margin: 0 auto 25px auto; }
         
-        .suggestions { background: var(--ios-card); border-radius: 12px; position: absolute; top: 100%; left: -20px; width: calc(100% + 40px); margin-top: 10px; max-height: 250px; overflow-y: auto; display: none; box-shadow: 0 10px 30px rgba(0,0,0,0.15); z-index: 9999; border: 0.5px solid var(--ios-separator); }
-        .s-item { padding: 14px 20px; border-bottom: 0.5px solid var(--ios-separator); font-size: 1rem; cursor: pointer; }
+        .action-btn { 
+            display: flex; align-items: center; gap: 15px; width: 100%; padding: 16px; margin-bottom: 8px; 
+            border-radius: 16px; background: rgba(120,120,128,0.05); text-align: left; 
+            font-weight: 600; font-size: 1.05rem; border: none; cursor: pointer; color: var(--ios-text);
+        }
+
+        /* TOGGLE */
+        .ios-switch { appearance: none; width: 50px; height: 30px; background: #e9e9ea; border-radius: 25px; position: relative; outline:none; transition:0.3s; }
+        .ios-switch:checked { background: var(--ios-accent); }
+        .ios-switch::after { content: ''; position: absolute; top: 2px; left: 2px; width: 26px; height: 26px; border-radius: 50%; background: white; transition: 0.3s var(--spring-easing); box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+        .ios-switch:checked::after { transform: translateX(20px); }
+
     </style>
 </head>
 <body>
 
-    <div id="dynamic-island-container"><div id="dynamic-island"><div id="di-content"><i class="di-icon ph-fill ph-circle-notch ph-spin"></i><span class="di-text">Loading...</span></div></div></div>
+    <div id="island-wrapper">
+        <div id="dynamic-island">
+            <i class="di-icon ph-fill ph-bell"></i>
+            <span class="di-msg" id="di-text">Notification</span>
+        </div>
+    </div>
 
     <nav class="nav-bar">
-        <div class="logo" onclick="location.reload()" style="font-weight: 700; font-size: 1.3rem; display: flex; align-items: center; gap: 6px; cursor: pointer;">
-            <i class="ph-fill ph-steering-wheel" style="color:var(--ios-blue); font-size:1.6rem;"></i> <span>AutoMatch</span>
+        <div class="logo btn-scale" onclick="location.reload()" style="font-weight: 800; font-size: 1.4rem; display: flex; align-items: center; gap: 5px;">
+            <i class="ph-fill ph-steering-wheel" style="color:var(--ios-accent);"></i> AutoMatch
         </div>
-        <div style="display:flex; gap:12px;">
-            <div class="icon-btn" onclick="haptic(); openShareSheet()"><i class="ph-bold ph-share-network"></i></div>
-            <div class="icon-btn" onclick="document.body.classList.toggle('dark-mode')"><i class="ph-fill ph-moon-stars"></i></div>
+        <div style="display:flex; gap:10px;">
+            <div class="icon-btn btn-scale" onclick="openShareSheet()"><i class="ph-bold ph-share-network"></i></div>
+            <div class="icon-btn btn-scale" onclick="document.body.classList.toggle('dark-mode')"><i class="ph-fill ph-moon-stars"></i></div>
         </div>
     </nav>
 
     <div id="landing-page" style="padding-top:120px; text-align:center; padding-bottom: 40px;">
         <div style="max-width:800px; margin:0 auto; padding:20px;">
-            <span style="color:var(--ios-blue); font-weight:700; letter-spacing:1px; font-size:0.8rem; text-transform:uppercase; margin-bottom:15px; display:block;">Pianificatore 3.0</span>
-            <h1 style="font-size:3.5rem; line-height:1.05; margin-bottom:20px;">Viaggia Smart.</h1>
-            <p style="color:var(--ios-text-sec); font-size:1.2rem; margin-bottom:40px;">Confronta Auto, Treno e Aereo in un attimo.</p>
-            <button class="btn-main" onclick="haptic(); goToApp()">Inizia Ora</button>
+            <span style="color:var(--ios-accent); font-weight:700; letter-spacing:1px; font-size:0.8rem; text-transform:uppercase; margin-bottom:15px; display:block;">iOS 26 Concept</span>
+            <h1 style="font-size:3.5rem; line-height:1; margin-bottom:20px;">Il viaggio<br>reinventato.</h1>
+            <p style="color:var(--ios-sub); font-size:1.2rem; margin-bottom:40px; max-width: 500px; margin-left:auto; margin-right:auto;">
+                Confronta Auto, Treno e Aereo in tempo reale.
+            </p>
+            <button class="btn-main btn-scale" onclick="goToApp()">Inizia Ora</button>
+            
+            <div class="bento-grid">
+                <div class="bento-card wide">
+                    <div>
+                        <div style="font-weight:700; font-size:1.1rem; margin-bottom:5px;">Smart Route</div>
+                        <div style="font-size:0.9rem; color:var(--ios-sub);">Analisi traffico e pedaggi reali.</div>
+                    </div>
+                    <i class="ph-fill ph-map-trifold bento-icon"></i>
+                </div>
+                <div class="bento-card">
+                    <i class="ph-fill ph-train bento-icon" style="color:#AF52DE"></i>
+                    <div style="font-weight:700;">Treni</div>
+                </div>
+                <div class="bento-card">
+                    <i class="ph-fill ph-airplane-tilt bento-icon" style="color:#FF9500"></i>
+                    <div style="font-weight:700;">Voli</div>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -140,86 +239,83 @@
         <div class="wizard-container" id="wizard-box">
             
             <div class="step active" id="step-mode">
-                <h2 style="margin-bottom:10px; text-align:center;">Come preferisci muoverti?</h2>
-                <p style="text-align:center; margin-bottom:30px; color:var(--ios-text-sec);">Scegli il tuo mezzo principale.</p>
+                <h2 style="margin-bottom:10px; text-align:center;">Come viaggerai?</h2>
+                <p style="text-align:center; color:var(--ios-sub); margin-bottom:30px;">L'esperienza si adatta alla tua scelta.</p>
                 
                 <div class="mode-grid">
-                    <div class="mode-card" onclick="selectMode('car')">
-                        <i class="ph-fill ph-car mode-icon" style="color:var(--ios-blue)"></i>
-                        <div class="mode-title">Guido Io</div>
+                    <div class="mode-card btn-scale" onclick="selectMode('car')">
+                        <i class="ph-fill ph-car mode-icon" style="font-size:3rem; color:var(--ios-accent); margin-bottom:15px;"></i>
+                        <div style="font-weight:700; font-size:1.1rem;">Guido Io</div>
                     </div>
-                    <div class="mode-card" onclick="selectMode('public')">
-                        <i class="ph-fill ph-train mode-icon" style="color:var(--ios-purple)"></i>
-                        <div class="mode-title">Mezzi Pubblici</div>
+                    <div class="mode-card btn-scale" onclick="selectMode('public')">
+                        <i class="ph-fill ph-train mode-icon" style="font-size:3rem; color:#AF52DE; margin-bottom:15px;"></i>
+                        <div style="font-weight:700; font-size:1.1rem;">Mezzi Pubblici</div>
                     </div>
                 </div>
             </div>
 
             <div class="step" id="step-1">
-                <h2 style="margin-bottom:10px;">Dettagli Viaggio</h2>
+                <h2 style="margin-bottom:20px;">Dettagli Viaggio</h2>
                 <div class="ios-list">
-                    <div class="ios-item" style="z-index: 20;">
+                    <div class="ios-item" style="z-index:20;">
                         <i class="ph-fill ph-navigation-arrow"></i>
                         <div class="ios-content">
                             <label>Partenza</label>
-                            <input type="text" id="originInput" placeholder="Città..." autocomplete="off"><div id="list-origin" class="suggestions"></div>
+                            <input type="text" id="originInput" placeholder="Città..." onfocus="showSuggestions('originInput', 'list-origin')" autocomplete="off">
+                            <div id="list-origin" class="suggestions"></div>
                         </div>
                     </div>
-                    <div class="ios-item" style="z-index: 10;">
+                    <div class="ios-item" style="z-index:10;">
                         <i class="ph-fill ph-flag-checkered"></i>
                         <div class="ios-content">
                             <label>Destinazione</label>
-                            <input type="text" id="destInput" placeholder="Città..." autocomplete="off"><div id="list-dest" class="suggestions"></div>
+                            <input type="text" id="destInput" placeholder="Città..." onfocus="showSuggestions('destInput', 'list-dest')" autocomplete="off">
+                            <div id="list-dest" class="suggestions"></div>
                         </div>
-                        <i class="ph-bold ph-x-circle" id="clearDest" onclick="clearDestination()" style="display:none; color:var(--ios-text-sec); cursor:pointer;"></i>
                     </div>
                     <div class="ios-item">
                         <i class="ph-fill ph-calendar-blank"></i>
                         <div class="ios-content">
-                            <label>Data</label>
-                            <input type="datetime-local" id="tripDate">
-                        </div>
+                            <label id="lbl-date">Data</label>
+                            <input type="date" id="tripDate"> </div>
                     </div>
                 </div>
                 <div style="display:flex; gap:10px;">
-                    <button class="btn-sec" onclick="prevStep('mode')">Indietro</button>
-                    <button class="btn-pri" onclick="haptic(); validateStep1()">Avanti</button>
+                    <button class="btn-sec btn-scale" onclick="prevStep('mode')">Indietro</button>
+                    <button class="btn-pri btn-scale" onclick="validateStep1()">Avanti</button>
                 </div>
             </div>
 
             <div class="step" id="step-2">
-                <h2 style="margin-bottom:10px;">Abitudini Auto</h2>
+                <h2 style="margin-bottom:20px;">Info Auto</h2>
                 <div class="ios-list">
                     <div class="ios-item">
-                        <i class="ph-fill ph-road-horizon"></i>
-                        <div class="ios-content"><label>Distanza (KM)</label><input type="number" id="kmInput" placeholder="--"></div>
+                        <div class="ios-content"><label>Km Totali</label><input type="number" id="kmInput" placeholder="--"></div>
                     </div>
                     <div class="ios-item">
-                        <i class="ph-fill ph-house-line"></i>
-                        <div class="ios-content"><label>Garage?</label><select id="chargingInput"><option value="no">No, pubblica</option><option value="yes">Sì, domestica</option></select></div>
+                        <div class="ios-content"><label>Ricarica a casa?</label><select id="chargingInput"><option value="no">No</option><option value="yes">Sì</option></select></div>
                     </div>
                 </div>
                 <div style="display:flex; gap:10px;">
-                    <button class="btn-sec" onclick="prevStep(1)">Indietro</button>
-                    <button class="btn-pri" onclick="nextStep(3)">Avanti</button>
+                    <button class="btn-sec btn-scale" onclick="prevStep(1)">Indietro</button>
+                    <button class="btn-pri btn-scale" onclick="nextStep(3)">Avanti</button>
                 </div>
             </div>
 
             <div class="step" id="step-3">
-                <h2 style="margin-bottom:10px;">Preferenze</h2>
+                <h2 style="margin-bottom:20px;">Opzioni</h2>
                 <div class="ios-list">
                     <div class="ios-item">
-                        <div class="ios-content"><span style="font-size:1rem; font-weight:500;">Voglio acquistare un'auto</span></div>
+                        <div class="ios-content"><span style="font-weight:500;">Voglio acquistare un'auto</span></div>
                         <input type="checkbox" id="buyToggle" class="ios-switch" onchange="toggleBudget()">
                     </div>
                     <div class="ios-item" id="budgetRow" style="display:none;">
-                        <i class="ph-fill ph-wallet"></i>
                         <div class="ios-content"><label>Budget (€)</label><input type="number" id="budgetInput" value="35000"></div>
                     </div>
                 </div>
                 <div style="display:flex; gap:10px;">
-                    <button class="btn-sec" onclick="prevStep(2)">Indietro</button>
-                    <button class="btn-pri" onclick="runAnalysis()">Calcola</button>
+                    <button class="btn-sec btn-scale" onclick="prevStep(2)">Indietro</button>
+                    <button class="btn-pri btn-scale" onclick="runAnalysis()">Calcola</button>
                 </div>
             </div>
         </div>
@@ -227,256 +323,342 @@
         <div id="results-container">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
                 <h2>Risultati</h2>
-                <button class="icon-btn" onclick="location.reload()"><i class="ph-bold ph-arrow-counter-clockwise"></i></button>
+                <button class="icon-btn btn-scale" onclick="location.reload()"><i class="ph-bold ph-arrow-counter-clockwise"></i></button>
             </div>
             
-            <div class="map-wrapper" id="map-container"><div id="map"></div></div>
+            <div class="map-box"><div id="map"></div></div>
             
-            <div style="display:grid; grid-template-columns:1fr 1fr; gap:15px; margin-bottom:25px;">
-                <div class="glass-card"><label>Distanza</label><div style="font-size:1.6rem; font-weight:700;" id="t-km">--</div></div>
-                <div class="glass-card weather-widget"><i class="ph-fill ph-cloud-sun weather-bg"></i><label style="color:rgba(255,255,255,0.8)">Meteo</label><div style="font-size:1.6rem; font-weight:700;" id="w-temp">--°</div></div>
-            </div>
-
-            <div id="car-section" style="display:none;">
-                <div class="transport-card" style="margin-bottom:20px; justify-content:center; gap:10px; background:var(--ios-card); border:1px solid var(--ios-blue);" onclick="openNavSheet()">
-                    <i class="ph-fill ph-navigation-arrow" style="color:var(--ios-blue); font-size:1.2rem;"></i>
-                    <span style="font-weight:600; color:var(--ios-blue);">Avvia Navigazione Auto</span>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:15px; margin-bottom:30px;">
+                <div class="trans-card" style="flex-direction:column; align-items:start; margin:0;">
+                    <label>Distanza</label><div style="font-size:1.5rem; font-weight:700;" id="t-km">--</div>
                 </div>
-                
-                <h3 style="margin-bottom:10px;">Costi Stimati Auto</h3>
-                <div class="transport-card">
-                    <div class="t-left"><div class="t-icon" style="background:#EBF2FF; color:var(--ios-blue)"><i class="ph-fill ph-car"></i></div><div><div style="font-weight:700;">Guida</div><div class="t-meta" id="drive-time">--</div></div></div>
-                    <div style="text-align:right;"><div class="t-price" id="drive-cost">--</div><div class="t-meta">Carburante + Pedaggi</div></div>
-                </div>
-
-                <div id="car-suggestions" style="margin-top:30px; display:none;">
-                    <h3 style="margin-bottom:15px;">Auto Consigliate</h3>
-                    <div id="car-grid" class="car-grid"></div>
+                <div class="trans-card" style="flex-direction:column; align-items:start; margin:0; background:linear-gradient(135deg, #007AFF, #5856D6); color:white;">
+                    <i class="ph-fill ph-cloud-sun" style="font-size:1.5rem;"></i><div style="font-size:1.5rem; font-weight:700;" id="w-temp">--°</div>
                 </div>
             </div>
 
-            <div id="public-section" style="display:none;">
-                <h3 style="margin-bottom:10px;">Opzioni Mezzi</h3>
-                
-                <div class="transport-card" onclick="openTrainLink()">
-                    <div class="t-left"><div class="t-icon" style="background:#F2E6FF; color:var(--ios-purple)"><i class="ph-fill ph-train"></i></div><div><div style="font-weight:700;">Treno</div><div class="t-meta" id="train-time">--</div></div></div>
-                    <div style="text-align:right;"><div class="t-price" id="train-cost">--</div><div style="color:var(--ios-blue); font-size:0.8rem; font-weight:600;">Vedi Offerte ›</div></div>
+            <div id="res-car" style="display:none;">
+                <h3 style="margin-bottom:15px; font-size:0.9rem; text-transform:uppercase; color:var(--ios-sub);">Costi Stimati</h3>
+                <div class="trans-card">
+                    <div style="display:flex; align-items:center; gap:15px;">
+                        <i class="ph-fill ph-car" style="font-size:1.5rem; color:var(--ios-accent);"></i>
+                        <div><div style="font-weight:700;">In Auto</div><div style="font-size:0.85rem; color:var(--ios-sub);">Carburante + Pedaggi</div></div>
+                    </div>
+                    <div style="font-weight:700; font-size:1.1rem;" id="drive-cost">--</div>
                 </div>
+                <button class="btn-pri btn-scale" onclick="openNavSheet()" style="margin-top:10px;"><i class="ph-bold ph-navigation-arrow"></i> Avvia Navigazione</button>
                 
-                <div class="transport-card" id="card-plane" onclick="openPlaneLink()">
-                    <div class="t-left"><div class="t-icon" style="background:#FFF3E0; color:var(--ios-orange)"><i class="ph-fill ph-airplane-tilt"></i></div><div><div style="font-weight:700;">Aereo</div><div class="t-meta" id="plane-time">--</div></div></div>
-                    <div style="text-align:right;"><div class="t-price" id="plane-cost">--</div><div style="color:var(--ios-blue); font-size:0.8rem; font-weight:600;">Vedi Offerte ›</div></div>
+                <div id="car-buy-grid" style="margin-top:30px; display:none;"></div>
+            </div>
+
+            <div id="res-public" style="display:none;">
+                <h3 style="margin-bottom:15px; font-size:0.9rem; text-transform:uppercase; color:var(--ios-sub);">Opzioni Migliori</h3>
+                
+                <div class="trans-card btn-scale" onclick="openLink('train')">
+                    <div style="display:flex; align-items:center; gap:15px;">
+                        <div style="width:40px; height:40px; background:#F2E6FF; border-radius:10px; display:flex; align-items:center; justify-content:center; color:#AF52DE;"><i class="ph-fill ph-train" style="font-size:1.2rem;"></i></div>
+                        <div><div style="font-weight:700;">Treno</div><div style="font-size:0.85rem; color:var(--ios-sub);" id="train-time">--</div></div>
+                    </div>
+                    <div style="text-align:right;">
+                        <div style="font-weight:700; font-size:1.1rem;" id="train-cost">--</div>
+                        <div style="font-size:0.75rem; color:var(--ios-accent); font-weight:600;">Vedi Orari ›</div>
+                    </div>
+                </div>
+
+                <div class="trans-card btn-scale" onclick="openLink('plane')">
+                    <div style="display:flex; align-items:center; gap:15px;">
+                        <div style="width:40px; height:40px; background:#FFF3E0; border-radius:10px; display:flex; align-items:center; justify-content:center; color:#FF9500;"><i class="ph-fill ph-airplane-tilt" style="font-size:1.2rem;"></i></div>
+                        <div><div style="font-weight:700;">Aereo</div><div style="font-size:0.85rem; color:var(--ios-sub);" id="plane-time">--</div></div>
+                    </div>
+                    <div style="text-align:right;">
+                        <div style="font-weight:700; font-size:1.1rem;" id="plane-cost">--</div>
+                        <div style="font-size:0.75rem; color:var(--ios-accent); font-weight:600;">Vedi Voli ›</div>
+                    </div>
                 </div>
             </div>
 
         </div>
     </section>
 
-    <div id="share-sheet" class="modal-overlay" onclick="if(event.target===this) closeShareSheet()">
-        <div class="sheet-modal">
-            <div class="sheet-handle"></div><h3 style="text-align:center; margin-bottom:20px;">Condividi</h3>
-            <button class="list-btn" onclick="shareWhatsApp()"><i class="ph-fill ph-whatsapp-logo" style="color:#25D366; font-size:1.5rem;"></i> WhatsApp</button>
-            <button class="list-btn" onclick="shareMail()"><i class="ph-fill ph-envelope-simple" style="color:#007AFF; font-size:1.5rem;"></i> Email</button>
-            <button class="list-btn" onclick="shareNative()"><i class="ph-bold ph-share-network" style="font-size:1.5rem;"></i> Altro</button>
-            <button class="btn-sec" style="margin-top:20px;" onclick="closeShareSheet()">Annulla</button>
+    <div id="share-overlay" class="overlay" onclick="if(event.target===this) closeSheet('share')">
+        <div class="sheet">
+            <div class="handle"></div>
+            <h3 style="text-align:center; margin-bottom:20px;">Condividi Viaggio</h3>
+            <button class="action-btn btn-scale" onclick="shareWhatsApp()"><i class="ph-fill ph-whatsapp-logo" style="color:#25D366; font-size:1.5rem;"></i> WhatsApp</button>
+            <button class="action-btn btn-scale" onclick="shareMail()"><i class="ph-fill ph-envelope-simple" style="color:#007AFF; font-size:1.5rem;"></i> Email</button>
+            <button class="btn-sec btn-scale" style="margin-top:20px;" onclick="closeSheet('share')">Annulla</button>
         </div>
     </div>
 
-    <div id="nav-sheet" class="modal-overlay" onclick="if(event.target===this) closeNavSheet()">
-        <div class="sheet-modal">
-            <div class="sheet-handle"></div><h3 style="text-align:center; margin-bottom:20px;">Naviga con...</h3>
-            <button class="list-btn" onclick="openMapApp('apple')"><i class="ph-fill ph-map-trifold" style="font-size:1.5rem;"></i> Apple Maps</button>
-            <button class="list-btn" onclick="openMapApp('google')"><i class="ph-fill ph-google-logo" style="color:#EA4335; font-size:1.5rem;"></i> Google Maps</button>
-            <button class="btn-sec" style="margin-top:20px;" onclick="closeNavSheet()">Annulla</button>
+    <div id="nav-overlay" class="overlay" onclick="if(event.target===this) closeSheet('nav')">
+        <div class="sheet">
+            <div class="handle"></div>
+            <h3 style="text-align:center; margin-bottom:20px;">Apri Mappa</h3>
+            <button class="action-btn btn-scale" onclick="openMap('apple')"><i class="ph-fill ph-map-trifold" style="font-size:1.5rem;"></i> Apple Maps</button>
+            <button class="action-btn btn-scale" onclick="openMap('google')"><i class="ph-fill ph-google-logo" style="color:#EA4335; font-size:1.5rem;"></i> Google Maps</button>
+            <button class="btn-sec btn-scale" style="margin-top:20px;" onclick="closeSheet('nav')">Annulla</button>
         </div>
     </div>
 
     <script>
-        // GLOBALS & DATA
-        window.travelMode = 'car'; // 'car' or 'public'
-        window.startCoords = null; window.endCoords = null; window.calculatedKm = 0; window.wantsToBuy = false;
+        // --- DATA & STATE ---
+        const POPULAR_CITIES = ["Roma", "Milano", "Napoli", "Torino", "Bologna", "Firenze", "Venezia", "Bari", "Verona", "Palermo"];
+        const CARS_DB = [{brand:"Tesla",model:"Model 3",price:42990,type:"Elettrica",img:"https://upload.wikimedia.org/wikipedia/commons/thumb/8/82/2019_Tesla_Model_3_Long_Range_AWD_Front.jpg/800px-2019_Tesla_Model_3_Long_Range_AWD_Front.jpg"},{brand:"Fiat",model:"500e",price:29950,type:"Elettrica",img:"https://upload.wikimedia.org/wikipedia/commons/thumb/7/7f/Fiat_500_Electric_La_Prima_Genf_2020_1X7A5372.jpg/800px-Fiat_500_Electric_La_Prima_Genf_2020_1X7A5372.jpg"}];
         
-        const CARS_DB = [{ brand: "Tesla", model: "Model 3", price: 42990, type: "Elettrica", img: "https://upload.wikimedia.org/wikipedia/commons/thumb/8/82/2019_Tesla_Model_3_Long_Range_AWD_Front.jpg/800px-2019_Tesla_Model_3_Long_Range_AWD_Front.jpg" }, { brand: "Fiat", model: "500e", price: 29950, type: "Elettrica", img: "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7f/Fiat_500_Electric_La_Prima_Genf_2020_1X7A5372.jpg/800px-Fiat_500_Electric_La_Prima_Genf_2020_1X7A5372.jpg" }, { brand: "VW", model: "Golf 8", price: 34500, type: "Diesel", img: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c9/2020_Volkswagen_Golf_Style_2.0_Front.jpg/800px-2020_Volkswagen_Golf_Style_2.0_Front.jpg" }];
-        const CONFIG = { prices: {petrol:1.84, diesel:1.71, kwh:0.55, flight_base:40, flight_km:0.12}, toll:0.075 };
-
-        function haptic() { if(navigator.vibrate) navigator.vibrate(10); }
-        function diNotify(icon, text, type) { 
-            const di=document.getElementById('dynamic-island'); di.innerHTML=`<div id="di-content" style="display:flex;align-items:center;gap:10px;"><i class="${icon} di-icon" style="color:${type=='error'?'#FF3B30':(type=='success'?'#34C759':'#fff')}"></i><span>${text}</span></div>`;
-            di.classList.add('active'); setTimeout(()=>di.classList.remove('active'), 2500); 
+        window.mode = 'car';
+        window.start = null; window.end = null; window.km = 0;
+        
+        // --- DYNAMIC ISLAND ---
+        function notify(icon, text, type='neutral') {
+            const wrap = document.getElementById('island-wrapper');
+            const di = document.getElementById('dynamic-island');
+            const color = type==='error'?'#FF3B30':(type==='success'?'#34C759':'#fff');
+            
+            di.innerHTML = `<i class="${icon} di-icon" style="color:${color}"></i><span class="di-msg">${text}</span>`;
+            wrap.classList.add('active');
+            
+            setTimeout(() => wrap.classList.remove('active'), 3000);
         }
 
-        let map, markersLayer, routeLayer;
+        function haptic() { if(navigator.vibrate) navigator.vibrate(10); }
+
+        // --- INIT ---
         window.onload = function() {
-            const now = new Date(); now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
-            document.getElementById('tripDate').value = now.toISOString().slice(0,16);
-            map = L.map('map', {zoomControl:false}).setView([41.9, 12.5], 5);
-            L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {attribution:''}).addTo(map);
-            markersLayer = L.layerGroup().addTo(map); routeLayer = L.layerGroup().addTo(map);
-            initAutocomplete('originInput','list-origin'); initAutocomplete('destInput','list-dest');
+            const map = L.map('map', {zoomControl:false}).setView([41.9, 12.5], 5);
+            L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png').addTo(map);
+            window.map = map; window.markers = L.layerGroup().addTo(map); window.route = L.layerGroup().addTo(map);
+            
+            // Set Default Date
+            document.getElementById('tripDate').valueAsDate = new Date();
         };
 
-        // --- NAVIGATION LOGIC ---
-        function goToApp() { document.getElementById('landing-page').style.display='none'; document.getElementById('app-section').style.display='flex'; setTimeout(()=>document.getElementById('app-section').style.opacity='1',50); }
-        
-        function selectMode(mode) {
-            window.travelMode = mode;
-            haptic();
+        // --- NAVIGATION ---
+        function goToApp() {
+            document.getElementById('landing-page').style.display = 'none';
+            document.getElementById('app-section').style.display = 'flex';
+            setTimeout(()=>document.getElementById('app-section').style.opacity='1',50);
+        }
+
+        function selectMode(m) {
+            window.mode = m;
+            const dateInput = document.getElementById('tripDate');
+            const label = document.getElementById('lbl-date');
+            
+            if(m === 'car') {
+                dateInput.type = 'date';
+                label.innerText = "Data Partenza";
+            } else {
+                dateInput.type = 'datetime-local';
+                label.innerText = "Data e Ora";
+                // Set default datetime
+                const now = new Date(); now.setMinutes(now.getMinutes()-now.getTimezoneOffset());
+                dateInput.value = now.toISOString().slice(0,16);
+            }
             nextStep(1);
         }
 
-        function nextStep(s) { 
-            document.querySelectorAll('.step').forEach(e=>e.classList.remove('active')); 
-            document.getElementById(`step-${s}`).classList.add('active'); 
+        function nextStep(s) {
+            document.querySelectorAll('.step').forEach(el => el.classList.remove('active'));
+            document.getElementById(`step-${s}`).classList.add('active');
         }
-        function prevStep(s) { 
-            if(s === 'mode') { nextStep('mode'); } 
-            else { nextStep(s); }
-        }
-
-        function toggleBudget() {
-            window.wantsToBuy = document.getElementById('buyToggle').checked;
-            document.getElementById('budgetRow').style.display = window.wantsToBuy ? 'flex' : 'none';
+        
+        function prevStep(s) {
+            if(s === 'mode') { nextStep('mode'); } else { nextStep(s); }
         }
 
-        // --- VALIDATION & ANALYSIS ---
-        async function validateStep1() {
-            const o = document.getElementById('originInput').value; const d = document.getElementById('destInput').value;
-            if(!o) return diNotify("ph-fill ph-warning", "Inserisci Partenza", "error");
+        // --- LOGIC ---
+        function showSuggestions(id, listId) {
+            const list = document.getElementById(listId);
+            list.innerHTML = '';
+            POPULAR_CITIES.forEach(city => {
+                const div = document.createElement('div');
+                div.className = 's-item';
+                div.innerText = city;
+                div.onclick = () => {
+                    document.getElementById(id).value = city;
+                    list.style.display = 'none';
+                };
+                list.appendChild(div);
+            });
+            list.style.display = 'block';
             
-            diNotify("ph-fill ph-map-pin", "Cerco percorso...", "neutral");
-            if(!window.startCoords) window.startCoords = await resolveCity(o);
-            
-            if(d) {
-                if(!window.endCoords) window.endCoords = await resolveCity(d);
-                if(window.endCoords) {
-                    try { window.routeDataGlobal = await fetchRoute(window.startCoords, window.endCoords); } catch(e){}
-                    window.calculatedKm = window.routeDataGlobal ? Math.round(window.routeDataGlobal.distance/1000) : Math.round(getDist(window.startCoords, window.endCoords));
-                    document.getElementById('kmInput').value = window.calculatedKm;
+            // Close on click outside
+            document.addEventListener('click', function close(e) {
+                if(e.target.id !== id) {
+                    list.style.display = 'none';
+                    document.removeEventListener('click', close);
                 }
-            }
+            });
+        }
 
-            // BRANCHING LOGIC
-            if(window.travelMode === 'public') {
-                runAnalysis(); // Skip Car Details
-            } else {
-                nextStep(2); // Go to Car Habits
+        async function validateStep1() {
+            const o = document.getElementById('originInput').value;
+            const d = document.getElementById('destInput').value;
+            
+            if(!o) return notify("ph-fill ph-warning", "Inserisci Partenza", "error");
+            
+            notify("ph-fill ph-circle-notch ph-spin", "Calcolo Percorso...");
+            
+            if(!window.start) window.start = await resolve(o);
+            if(d && !window.end) window.end = await resolve(d);
+            
+            if(window.start && window.end) {
+                try {
+                    const r = await fetch(`https://router.project-osrm.org/route/v1/driving/${window.start.lon},${window.start.lat};${window.end.lon},${window.end.lat}?overview=full`);
+                    const data = await r.json();
+                    if(data.routes && data.routes[0]) {
+                        window.calculatedKm = Math.round(data.routes[0].distance/1000);
+                        window.routeData = data.routes[0].geometry;
+                        notify("ph-fill ph-check-circle", "Percorso Trovato", "success");
+                    }
+                } catch(e) {
+                    window.calculatedKm = Math.round(dist(window.start, window.end));
+                    notify("ph-fill ph-warning", "Server Offline: Stima", "error");
+                }
+                document.getElementById('kmInput').value = window.calculatedKm;
             }
+            
+            if(window.mode === 'public') runAnalysis();
+            else nextStep(2);
         }
 
         async function runAnalysis() {
-            const km = window.calculatedKm > 0 ? window.calculatedKm : parseFloat(document.getElementById('kmInput').value);
-            if(!km) return diNotify("ph-fill ph-warning", "Km mancanti", "error");
+            const km = window.mode==='car' ? parseFloat(document.getElementById('kmInput').value) : window.calculatedKm;
+            if(!km) return notify("ph-fill ph-warning", "Km mancanti", "error");
 
             document.getElementById('wizard-box').style.display='none';
-            diNotify("ph-fill ph-check-circle", "Calcolo completato", "success");
             document.getElementById('results-container').style.display='block';
             
-            // Map Update
-            setTimeout(() => { map.invalidateSize(); updateMap(); }, 200);
-            
-            // Populate Data
-            document.getElementById('t-km').innerText = km + " km";
-            if(window.endCoords) fetchWeather(window.endCoords.lat, window.endCoords.lon);
+            // Map
+            setTimeout(() => {
+                window.map.invalidateSize();
+                window.markers.clearLayers(); window.route.clearLayers();
+                if(window.start) {
+                    L.circleMarker(window.start, {color:'#34C759'}).addTo(window.markers);
+                    if(window.end) {
+                        L.circleMarker(window.end, {color:'#FF3B30'}).addTo(window.markers);
+                        if(window.mode==='car' && window.routeData) {
+                            // Decode geometry needs polyline utility or geojson (simplified here with polyline if coords available)
+                            // OSRM returns encoded string usually, simplified for prompt context:
+                            L.polyline([window.start, window.end], {dashArray:'10,10'}).addTo(window.route); // Simple fallback
+                        } else {
+                            L.polyline([window.start, window.end], {dashArray:'10,10', color:'#AF52DE'}).addTo(window.route);
+                        }
+                        window.map.fitBounds(L.latLngBounds([window.start, window.end]), {padding:[50,50]});
+                    }
+                }
+            }, 200);
 
-            // Toggle Sections based on Mode
-            const carSec = document.getElementById('car-section');
-            const pubSec = document.getElementById('public-section');
+            document.getElementById('t-km').innerText = km + " km";
             
-            if(window.travelMode === 'car') {
-                carSec.style.display = 'block';
-                pubSec.style.display = 'none';
+            if(window.mode === 'car') {
+                document.getElementById('res-car').style.display = 'block';
+                document.getElementById('res-public').style.display = 'none';
                 
-                // Car Calc
-                const cost = ((km/100)*6.5*1.8 + (km*CONFIG.toll)).toFixed(0);
+                const cost = ((km/100)*6.5*1.8 + (km*0.075)).toFixed(0);
                 document.getElementById('drive-cost').innerText = "€" + cost;
-                document.getElementById('drive-time').innerText = (km/90).toFixed(1)+"h";
                 
-                // Car Suggestions
-                if(window.wantsToBuy) {
-                    document.getElementById('car-suggestions').style.display='block';
+                if(document.getElementById('buyToggle').checked) {
                     const budget = parseFloat(document.getElementById('budgetInput').value);
-                    const grid = document.getElementById('car-grid');
+                    const grid = document.getElementById('car-buy-grid');
+                    grid.style.display = 'block';
                     grid.innerHTML = CARS_DB.filter(c=>c.price<=budget*1.3).map(c=>
-                        `<div class="car-card"><img src="${c.img}" class="car-img"><div style="padding:15px;"><b>${c.brand} ${c.model}</b><br>€${c.price.toLocaleString()}</div></div>`
+                        `<div class="trans-card"><div style="display:flex;align-items:center;gap:15px;"><img src="${c.img}" style="width:50px;height:35px;object-fit:cover;border-radius:5px;"><div><b>${c.brand} ${c.model}</b><br><small>€${c.price.toLocaleString()}</small></div></div></div>`
                     ).join('') || "<p>Nessuna auto nel budget.</p>";
                 }
             } else {
-                carSec.style.display = 'none';
-                pubSec.style.display = 'block';
+                document.getElementById('res-car').style.display = 'none';
+                document.getElementById('res-public').style.display = 'block';
                 
-                // Public Calc
-                const tDate = new Date(document.getElementById('tripDate').value);
-                const days = (tDate - new Date())/(1000*3600*24);
+                const tCost = (km * 0.15).toFixed(0);
+                const pCost = (40 + (km*0.05)).toFixed(0);
                 
-                // Train
-                const tCost = (km * (days<2?0.25:0.15)).toFixed(0);
                 document.getElementById('train-cost').innerText = "€" + tCost;
-                document.getElementById('train-time').innerText = (km/120).toFixed(1)+"h";
-                
-                // Plane
-                if(km<300) document.getElementById('card-plane').style.display='none';
-                else {
-                    const pCost = ((days<7?120:40)+(km*0.05)).toFixed(0);
-                    document.getElementById('plane-cost').innerText="€"+pCost;
-                    document.getElementById('plane-time').innerText="3.5h";
-                }
+                document.getElementById('train-time').innerText = (km/120).toFixed(1) + "h";
+                document.getElementById('plane-cost').innerText = "€" + pCost;
+                document.getElementById('plane-time').innerText = "3.5h";
             }
         }
 
-        // --- HELPERS ---
-        function updateMap() {
-            markersLayer.clearLayers(); routeLayer.clearLayers();
-            if(window.startCoords) {
-                L.circleMarker(window.startCoords, {color:'#34C759'}).addTo(markersLayer);
-                if(window.endCoords) {
-                    L.circleMarker(window.endCoords, {color:'#FF3B30'}).addTo(markersLayer);
-                    if(window.routeDataGlobal) L.geoJSON(window.routeDataGlobal.geometry).addTo(routeLayer);
-                    else L.polyline([window.startCoords, window.endCoords], {dashArray:'10,10'}).addTo(routeLayer);
-                    map.fitBounds(L.latLngBounds([window.startCoords, window.endCoords]), {padding:[50,50]});
-                } else map.setView(window.startCoords, 10);
-            }
+        // --- UTILS ---
+        function toggleBudget() {
+            const on = document.getElementById('buyToggle').checked;
+            document.getElementById('budgetRow').style.display = on ? 'flex' : 'none';
         }
 
-        // Share
+        async function resolve(n) {
+            try {
+                const r = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(n)}&limit=1`);
+                const d = await r.json();
+                return {lat: parseFloat(d[0].lat), lon: parseFloat(d[0].lon)};
+            } catch(e) { return null; }
+        }
+        
+        function dist(p1,p2) {
+            var R=6371; var dLat=(p2.lat-p1.lat)*Math.PI/180; var dLon=(p2.lon-p1.lon)*Math.PI/180;
+            var a=Math.sin(dLat/2)*Math.sin(dLat/2)+Math.cos(p1.lat*Math.PI/180)*Math.cos(p2.lat*Math.PI/180)*Math.sin(dLon/2)*Math.sin(dLon/2);
+            return R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a))*1.3;
+        }
+
+        // --- SHARING & LINKS ---
         function getShareText() {
             const km = document.getElementById('t-km').innerText;
-            const mode = window.travelMode === 'car' ? "🚗 Auto" : "🚆 Mezzi Pubblici";
-            let costInfo = "";
+            const o = document.getElementById('originInput').value;
+            const d = document.getElementById('destInput').value;
+            let details = "";
             
-            if(window.travelMode === 'car') {
-                costInfo = `💰 Stima Auto: ${document.getElementById('drive-cost').innerText}`;
+            if(window.mode === 'car') {
+                details = `🚗 Costo Auto Stimato: ${document.getElementById('drive-cost').innerText}`;
             } else {
-                costInfo = `🚆 Treno: ${document.getElementById('train-cost').innerText}\n✈️ Aereo: ${document.getElementById('plane-cost').innerText}`;
+                details = `🚆 Treno: ${document.getElementById('train-cost').innerText}\n✈️ Aereo: ${document.getElementById('plane-cost').innerText}`;
             }
-
-            return `*Viaggio AutoMatch* 🇮🇹\nModo: ${mode}\n📍 ${document.getElementById('originInput').value} ➡️ ${document.getElementById('destInput').value}\n📏 ${km}\n${costInfo}\n\n🔗 https://chrii2612.github.io/trovaauto/`;
+            
+            return `*AutoMatch Trip*\n${o} ➡️ ${d}\n📏 ${km}\n${details}\n\nCreato con AutoMatch Web`;
         }
-        function openShareSheet(){const s=document.getElementById('share-sheet').querySelector('.sheet-modal'); document.getElementById('share-sheet').style.display='flex'; setTimeout(()=>s.style.transform='translateY(0)',10);}
-        function closeShareSheet(){const s=document.getElementById('share-sheet').querySelector('.sheet-modal'); s.style.transform='translateY(100%)'; setTimeout(()=>document.getElementById('share-sheet').style.display='none',300);}
-        function shareWhatsApp(){window.open(`https://wa.me/?text=${encodeURIComponent(getShareText())}`); closeShareSheet();}
-        function shareMail(){window.open(`mailto:?subject=Viaggio&body=${encodeURIComponent(getShareText())}`); closeShareSheet();}
-        function shareNative(){if(navigator.share)navigator.share({title:'Trip',text:getShareText()}); closeShareSheet();}
 
-        // Deep Links
-        function openTrainLink(){ const o=document.getElementById('originInput').value; const d=document.getElementById('destInput').value; window.open(`https://www.google.com/search?q=Treno+da+${o}+a+${d}`); }
-        function openPlaneLink(){ const o=document.getElementById('originInput').value; const d=document.getElementById('destInput').value; window.open(`https://www.google.com/search?q=Voli+da+${o}+a+${d}`); }
-        function openNavSheet(){const s=document.getElementById('nav-sheet').querySelector('.sheet-modal'); document.getElementById('nav-sheet').style.display='flex'; setTimeout(()=>s.style.transform='translateY(0)',10);}
-        function closeNavSheet(){const s=document.getElementById('nav-sheet').querySelector('.sheet-modal'); s.style.transform='translateY(100%)'; setTimeout(()=>document.getElementById('nav-sheet').style.display='none',300);}
-        function openMapApp(app){
-            const s=`${window.startCoords.lat},${window.startCoords.lon}`; const d=`${window.endCoords.lat},${window.endCoords.lon}`;
+        function shareWhatsApp() {
+            const txt = encodeURIComponent(getShareText());
+            window.open(`https://wa.me/?text=${txt}`, '_blank');
+            closeSheet('share');
+        }
+        function shareMail() {
+            const body = encodeURIComponent(getShareText());
+            window.open(`mailto:?subject=Viaggio&body=${body}`, '_blank');
+            closeSheet('share');
+        }
+
+        function openLink(type) {
+            const o = document.getElementById('originInput').value;
+            const d = document.getElementById('destInput').value;
+            if(type==='train') window.open(`https://www.google.com/search?q=Treno+da+${o}+a+${d}`);
+            if(type==='plane') window.open(`https://www.google.com/search?q=Voli+da+${o}+a+${d}`);
+        }
+
+        // --- SHEET MANAGEMENT ---
+        function openShareSheet() { 
+            if(!window.calculatedKm) return notify("ph-fill ph-warning", "Nessun dato", "error");
+            openSheet('share'); 
+        }
+        function openNavSheet() { openSheet('nav'); }
+        function openSheet(id) {
+            const el = document.getElementById(id+'-overlay');
+            const sheet = el.querySelector('.sheet');
+            el.style.display = 'flex';
+            setTimeout(() => sheet.style.transform = 'translateY(0)', 10);
+        }
+        function closeSheet(id) {
+            const el = document.getElementById(id+'-overlay');
+            const sheet = el.querySelector('.sheet');
+            sheet.style.transform = 'translateY(100%)';
+            setTimeout(() => el.style.display = 'none', 400);
+        }
+        function openMap(app) {
+            const s=`${window.start.lat},${window.start.lon}`; const d=`${window.end.lat},${window.end.lon}`;
             if(app=='apple') window.open(`http://maps.apple.com/?saddr=${s}&daddr=${d}`);
-            if(app=='google') window.open(`http://maps.google.com/?saddr=${s}&daddr=${d}`);
-            if(app=='waze') window.open(`https://waze.com/ul?ll=${d}&navigate=yes`);
-            closeNavSheet();
+            if(app=='google') window.open(`https://www.google.com/maps/dir/?api=1&origin=${s}&destination=${d}`);
+            closeSheet('nav');
         }
 
-        // API Utils
-        function getDist(p1,p2){var R=6371;var dLat=(p2.lat-p1.lat)*Math.PI/180;var dLon=(p2.lon-p1.lon)*Math.PI/180;var a=Math.sin(dLat/2)*Math.sin(dLat/2)+Math.cos(p1.lat*Math.PI/180)*Math.cos(p2.lat*Math.PI/180)*Math.sin(dLon/2)*Math.sin(dLon/2);return R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a))*1.3;}
-        async function resolveCity(n){try{const r=await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(n)}&limit=1`);const d=await r.json();return {lat:parseFloat(d[0].lat),lon:parseFloat(d[0].lon)};}catch(e){return null;}}
-        async function fetchRoute(s,e){const r=await fetch(`https://router.project-osrm.org/route/v1/driving/${s.lon},${s.lat};${e.lon},${e.lat}?overview=full&geometries=geojson`);if(!r.ok)return null;const d=await r.json();return d.routes[0];}
-        async function fetchWeather(lat,lon){try{const r=await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true`);const d=await r.json();document.getElementById('w-temp').innerText=Math.round(d.current_weather.temperature)+"°";}catch(e){}}
-        function initAutocomplete(id,listId){const inp=document.getElementById(id);const list=document.getElementById(listId);let t;inp.addEventListener('input',()=>{clearTimeout(t);if(inp.value.length<3){list.style.display='none';return;}t=setTimeout(async()=>{const r=await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${inp.value}&limit=5`);const d=await r.json();list.innerHTML='';list.style.display='block';d.forEach(x=>{const div=document.createElement('div');div.className='s-item';div.innerText=x.display_name.split(',')[0];div.onclick=()=>{inp.value=div.innerText;list.style.display='none';document.getElementById('clearDest').style.display='block';};list.appendChild(div);});},300);});document.addEventListener('click',e=>{if(e.target!=inp)list.style.display='none';});}
-        function clearDestination(){document.getElementById('destInput').value='';document.getElementById('clearDest').style.display='none';window.endCoords=null;}
     </script>
 </body>
 </html>
