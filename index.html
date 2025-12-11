@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>AutoMatch Pro - Final</title>
+    <title>AutoMatch Pro - Ultimate</title>
     
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
@@ -216,13 +216,26 @@
             text-align: center; box-shadow: var(--shadow-float);
         }
 
-        /* SETTINGS & NAV ACTION SHEET */
+        /* MENU BUTTONS */
         .list-btn {
             display: flex; align-items: center; gap: 15px; width: 100%; padding: 16px; margin-bottom: 8px; border-radius: 12px;
             background: rgba(120,120,128,0.08); text-align: left; font-weight: 600; font-size: 1rem;
             border: none; cursor: pointer; color: var(--ios-text);
         }
         .list-btn:active { background: rgba(120,120,128,0.15); }
+        .list-btn.wa i { color: #25D366; }
+        .list-btn.mail i { color: #007AFF; }
+
+        /* STATUS BADGE */
+        .status-badge {
+            display: inline-flex; align-items: center; gap: 6px;
+            padding: 4px 10px; background: rgba(52, 199, 89, 0.1); 
+            border-radius: 20px; font-size: 0.75rem; font-weight: 700; color: var(--ios-green);
+            margin-bottom: 15px; transition: 0.3s;
+        }
+        .status-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--ios-green); box-shadow: 0 0 5px var(--ios-green); }
+        .status-badge.offline { background: rgba(255, 59, 48, 0.1); color: var(--ios-red); }
+        .status-badge.offline .status-dot { background: var(--ios-red); box-shadow: 0 0 5px var(--ios-red); }
 
         .theme-tog { width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: rgba(120,120,128,0.15); transition: 0.3s; cursor: pointer; }
         .theme-tog:active { transform: rotate(15deg) scale(0.9); }
@@ -237,7 +250,7 @@
             <span>AutoMatch</span>
         </div>
         <div style="display:flex; gap:10px;">
-            <div class="icon-btn" onclick="haptic(); shareTrip()">
+            <div class="icon-btn" onclick="haptic(); openShareSheet()">
                 <i class="ph-bold ph-share-network"></i>
             </div>
             <div class="icon-btn" onclick="haptic(); toggleSettings()">
@@ -246,22 +259,36 @@
         </div>
     </nav>
 
+    <div id="share-sheet" class="modal-overlay" onclick="if(event.target===this) closeShareSheet()">
+        <div class="sheet-modal">
+            <div class="sheet-handle"></div>
+            <h3 style="margin-bottom:20px; text-align:center;">Condividi Viaggio</h3>
+            <button class="list-btn wa" onclick="shareWhatsApp()">
+                <i class="ph-fill ph-whatsapp-logo" style="font-size:1.4rem;"></i> WhatsApp
+            </button>
+            <button class="list-btn mail" onclick="shareMail()">
+                <i class="ph-fill ph-envelope-simple" style="font-size:1.4rem;"></i> Email
+            </button>
+            <button class="list-btn" onclick="shareNative()">
+                <i class="ph-bold ph-share-network" style="font-size:1.4rem;"></i> Altro (iOS/Android)
+            </button>
+            <button class="btn-sec" style="margin-top:15px;" onclick="closeShareSheet()" data-key="close">Annulla</button>
+        </div>
+    </div>
+
     <div id="settings-modal" class="modal-overlay" style="align-items:center;" onclick="if(event.target===this) toggleSettings()">
         <div class="popup-modal">
             <h2 style="margin-bottom:20px;" data-key="settings">Impostazioni</h2>
-            
             <label style="margin-bottom:10px; display:block; text-align:left;" data-key="language">Lingua</label>
             <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; margin-bottom:20px;">
                 <button class="btn-sec" style="padding:10px; font-size:0.9rem;" onclick="setLang('it')">IT 🇮🇹</button>
                 <button class="btn-sec" style="padding:10px; font-size:0.9rem;" onclick="setLang('en')">EN 🇬🇧</button>
                 <button class="btn-sec" style="padding:10px; font-size:0.9rem;" onclick="setLang('es')">ES 🇪🇸</button>
             </div>
-            
             <label style="margin-bottom:10px; display:block; text-align:left;" data-key="appearance">Aspetto</label>
             <button class="list-btn" onclick="document.body.classList.toggle('dark-mode'); haptic();">
                 <i class="ph-fill ph-moon-stars"></i> Light / Dark Mode
             </button>
-
             <button class="btn-pri" style="margin-top:20px;" onclick="toggleSettings()" data-key="close">Chiudi</button>
         </div>
     </div>
@@ -278,18 +305,10 @@
     <div id="nav-sheet" class="modal-overlay" onclick="if(event.target===this) closeNavSheet()">
         <div class="sheet-modal">
             <div class="sheet-handle"></div>
-            <h3 style="margin-bottom:20px; text-align:center;">Apri indicazioni con...</h3>
-            
-            <button class="list-btn" onclick="openMapApp('apple')">
-                <i class="ph-fill ph-map-trifold" style="color:#000;"></i> Apple Maps
-            </button>
-            <button class="list-btn" onclick="openMapApp('google')">
-                <i class="ph-fill ph-google-logo" style="color:#EA4335;"></i> Google Maps
-            </button>
-            <button class="list-btn" onclick="openMapApp('waze')">
-                <i class="ph-fill ph-car" style="color:#33CCFF;"></i> Waze
-            </button>
-            
+            <h3 style="margin-bottom:20px; text-align:center;">Naviga con...</h3>
+            <button class="list-btn" onclick="openMapApp('apple')"><i class="ph-fill ph-map-trifold"></i> Apple Maps</button>
+            <button class="list-btn" onclick="openMapApp('google')"><i class="ph-fill ph-google-logo" style="color:#EA4335;"></i> Google Maps</button>
+            <button class="list-btn" onclick="openMapApp('waze')"><i class="ph-fill ph-car" style="color:#33CCFF;"></i> Waze</button>
             <button class="btn-sec" style="margin-top:15px;" onclick="closeNavSheet()" data-key="close">Annulla</button>
         </div>
     </div>
@@ -310,7 +329,10 @@
             <div class="progress-dots"><div class="dot active" id="d1"></div><div class="dot" id="d2"></div><div class="dot" id="d3"></div></div>
             
             <div class="step active" id="step-1">
-                <h2 data-key="step1_title">Il tuo Viaggio</h2>
+                <div style="display:flex; justify-content:space-between; align-items:start;">
+                    <h2 data-key="step1_title">Il tuo Viaggio</h2>
+                    <div id="server-status" class="status-badge"><span class="status-dot"></span> Online</div>
+                </div>
                 <p data-key="step1_sub">Da dove parti e dove vuoi andare?</p>
                 <div class="ios-list">
                     <div class="ios-item" style="z-index: 20;">
@@ -424,25 +446,17 @@
             <h3 style="margin: 20px 0 10px 0; font-size:0.9rem; text-transform:uppercase; color:var(--ios-text-sec);" data-key="smart_insights">Smart Insights (Clicca per info)</h3>
             <div class="vibe-grid">
                 <div class="vibe-item" onclick="haptic(); showInfo('tree')">
-                    <div class="vibe-icon-box" style="background:rgba(52, 199, 89, 0.1); color:var(--ios-green);">
-                        <i class="ph-fill ph-tree"></i>
-                    </div>
+                    <div class="vibe-icon-box" style="background:rgba(52, 199, 89, 0.1); color:var(--ios-green);"><i class="ph-fill ph-tree"></i></div>
                     <div>
                         <div style="font-size:0.7rem; color:var(--ios-text-sec); font-weight:600; text-transform:uppercase;" data-key="si_trees">Alberi Salvati</div>
-                        <div style="font-weight:700; font-size:0.9rem; line-height:1.2;">
-                            <span id="vibe-trees" style="font-size:1.1rem;">--</span> <span style="font-size:0.8rem">vs Diesel</span>
-                        </div>
+                        <div style="font-weight:700; font-size:0.9rem; line-height:1.2;"><span id="vibe-trees" style="font-size:1.1rem;">--</span> <span style="font-size:0.8rem">vs Diesel</span></div>
                     </div>
                 </div>
                 <div class="vibe-item" onclick="haptic(); showInfo('flight')">
-                    <div class="vibe-icon-box" style="background:rgba(0, 122, 255, 0.1); color:var(--ios-blue);">
-                        <i class="ph-fill ph-airplane-tilt"></i>
-                    </div>
+                    <div class="vibe-icon-box" style="background:rgba(0, 122, 255, 0.1); color:var(--ios-blue);"><i class="ph-fill ph-airplane-tilt"></i></div>
                     <div>
                         <div style="font-size:0.7rem; color:var(--ios-text-sec); font-weight:600; text-transform:uppercase;" data-key="si_flight">Vs Aereo</div>
-                        <div style="font-weight:700; font-size:0.9rem; line-height:1.2;">
-                            <span id="vibe-flight-cost" style="font-size:1.1rem;">--</span>
-                        </div>
+                        <div style="font-weight:700; font-size:0.9rem; line-height:1.2;"><span id="vibe-flight-cost" style="font-size:1.1rem;">--</span></div>
                     </div>
                 </div>
             </div>
@@ -492,7 +506,7 @@
         };
         const PLACEHOLDER_IMG = "https://placehold.co/600x400/EEE/AAA?text=Auto";
 
-        // --- UPDATED DB (Better Images) ---
+        // --- UPDATED DB ---
         const CARS_DB = [
             { brand: "Tesla", model: "Model 3", price: 42990, type: "Elettrica", range: 513, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/8/82/2019_Tesla_Model_3_Long_Range_AWD_Front.jpg/800px-2019_Tesla_Model_3_Long_Range_AWD_Front.jpg" },
             { brand: "Tesla", model: "Model Y", price: 46990, type: "Elettrica", range: 455, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/7/73/Tesla_Model_Y_Performance_IMG_4905.jpg/800px-Tesla_Model_Y_Performance_IMG_4905.jpg" },
@@ -505,7 +519,7 @@
             { brand: "BMW", model: "i4", price: 59000, type: "Elettrica", range: 590, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4b/BMW_i4_M50_IMG_5330.jpg/800px-BMW_i4_M50_IMG_5330.jpg" }
         ];
         
-        // --- TRANSLATIONS ---
+        // --- TRANSLATIONS (UPDATED TEXTS) ---
         const STRINGS = {
             it: {
                 hero_tag: "Pianificatore Intelligente", hero_title: "Viaggia meglio.<br>Spendi meno.", hero_sub: "Confronta auto, calcola pedaggi e risparmia.", btn_start: "Inizia Configurazione",
@@ -516,8 +530,8 @@
                 si_trees: "Alberi Salvati", si_flight: "Vs Aereo", rec_cars: "Veicoli Consigliati", btn_nav: "Avvia Navigazione",
                 m_fuel: "Costo Carburante", m_toll: "Pedaggio Autostrada", m_stops: "Soste Ricarica", m_save: "Risparmio vs Benzina", m_total: "Costo Totale", close: "Chiudi",
                 settings: "Impostazioni", language: "Lingua", appearance: "Aspetto",
-                info_tree_t: "Indice Ecologico", info_tree_d: "Questo indice calcola quanti alberi servirebbero per assorbire la CO2 che hai risparmiato guidando un'auto elettrica invece di una diesel per questo viaggio (basato su 20kg CO2/anno per albero).",
-                info_flight_t: "Confronto Aereo", info_flight_d: "Confrontiamo il costo del viaggio in auto elettrica con un biglietto aereo medio low-cost (prezzo base + costo bagaglio/km). Spesso l'auto conviene se si viaggia in compagnia!"
+                info_tree_t: "Indice Ecologico", info_tree_d: "Un albero maturo assorbe circa 20kg di CO₂ all'anno. Guidando questo veicolo elettrico, eviti emissioni pari al lavoro annuale di questi alberi rispetto a un diesel.",
+                info_flight_t: "Confronto Aereo", info_flight_d: "Confrontiamo i costi vivi (energia + pedaggi) con un biglietto aereo low-cost medio per questa distanza. Se viaggiate in 2 o più persone, l'auto è quasi sempre vincente!"
             },
             en: {
                 hero_tag: "Smart Planner", hero_title: "Travel better.<br>Spend less.", hero_sub: "Compare cars, calculate tolls, and save.", btn_start: "Start Config",
@@ -528,8 +542,8 @@
                 si_trees: "Eco Impact", si_flight: "Vs Flight", rec_cars: "Recommended Cars", btn_nav: "Start Navigation",
                 m_fuel: "Fuel Cost", m_toll: "Estimated Toll", m_stops: "Charging Stops", m_save: "Savings vs Gas", m_total: "Total Cost", close: "Close",
                 settings: "Settings", language: "Language", appearance: "Appearance",
-                info_tree_t: "Eco Index", info_tree_d: "Calculates how many trees would be needed to absorb the CO2 saved by driving EV vs Diesel (based on 20kg CO2/year per tree).",
-                info_flight_t: "Flight Check", info_flight_d: "We compare EV driving costs against average low-cost flight tickets. Driving often wins if traveling with passengers!"
+                info_tree_t: "Eco Index", info_tree_d: "A mature tree absorbs ~20kg of CO₂/year. By driving EV, you save emissions equivalent to the annual work of these trees vs driving diesel.",
+                info_flight_t: "Flight Check", info_flight_d: "We compare driving costs (energy + tolls) against an average low-cost flight for this distance. Driving often wins if traveling with passengers!"
             },
             es: {
                 hero_tag: "Planificador Inteligente", hero_title: "Viaja mejor.<br>Gasta menos.", hero_sub: "Compara coches, peajes y ahorra.", btn_start: "Empezar",
@@ -540,8 +554,8 @@
                 si_trees: "Impacto Eco", si_flight: "Vs Avión", rec_cars: "Coches Recomendados", btn_nav: "Iniciar Navegación",
                 m_fuel: "Combustible", m_toll: "Peaje", m_stops: "Paradas de Carga", m_save: "Ahorro vs Gasolina", m_total: "Costo Total", close: "Cerrar",
                 settings: "Ajustes", language: "Idioma", appearance: "Apariencia",
-                info_tree_t: "Índice Eco", info_tree_d: "Calcula cuántos árboles se necesitarían para absorber el CO2 ahorrado (EV vs Diesel).",
-                info_flight_t: "Vs Vuelo", info_flight_d: "Comparamos el costo de conducir vs un boleto de avión promedio."
+                info_tree_t: "Índice Eco", info_tree_d: "Un árbol absorbe ~20kg de CO₂/año. Al conducir eléctrico, ahorras emisiones equivalentes al trabajo anual de estos árboles vs diésel.",
+                info_flight_t: "Vs Vuelo", info_flight_d: "Comparamos el costo de conducir (energía + peajes) vs un boleto de avión promedio."
             }
         };
 
@@ -553,6 +567,7 @@
 
         let map, markersLayer, routeLayer;
         window.onload = function() {
+            checkServerStatus(); // Check connection immediately
             map = L.map('map', {zoomControl: false, dragging: !L.Browser.mobile, tap: !L.Browser.mobile}).setView([41.9, 12.5], 5);
             L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', { attribution: '', maxZoom: 19 }).addTo(map);
             markersLayer = L.layerGroup().addTo(map); routeLayer = L.layerGroup().addTo(map);
@@ -560,10 +575,54 @@
             document.getElementById('destInput').addEventListener('input', function() { document.getElementById('clearDest').style.display = this.value.length > 0 ? 'block' : 'none'; });
         };
 
-        // --- MODAL & UI LOGIC ---
+        // --- SERVER CHECK ---
+        async function checkServerStatus() {
+            const badge = document.getElementById('server-status');
+            const dot = badge.querySelector('.status-dot');
+            try {
+                // Try a quick light query
+                const res = await fetch('https://nominatim.openstreetmap.org/search?q=Rome&format=json&limit=1');
+                if(res.ok) {
+                    badge.innerHTML = '<span class="status-dot"></span> Online';
+                    badge.classList.remove('offline');
+                } else throw new Error();
+            } catch(e) {
+                badge.innerHTML = '<span class="status-dot"></span> Offline / Lento';
+                badge.classList.add('offline');
+            }
+        }
+
+        // --- SHARE LOGIC ---
+        function openShareSheet() {
+             if(!window.calculatedKm) return alert("Pianifica prima un viaggio!");
+             const m = document.getElementById('share-sheet'); const s = m.querySelector('.sheet-modal');
+             m.style.display = 'flex'; setTimeout(()=>{m.style.opacity='1'; s.style.transform='translateY(0)';},10);
+        }
+        function closeShareSheet() {
+             const m = document.getElementById('share-sheet'); const s = m.querySelector('.sheet-modal');
+             s.style.transform='translateY(100%)'; m.style.opacity='0'; setTimeout(()=>{m.style.display='none';},300);
+        }
+
+        function getShareText() {
+            return `🚗 *AutoMatch Trip*\n${document.getElementById('originInput').value} ➡️ ${document.getElementById('destInput').value}\n📏 Distanza: ${window.calculatedKm} km\n⚡ Scopri quanto risparmi con l'elettrico!`;
+        }
+
+        function shareWhatsApp() {
+            window.open(`https://wa.me/?text=${encodeURIComponent(getShareText())}`, '_blank');
+            closeShareSheet();
+        }
+        function shareMail() {
+            window.open(`mailto:?subject=Il mio viaggio AutoMatch&body=${encodeURIComponent(getShareText())}`, '_blank');
+            closeShareSheet();
+        }
+        function shareNative() {
+            if(navigator.share) navigator.share({title:'Trip', text:getShareText()});
+            closeShareSheet();
+        }
+
+        // --- UI LOGIC ---
         function toggleSettings() {
-            const m = document.getElementById('settings-modal');
-            const c = m.querySelector('.popup-modal');
+            const m = document.getElementById('settings-modal'); const c = m.querySelector('.popup-modal');
             if(m.style.display === 'flex') { m.style.opacity = '0'; c.style.transform = 'scale(0.9)'; setTimeout(()=>m.style.display='none',300); } 
             else { m.style.display = 'flex'; setTimeout(()=>{m.style.opacity='1'; c.style.transform='scale(1)';},10); }
         }
@@ -577,9 +636,8 @@
             haptic();
         }
 
-        // --- NAVIGATION SHEET ---
+        // --- NAV SHEET ---
         function openNavSheet() {
-            if(!window.startCoords || !window.endCoords) return alert("Pianifica prima il viaggio!");
             const m = document.getElementById('nav-sheet'); const s = m.querySelector('.sheet-modal');
             m.style.display = 'flex'; setTimeout(()=>{m.style.opacity='1'; s.style.transform='translateY(0)';},10);
         }
@@ -618,7 +676,7 @@
             m.style.opacity = '0'; c.style.transform = 'scale(0.9)'; setTimeout(()=>m.style.display='none',300);
         }
 
-        // --- APP FLOW ---
+        // --- APP FLOW (Standard) ---
         function goToApp() {
             document.getElementById('landing-page').style.opacity = '0';
             setTimeout(() => {
@@ -704,7 +762,6 @@
                 document.getElementById('t-km').innerText = km + " km";
                 document.getElementById('t-start-end').innerText = `${document.getElementById('originInput').value} -> ${document.getElementById('destInput').value || '?'}`;
                 
-                // INSIGHTS
                 const co2SavedGrams = km * CONFIG.co2.diesel; 
                 const trees = (co2SavedGrams / CONFIG.co2.tree_absorption).toFixed(1); 
                 document.getElementById('vibe-trees').innerText = trees > 0.1 ? trees + " 🌳" : "< 1 🌳";
@@ -806,13 +863,9 @@
         function closeModal(e) { if(e.target.classList.contains('modal-overlay')) {
             if(e.target.id === 'nav-sheet') closeNavSheet();
             else if(e.target.id === 'info-modal') closeInfo();
+            else if(e.target.id === 'share-sheet') closeShareSheet();
             else forceCloseModal();
         }}
-        function shareTrip() {
-            if(!window.calculatedKm) return alert("Pianifica prima un viaggio!");
-            const txt = `🚗 AutoMatch Trip\n${document.getElementById('originInput').value} -> ${document.getElementById('destInput').value}\n📏 ${window.calculatedKm} km`;
-            if(navigator.share) navigator.share({title:'Trip', text:txt}); else alert("Copiato!");
-        }
         
         // UTILS
         function getDistanceFromLatLonInKm(lat1,lon1,lat2,lon2) { var R=6371; var dLat=deg2rad(lat2-lat1); var dLon=deg2rad(lon2-lon1); var a=Math.sin(dLat/2)*Math.sin(dLat/2)+Math.cos(deg2rad(lat1))*Math.cos(deg2rad(lat2))*Math.sin(dLon/2)*Math.sin(dLon/2); var c=2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a)); return R*c*1.3; }
