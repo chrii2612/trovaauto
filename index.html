@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AutoMatch Pro - Final Logic Fix</title>
+    <title>AutoMatch Pro - Live Data</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;500;700;900&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
@@ -17,11 +17,11 @@
             --bg-dark: #050507;
             --text-main: #ffffff;
             --text-sub: #94a3b8;
-            --glass-bg: rgba(20, 20, 22, 0.9);
+            --glass-bg: rgba(20, 20, 22, 0.85);
             --glass-border: rgba(255, 255, 255, 0.1);
             --glass-blur: blur(30px);
             --input-bg: rgba(255, 255, 255, 0.05);
-            --card-bg: rgba(30, 30, 35, 0.8);
+            --card-bg: rgba(30, 30, 35, 0.7);
         }
 
         body.light-mode {
@@ -29,7 +29,7 @@
             --bg-dark: #f0f2f5;
             --text-main: #1a1a1a;
             --text-sub: #666666;
-            --glass-bg: rgba(255, 255, 255, 0.95);
+            --glass-bg: rgba(255, 255, 255, 0.9);
             --glass-border: rgba(0, 0, 0, 0.1);
             --input-bg: #ffffff;
             --card-bg: #ffffff;
@@ -47,7 +47,7 @@
             position: fixed; top: 0; left: 0; width: 100%; padding: 20px 40px; 
             display: flex; justify-content: space-between; align-items: center; 
             z-index: 1000; box-sizing: border-box; 
-            background: linear-gradient(to bottom, rgba(0,0,0,0.9), transparent);
+            background: linear-gradient(to bottom, rgba(0,0,0,0.8), transparent);
         }
         .logo { font-weight: 800; font-size: 1.5rem; letter-spacing: -1px; cursor: pointer; }
         .nav-controls { display: flex; gap: 15px; }
@@ -61,7 +61,6 @@
 
         /* --- LANDING PAGE --- */
         #landing-page { transition: opacity 0.5s ease; width: 100%; }
-        
         #home-section { min-height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 20px; position: relative; }
         .hero-title { font-size: 5rem; line-height: 0.95; margin-bottom: 20px; letter-spacing: -2px; z-index: 2; text-shadow: 0 0 30px rgba(41, 151, 255, 0.3); }
         .hero-sub { font-size: 1.3rem; color: var(--text-sub); max-width: 600px; margin-bottom: 50px; font-weight: 300; z-index: 2; }
@@ -71,7 +70,6 @@
             box-shadow: 0 10px 40px rgba(41, 151, 255, 0.4); z-index: 10; display: flex; align-items: center; gap: 10px;
         }
         .btn-main:hover { transform: scale(1.05) translateY(-3px); filter: brightness(1.1); }
-
         .float-card { 
             position: absolute; padding: 20px; width: 180px; border-radius: 20px; 
             text-align: left; animation: float 8s ease-in-out infinite; z-index: 1;
@@ -124,6 +122,7 @@
             box-sizing: border-box; font-family: 'Inter', sans-serif;
         }
         input:focus { border-color: var(--primary); background: rgba(255,255,255,0.08); }
+        input.auto-filled { border-color: var(--accent); color: var(--accent); font-weight: 700; }
         .input-icon { position: absolute; left: 15px; top: 48px; font-size: 1.2rem; color: var(--text-sub); }
 
         .suggestions { position: absolute; top: 105%; left: 0; width: 100%; background: #1a1a1a; border: 1px solid var(--primary); border-radius: 12px; z-index: 100; max-height: 250px; overflow-y: auto; display: none; }
@@ -137,12 +136,28 @@
         .btn-pri { flex: 2; background: var(--primary); color: #fff; border:none; padding: 16px; border-radius: 50px; font-weight: 700; cursor: pointer; transition:0.2s; box-shadow: 0 5px 20px rgba(41, 151, 255, 0.3); }
         .btn-pri:hover { transform: translateY(-2px); filter: brightness(1.1); }
 
-        /* --- RESULTS --- */
+        /* --- RESULTS LAYOUT --- */
         #results-container { width: 100%; max-width: 1200px; display: none; opacity: 0; transition: 0.5s; padding-bottom: 50px; }
         
-        .trip-card { background: var(--glass-bg); padding: 30px; border-radius: 24px; border: 1px solid var(--glass-border); margin-bottom: 30px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; text-align: center; }
-        .t-val { font-size: 1.5rem; font-weight: 800; color: var(--text-main); }
-        .t-lbl { font-size: 0.8rem; text-transform: uppercase; color: var(--text-sub); }
+        /* NEW TRIP CARD (ICONS + DATA) */
+        .trip-card { 
+            background: var(--glass-bg); padding: 30px; border-radius: 24px; border: 1px solid var(--glass-border); 
+            margin-bottom: 30px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; 
+            backdrop-filter: blur(20px);
+        }
+        .t-item { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+        .t-icon-box { 
+            width: 50px; height: 50px; border-radius: 12px; background: rgba(255,255,255,0.05); 
+            display: flex; align-items: center; justify-content: center; font-size: 1.5rem; color: var(--primary);
+            border: 1px solid var(--glass-border); margin-bottom: 5px;
+        }
+        .t-val { font-size: 1.3rem; font-weight: 700; color: var(--text-main); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
+        .t-lbl { font-size: 0.7rem; text-transform: uppercase; color: var(--text-sub); letter-spacing: 1px; }
+
+        .market-bar { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 40px; }
+        .market-item { background: var(--input-bg); padding: 20px; border-radius: 18px; text-align: center; border: 1px solid var(--glass-border); }
+        .m-price { font-size: 1.8rem; font-weight: 700; color: var(--text-main); }
+        .m-lbl { font-size: 0.7rem; text-transform: uppercase; color: var(--text-sub); margin-bottom: 5px;}
 
         .map-box { height: 450px; border-radius: 24px; overflow: hidden; margin-bottom: 40px; border: 1px solid var(--glass-border); position: relative; z-index: 1; box-shadow: 0 20px 40px rgba(0,0,0,0.3); }
         #map { width: 100%; height: 100%; }
@@ -157,11 +172,6 @@
         .spec-row { display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 0.9rem; border-bottom: 1px solid var(--glass-border); padding-bottom: 10px; color: var(--text-sub); }
         .action-btn { margin-top: auto; padding: 12px; border: 1px solid var(--glass-border); background: transparent; color: #fff; border-radius: 12px; cursor: pointer; transition: 0.2s; font-weight: 600; width: 100%; }
         .action-btn:hover { background: var(--primary); border-color: var(--primary); }
-
-        .market-bar { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 40px; }
-        .market-item { background: var(--input-bg); padding: 15px; border-radius: 15px; text-align: center; border: 1px solid var(--glass-border); }
-        .m-price { font-size: 1.5rem; font-weight: 700; color: var(--text-main); }
-        .m-lbl { font-size: 0.7rem; text-transform: uppercase; color: var(--text-sub); }
 
         /* LOADER */
         #loader { position: fixed; top:0; left:0; width:100%; height:100%; background:var(--bg-dark); z-index:2000; display:none; flex-direction:column; align-items:center; justify-content:center; }
@@ -216,6 +226,13 @@
                 </div>
                 <div class="detail-img-box"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c2/Plug_in_hybrid_charging.jpg/800px-Plug_in_hybrid_charging.jpg" class="detail-img"></div>
             </div>
+            <div class="detail-block">
+                <div class="detail-text">
+                    <h2>Community Green</h2>
+                    <p>Unisciti a migliaia di utenti che hanno scelto la mobilità sostenibile. Accedi per salvare i tuoi modelli preferiti e confronta i dati nel tempo.</p>
+                </div>
+                <div class="detail-img-box"><img src="https://images.unsplash.com/photo-1494976388531-d1058494cdd8?q=80&w=1000&auto=format&fit=crop" class="detail-img"></div>
+            </div>
         </section>
     </div>
 
@@ -258,7 +275,8 @@
                 <div id="km-auto-container" style="display:none; text-align:center; padding:20px; background:rgba(0,255,0,0.1); border:1px solid var(--accent); border-radius:12px; margin-bottom:20px;">
                     <i class="ph-fill ph-check-circle" style="color:var(--accent); font-size:2rem;"></i>
                     <h3 style="color:var(--accent); margin:10px 0;">Distanza Calcolata</h3>
-                    <div id="km-auto-val" style="font-size:2rem; font-weight:800;">-- km</div>
+                    <div id="km-auto-val" style="font-size:2rem; font-weight:800; animation: pulse 1s infinite;">--</div>
+                    <small style="color:#aaa;">Coordinate Satellitari</small>
                 </div>
 
                 <div class="input-group">
@@ -290,17 +308,38 @@
 
         <div id="results-container">
             
-            <div id="trip-details" class="trip-card">
-                <div><div class="t-lbl">Partenza</div><div class="t-val" id="t-start">--</div></div>
-                <div><div class="t-lbl">Arrivo</div><div class="t-val" id="t-end">--</div></div>
-                <div><div class="t-lbl">Distanza</div><div class="t-val" id="t-km">--</div></div>
-                <div><div class="t-lbl">Tempo Stimato</div><div class="t-val" id="t-time">--</div></div>
+            <div class="trip-card">
+                <div class="t-item">
+                    <div class="t-icon-box"><i class="ph-fill ph-map-pin"></i></div>
+                    <div><div class="t-lbl">Partenza</div><div class="t-val" id="t-start">--</div></div>
+                </div>
+                <div class="t-item">
+                    <div class="t-icon-box"><i class="ph-fill ph-flag-checkered"></i></div>
+                    <div><div class="t-lbl">Arrivo</div><div class="t-val" id="t-end">--</div></div>
+                </div>
+                <div class="t-item">
+                    <div class="t-icon-box"><i class="ph-fill ph-path"></i></div>
+                    <div><div class="t-lbl">Distanza</div><div class="t-val" id="t-km">0</div></div>
+                </div>
+                <div class="t-item">
+                    <div class="t-icon-box"><i class="ph-fill ph-clock"></i></div>
+                    <div><div class="t-lbl">Tempo</div><div class="t-val" id="t-time">--</div></div>
+                </div>
             </div>
 
             <div class="market-bar">
-                <div class="market-item"><div class="m-lbl">Benzina</div><div class="m-price" id="p-petrol">€1.84</div></div>
-                <div class="market-item"><div class="m-lbl">Diesel</div><div class="m-price" id="p-diesel">€1.71</div></div>
-                <div class="market-item"><div class="m-lbl">Elettrico</div><div class="m-price" id="p-ev">€0.58</div></div>
+                <div class="market-item">
+                    <div class="m-lbl">Benzina</div>
+                    <div class="m-price" id="p-petrol">€1.84</div>
+                </div>
+                <div class="market-item">
+                    <div class="m-lbl">Diesel</div>
+                    <div class="m-price" id="p-diesel">€1.71</div>
+                </div>
+                <div class="market-item">
+                    <div class="m-lbl">Elettrico</div>
+                    <div class="m-price" id="p-ev">€0.58</div>
+                </div>
             </div>
 
             <div class="map-box" id="map-container"><div id="map"></div></div>
@@ -331,7 +370,7 @@
         // --- GLOBALS ---
         window.startCoords = null;
         window.endCoords = null;
-        window.calcKm = 0; // Store Calculated KM
+        window.calcKm = 0;
         
         const POPULAR_CITIES = ["Roma", "Milano", "Napoli", "Torino", "Palermo", "Genova", "Bologna", "Firenze"];
         const CARS_DB = [
@@ -381,7 +420,6 @@
         function goToHome() { location.reload(); }
         function toggleTheme() { document.body.classList.toggle('light-mode'); }
 
-        // --- NAV LOGIC ---
         function nextStep(step) {
             document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
             document.getElementById(`step-${step}`).classList.add('active');
@@ -389,168 +427,179 @@
         }
         function prevStep(step) { nextStep(step); }
 
-        // --- VALIDATION & AUTO-CALC ---
+        // --- INTELLIGENT LOGIC ---
         async function validateStep1() {
             const origin = document.getElementById('originInput').value;
             const dest = document.getElementById('destInput').value;
-            
-            if(!origin) return alert("Inserisci la partenza!");
-            
-            document.getElementById('loader').style.display='flex';
+            const kmInput = document.getElementById('kmInput');
+
+            if(!origin) return alert("Inserisci almeno la partenza!");
+            document.getElementById('loader').style.display = 'flex';
 
             // Resolve Origin
             if(!window.startCoords) {
-                try {
-                    const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(origin)}&limit=1&countrycodes=it`);
-                    const data = await res.json();
-                    if(data.length>0) window.startCoords = {lat: parseFloat(data[0].lat), lon: parseFloat(data[0].lon)};
-                } catch(e){}
+                const c = await resolveCity(origin);
+                if(c) window.startCoords = c; 
+                else { alert("Città partenza non trovata!"); document.getElementById('loader').style.display = 'none'; return; }
             }
 
-            // Resolve Dest & Route
+            // Resolve Dest & Calculate
             if(dest) {
-                if(!window.endCoords) {
-                     try {
-                        const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(dest)}&limit=1&countrycodes=it`);
-                        const data = await res.json();
-                        if(data.length>0) window.endCoords = {lat: parseFloat(data[0].lat), lon: parseFloat(data[0].lon)};
-                    } catch(e){}
-                }
-
-                if(window.startCoords && window.endCoords) {
-                    try {
-                        const r = await fetch(`https://router.project-osrm.org/route/v1/driving/${window.startCoords.lon},${window.startCoords.lat};${window.endCoords.lon},${window.endCoords.lat}?overview=false`);
-                        const d = await r.json();
-                        if(d.routes.length>0) {
-                            window.calcKm = Math.round(d.routes[0].distance/1000);
-                            
-                            // UI CHANGE: HIDE MANUAL INPUT, SHOW AUTO DATA
-                            document.getElementById('km-container').style.display = 'none';
-                            document.getElementById('km-auto-container').style.display = 'block';
-                            document.getElementById('km-auto-val').innerText = window.calcKm + " km";
-                            document.getElementById('km-desc').innerText = "Distanza calcolata automaticamente.";
-                            
-                            // PRE-FILL TRIP DATA
-                            const duration = Math.round(d.routes[0].duration / 60);
-                            document.getElementById('t-time').innerText = Math.floor(duration/60) + "h " + (duration%60) + "m";
-                        }
-                    } catch(e) {}
-                }
+                 if(!window.endCoords) {
+                    const c = await resolveCity(dest);
+                    if(c) window.endCoords = c;
+                 }
+                 
+                 if(window.endCoords) {
+                     const routeData = await fetchRoute(window.startCoords, window.endCoords);
+                     if(routeData) {
+                         window.routeDataGlobal = routeData;
+                         window.calcKm = Math.round(routeData.distance/1000);
+                         
+                         // UI: Hide Manual, Show Auto
+                         document.getElementById('km-container').style.display = 'none';
+                         document.getElementById('km-auto-container').style.display = 'block';
+                         
+                         // Start counter animation immediately
+                         animateCounter("km-auto-val", 0, window.calcKm, 1500, " km");
+                         
+                         document.getElementById('km-desc').innerText = "Distanza calcolata automaticamente.";
+                     }
+                 }
             } else {
-                // RESET TO MANUAL
+                // MANUAL MODE
+                window.routeDataGlobal = null;
+                window.endCoords = null;
                 window.calcKm = 0;
                 document.getElementById('km-container').style.display = 'block';
                 document.getElementById('km-auto-container').style.display = 'none';
                 document.getElementById('km-desc').innerText = "Non hai una destinazione, inserisci i km manuali.";
             }
 
-            document.getElementById('loader').style.display='none';
-            
-            // FILL TRIP CARD DATA
-            document.getElementById('t-start').innerText = origin;
-            document.getElementById('t-end').innerText = dest || "N/D";
-            
+            document.getElementById('loader').style.display = 'none';
             nextStep(2);
         }
 
-        // --- AUTOCOMPLETE ---
+        async function resolveCity(name) {
+            try {
+                const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(name)}&limit=1&countrycodes=it`);
+                const data = await res.json();
+                if(data.length>0) return {lat: parseFloat(data[0].lat), lon: parseFloat(data[0].lon)};
+            } catch(e) {}
+            return null;
+        }
+
+        async function fetchRoute(start, end) {
+            try {
+                const res = await fetch(`https://router.project-osrm.org/route/v1/driving/${start.lon},${start.lat};${end.lon},${end.lat}?overview=full&geometries=geojson`);
+                const data = await res.json();
+                return (data.routes && data.routes.length > 0) ? data.routes[0] : null;
+            } catch(e) { return null; }
+        }
+
         function initAutocomplete(inputId, listId, isStart) {
             const inp = document.getElementById(inputId);
             const list = document.getElementById(listId);
             let timer;
-
-            inp.addEventListener('focus', () => {
-                if(inp.value.length === 0) showList(list, POPULAR_CITIES, inp, isStart, true);
-            });
-
+            inp.addEventListener('focus', () => { if(inp.value.length===0) showList(list, POPULAR_CITIES, inp, isStart, true); });
             inp.addEventListener('input', () => {
                 clearTimeout(timer);
-                if(inp.value.length === 0) { showList(list, POPULAR_CITIES, inp, isStart, true); return; }
-                timer = setTimeout(async () => {
+                if(inp.value.length===0) { showList(list, POPULAR_CITIES, inp, isStart, true); return; }
+                timer = setTimeout(async()=>{
                     try {
                         const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(inp.value)}&limit=5&addressdetails=1&countrycodes=it`);
                         const data = await res.json();
                         showList(list, data, inp, isStart, false);
-                    } catch(e) {}
+                    } catch(e){}
                 }, 300);
             });
-            document.addEventListener('click', e => { if(e.target !== inp) list.style.display='none'; });
+            document.addEventListener('click', e => { if(e.target!==inp) list.style.display='none'; });
         }
 
         function showList(list, data, inp, isStart, isPop) {
-            list.innerHTML = '';
-            if(data.length > 0) {
-                list.style.display = 'block';
-                if(isPop) list.innerHTML = '<div class="s-pop">Città Popolari</div>';
-                
-                data.forEach(d => {
-                    const div = document.createElement('div'); div.className = 's-item';
-                    const name = isPop ? d : d.display_name.split(',')[0];
-                    div.innerText = name;
-                    div.onclick = () => {
-                        inp.value = name; list.style.display = 'none';
-                        if(!isPop) {
-                            const c = { lat: parseFloat(d.lat), lon: parseFloat(d.lon) };
-                            if(isStart) window.startCoords = c; else window.endCoords = c;
-                        } else {
-                            // If pop city, reset coords to force resolve in validateStep1
-                             if(isStart) window.startCoords=null; else window.endCoords=null;
-                        }
-                    };
-                    list.appendChild(div);
-                });
-            } else { list.style.display = 'none'; }
+            list.innerHTML=''; list.style.display='block';
+            if(isPop) list.innerHTML='<div class="s-pop">Città Popolari</div>';
+            
+            data.forEach(d => {
+                const div = document.createElement('div'); div.className='s-item';
+                const name = isPop ? d : d.display_name.split(',')[0];
+                div.innerText = name;
+                div.onclick = () => {
+                    inp.value = name; list.style.display='none';
+                    if(!isPop) {
+                        const c = {lat: parseFloat(d.lat), lon: parseFloat(d.lon)};
+                        if(isStart) window.startCoords = c; else window.endCoords = c;
+                    } else {
+                        // If selected from popular list, force resolve later
+                        if(isStart) window.startCoords=null; else window.endCoords=null;
+                    }
+                };
+                list.appendChild(div);
+            });
         }
 
-        // --- ANALYSIS ---
-        async function runAnalysis() {
-            // Get KM (Auto or Manual)
+        // --- FINAL RESULTS ---
+        function runAnalysis() {
             let km = window.calcKm;
             if(km === 0) km = parseFloat(document.getElementById('kmInput').value);
-            
-            if(!km) return alert("Km mancanti!");
-            
             const budget = parseFloat(document.getElementById('budgetInput').value);
+            
+            if(!km) return alert("Inserisci i Km!");
 
             document.getElementById('loader').style.display='flex';
             document.getElementById('wizard-box').style.display='none';
             
-            setTimeout(async () => {
+            setTimeout(() => {
                 const resCont = document.getElementById('results-container');
                 resCont.style.display='block';
                 setTimeout(()=>resCont.style.opacity='1',50);
 
-                // Update Trip KM display
-                document.getElementById('t-km').innerText = km + " km";
+                // 1. FILL TRIP CARD
+                document.getElementById('t-start').innerText = document.getElementById('originInput').value;
+                document.getElementById('t-end').innerText = document.getElementById('destInput').value || "N/D";
+                
+                // Animate Numbers on Dashboard
+                animateCounter("t-km", 0, km, 2000, " km");
+                
+                // Calculate Time
+                let timeTxt = "--";
+                if(window.routeDataGlobal) {
+                    const m = Math.round(window.routeDataGlobal.duration/60);
+                    timeTxt = `${Math.floor(m/60)}h ${m%60}m`;
+                    // Simple fade in for text
+                    document.getElementById('t-time').innerText = timeTxt;
+                    document.getElementById('t-time').style.opacity = 0;
+                    setTimeout(()=>document.getElementById('t-time').style.opacity=1, 500);
+                } else {
+                     document.getElementById('t-time').innerText = "--";
+                }
 
-                // MAP RENDER
+                // 2. ANIMATE PRICES
+                const pPetrol = (km/100) * CONS.petrol * BASE_PRICES.petrol;
+                const pDiesel = (km/100) * CONS.diesel * BASE_PRICES.diesel;
+                const pEv = (km/100) * CONS.ev * BASE_PRICES.kwh_public; // Avg
+                
+                animateCounter("p-petrol", 0, pPetrol.toFixed(2), 1500, "", true);
+                animateCounter("p-diesel", 0, pDiesel.toFixed(2), 1500, "", true);
+                animateCounter("p-ev", 0, pEv.toFixed(2), 1500, "", true);
+
+                // 3. MAP
                 document.getElementById('map-container').style.display='block';
                 map.invalidateSize();
                 markersLayer.clearLayers(); routeLayer.clearLayers();
 
                 if(window.startCoords) {
                     L.marker(window.startCoords).addTo(markersLayer);
-                    if(window.endCoords) {
+                    if(window.endCoords && window.routeDataGlobal) {
                         L.marker(window.endCoords).addTo(markersLayer);
-                        // Draw Route
-                        try {
-                            const r = await fetch(`https://router.project-osrm.org/route/v1/driving/${window.startCoords.lon},${window.startCoords.lat};${window.endCoords.lon},${window.endCoords.lat}?overview=full&geometries=geojson`);
-                            const d = await r.json();
-                            if(d.routes.length > 0) {
-                                L.geoJSON(d.routes[0].geometry, {style:{color:'#00f2ff', weight:5}}).addTo(routeLayer);
-                                map.fitBounds(L.latLngBounds([window.startCoords, window.endCoords]), {padding:[50,50]});
-                                
-                                // Fake Chargers
-                                const pts = d.routes[0].geometry.coordinates;
-                                for(let i=1; i<4; i++) {
-                                    let idx = Math.floor((pts.length/4)*i);
-                                    L.circleMarker([pts[idx][1], pts[idx][0]], {radius:6, color:'#ffd700', fillOpacity:1}).addTo(markersLayer).bindPopup("Colonnina");
-                                }
-                            }
-                        } catch(e) {
-                             // Fallback
-                             L.polyline([window.startCoords, window.endCoords], {color:'red', dashArray:'5,10'}).addTo(routeLayer);
-                             map.fitBounds(L.latLngBounds([window.startCoords, window.endCoords]));
+                        L.geoJSON(window.routeDataGlobal.geometry, {style:{color:'#00f2ff', weight:5}}).addTo(routeLayer);
+                        map.fitBounds(L.latLngBounds([window.startCoords, window.endCoords]), {padding:[50,50]});
+                        
+                        // Fake Chargers
+                        const pts = window.routeDataGlobal.geometry.coordinates;
+                        for(let i=1; i<4; i++) {
+                            let idx = Math.floor((pts.length/4)*i);
+                            L.circleMarker([pts[idx][1], pts[idx][0]], {radius:6, color:'#ffd700', fillOpacity:1}).addTo(markersLayer);
                         }
                     } else {
                         map.setView(window.startCoords, 10);
@@ -561,6 +610,28 @@
                 document.getElementById('loader').style.display='none';
 
             }, 1000);
+        }
+
+        // --- ANIMATION HELPER ---
+        function animateCounter(id, start, end, duration, suffix = "", isFloat = false) {
+            let obj = document.getElementById(id);
+            let range = end - start;
+            let current = start;
+            let increment = end > start ? 1 : -1;
+            let stepTime = Math.abs(Math.floor(duration / range));
+            if(isFloat) { stepTime = 20; increment = range / (duration/20); } // Smooth float
+            
+            let timer = setInterval(function() {
+                current += increment;
+                let displayVal = isFloat ? current.toFixed(2) : Math.floor(current);
+                
+                if ((increment > 0 && current >= end) || (increment < 0 && current <= end)) {
+                    current = end;
+                    displayVal = isFloat ? Number(end).toFixed(2) : end;
+                    clearInterval(timer);
+                }
+                obj.innerText = (isFloat ? "€" : "") + displayVal + suffix;
+            }, stepTime);
         }
 
         function renderGrid(budget, km) {
@@ -588,7 +659,6 @@
                         <h3 class="car-title">${c.brand} ${c.model}</h3>
                         <span class="car-price">€${c.price.toLocaleString()}</span>
                         <div class="spec-row"><span>Costo Viaggio:</span><span style="color:var(--accent)">€${cost.toFixed(2)}</span></div>
-                        <div class="spec-row"><span>Range:</span><span>${c.range || '-'} km</span></div>
                         <button class="action-btn">Dettagli</button>
                     </div>
                 </div>`;
