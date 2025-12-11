@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AutoMatch Pro - Navigator</title>
+    <title>AutoMatch Pro - Turbo</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;500;700;900&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
@@ -18,10 +18,10 @@
             --bg-dark: #050507;
             --text-main: #ffffff;
             --text-sub: #94a3b8;
-            --glass-bg: rgba(20, 20, 22, 0.9);
+            --glass-bg: rgba(20, 20, 22, 0.95);
             --glass-border: rgba(255, 255, 255, 0.15);
             --input-bg: rgba(255, 255, 255, 0.08);
-            --card-bg: rgba(30, 30, 35, 0.8);
+            --card-bg: rgba(30, 30, 35, 0.9);
         }
 
         body.light-mode {
@@ -35,7 +35,7 @@
             --card-bg: #ffffff;
         }
 
-        body, html { margin: 0; padding: 0; min-height: 100%; font-family: 'Inter', sans-serif; background: var(--bg-dark); color: var(--text-main); overflow-x: hidden; transition: 0.3s; scroll-behavior: smooth; }
+        body, html { margin: 0; padding: 0; min-height: 100%; font-family: 'Inter', sans-serif; background: var(--bg-dark); color: var(--text-main); overflow-x: hidden; transition: 0.2s; scroll-behavior: smooth; }
         h1, h2, h3, button { font-family: 'Outfit', sans-serif; }
 
         /* BACKGROUND */
@@ -43,65 +43,55 @@
         .bg-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(circle at top, transparent 0%, var(--bg-dark) 90%); z-index: -9; pointer-events: none; }
 
         /* NAVBAR */
-        .nav-bar { position: fixed; top: 0; left: 0; width: 100%; padding: 20px 40px; display: flex; justify-content: space-between; align-items: center; z-index: 1000; box-sizing: border-box; background: rgba(0,0,0,0.8); backdrop-filter: blur(10px); border-bottom: 1px solid var(--glass-border); }
+        .nav-bar { position: fixed; top: 0; left: 0; width: 100%; padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; z-index: 1000; box-sizing: border-box; background: rgba(0,0,0,0.8); backdrop-filter: blur(10px); border-bottom: 1px solid var(--glass-border); }
         .logo { font-weight: 800; font-size: 1.5rem; letter-spacing: -1px; cursor: pointer; }
         .nav-controls { display: flex; gap: 15px; }
         .icon-btn { width: 40px; height: 40px; border-radius: 12px; border: 1px solid var(--glass-border); display: flex; align-items: center; justify-content: center; cursor: pointer; background: var(--glass-bg); color: var(--text-main); transition: 0.2s; font-size: 1.2rem; }
         .icon-btn:hover { border-color: var(--primary); color: var(--primary); }
 
-        /* --- DASHBOARD BAR (STATS) --- */
+        /* DASHBOARD BAR */
         #dashboard-bar {
             width: 100%; padding: 20px 40px; background: var(--glass-bg); border-bottom: 1px solid var(--glass-border);
             display: none; justify-content: center; gap: 40px; align-items: center; flex-wrap: wrap;
-            animation: slideDown 0.5s ease; position: relative; z-index: 900; margin-top: 80px;
+            position: relative; z-index: 900; margin-top: 75px; box-sizing: border-box;
         }
         .dash-item { display: flex; flex-direction: column; align-items: center; min-width: 100px; }
         .dash-label { font-size: 0.75rem; text-transform: uppercase; color: var(--text-sub); margin-bottom: 5px; font-weight: 600; }
         .dash-val { font-size: 1.5rem; font-weight: 800; display: flex; align-items: center; gap: 8px; }
-        .dash-icon { font-size: 1.2rem; }
         .val-good { color: var(--accent); } .val-bad { color: #ff453a; } .val-warn { color: #ffaa00; }
 
-        @keyframes slideDown { from {opacity:0; transform:translateY(-20px);} to {opacity:1; transform:translateY(0);} }
-
-        /* --- LAYOUT --- */
+        /* MAIN LAYOUT */
         #app-container { width: 100%; max-width: 1200px; margin: 0 auto; padding: 40px 20px; display: flex; flex-direction: column; gap: 40px; }
-        
         .main-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; align-items: start; }
-        
-        /* MAP */
-        .map-wrapper { 
-            height: 500px; border-radius: 24px; overflow: hidden; border: 1px solid var(--glass-border); 
-            position: relative; box-shadow: 0 20px 50px rgba(0,0,0,0.5); 
-        }
-        #map { width: 100%; height: 100%; }
 
-        /* FORM SIDE */
+        /* FORM */
         .wizard-box { background: var(--glass-bg); padding: 30px; border-radius: 24px; border: 1px solid var(--glass-border); }
         .input-group { margin-bottom: 20px; position: relative; }
         label { display: block; margin-bottom: 8px; font-weight: 600; font-size: 0.9rem; color: var(--text-sub); }
         input, select { width: 100%; padding: 15px; background: var(--input-bg); border: 1px solid var(--glass-border); border-radius: 12px; color: var(--text-main); font-size: 1rem; box-sizing: border-box; transition: 0.3s; font-family: 'Inter', sans-serif; }
         input:focus { border-color: var(--primary); background: rgba(255,255,255,0.1); outline: none; }
-        
         .suggestions { position: absolute; top: 100%; left: 0; width: 100%; background: #1a1a1a; border: 1px solid var(--primary); border-radius: 12px; z-index: 100; max-height: 200px; overflow-y: auto; display: none; }
         .s-item { padding: 12px; cursor: pointer; color: #fff; border-bottom: 1px solid #333; }
         .s-item:hover { background: var(--primary); color: #000; }
 
-        /* RESULTS CARDS */
-        .results-section { display: none; margin-top: 40px; animation: fadeIn 1s ease; }
+        /* MAP */
+        .map-wrapper { height: 500px; border-radius: 24px; overflow: hidden; border: 1px solid var(--glass-border); position: relative; box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
+        #map { width: 100%; height: 100%; }
+
+        /* RESULTS */
+        .results-section { display: none; margin-top: 40px; }
         .car-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 25px; }
-        
         .car-card { background: var(--card-bg); border-radius: 20px; border: 1px solid var(--glass-border); overflow: hidden; transition: 0.3s; cursor: pointer; position: relative; }
-        .car-card:hover { transform: translateY(-10px); border-color: var(--primary); }
+        .car-card:hover { transform: translateY(-5px); border-color: var(--primary); }
         .car-img { width: 100%; height: 180px; object-fit: cover; }
         .car-body { padding: 20px; }
         .car-title { font-size: 1.3rem; font-weight: 700; margin-bottom: 5px; }
         .car-price { color: var(--primary); font-weight: 700; font-size: 1.1rem; }
         .spec-row { display: flex; justify-content: space-between; margin-top: 15px; font-size: 0.9rem; border-top: 1px solid var(--glass-border); padding-top: 10px; color: var(--text-sub); }
 
-        .btn-main { width: 100%; padding: 15px; background: var(--primary); border: none; border-radius: 12px; color: #fff; font-weight: 700; cursor: pointer; margin-top: 20px; font-size: 1.1rem; }
-        .btn-main:hover { filter: brightness(1.1); transform: scale(1.02); }
+        .btn-main { width: 100%; padding: 15px; background: var(--primary); border: none; border-radius: 12px; color: #fff; font-weight: 700; cursor: pointer; margin-top: 20px; font-size: 1.1rem; transition: 0.1s;}
+        .btn-main:active { transform: scale(0.98); }
 
-        @keyframes fadeIn { from {opacity:0;} to {opacity:1;} }
         @media(max-width: 800px) { .main-grid { grid-template-columns: 1fr; } .map-wrapper { height: 300px; order: -1; } #dashboard-bar { margin-top: 70px; gap: 20px; justify-content: space-around; } }
     </style>
 </head>
@@ -111,59 +101,41 @@
     <div class="bg-overlay"></div>
 
     <nav class="nav-bar">
-        <div class="logo" onclick="location.reload()">AUTOMATCH</div>
+        <div class="logo" onclick="location.reload()">AUTOMATCH ⚡</div>
         <div class="nav-controls">
             <div class="icon-btn" onclick="document.body.classList.toggle('light-mode')"><i class="ph ph-sun"></i></div>
         </div>
     </nav>
 
     <div id="dashboard-bar">
-        <div class="dash-item">
-            <span class="dash-label">Distanza</span>
-            <div class="dash-val" id="d-km">-- km</div>
-        </div>
-        <div class="dash-item">
-            <span class="dash-label">Benzina</span>
-            <div class="dash-val val-bad"><i class="ph-fill ph-gas-pump"></i> <span id="d-petrol">--</span></div>
-        </div>
-        <div class="dash-item">
-            <span class="dash-label">Diesel</span>
-            <div class="dash-val val-warn"><i class="ph-fill ph-truck"></i> <span id="d-diesel">--</span></div>
-        </div>
-        <div class="dash-item">
-            <span class="dash-label">Elettrico</span>
-            <div class="dash-val val-good"><i class="ph-fill ph-lightning"></i> <span id="d-ev">--</span></div>
-        </div>
+        <div class="dash-item"><span class="dash-label">Distanza</span><div class="dash-val" id="d-km">-- km</div></div>
+        <div class="dash-item"><span class="dash-label">Benzina</span><div class="dash-val val-bad"><i class="ph-fill ph-gas-pump"></i> <span id="d-petrol">--</span></div></div>
+        <div class="dash-item"><span class="dash-label">Diesel</span><div class="dash-val val-warn"><i class="ph-fill ph-truck"></i> <span id="d-diesel">--</span></div></div>
+        <div class="dash-item"><span class="dash-label">Elettrico</span><div class="dash-val val-good"><i class="ph-fill ph-lightning"></i> <span id="d-ev">--</span></div></div>
     </div>
 
     <div id="app-container">
-        
         <div class="main-grid">
             <div class="wizard-box">
                 <h2 style="margin-bottom:20px;">Configura Viaggio</h2>
-                
                 <div class="input-group">
                     <label>📍 Partenza</label>
                     <input type="text" id="originInput" placeholder="Città..." autocomplete="off">
                     <div id="list-origin" class="suggestions"></div>
                 </div>
-
                 <div class="input-group">
                     <label>🏁 Destinazione</label>
                     <input type="text" id="destInput" placeholder="Dove vai?" autocomplete="off">
                     <div id="list-dest" class="suggestions"></div>
                 </div>
-
                 <div class="input-group">
                     <label>🛣️ Km (Auto-Calcolo)</label>
                     <input type="number" id="kmInput" placeholder="...">
                 </div>
-
                 <div class="input-group">
                     <label>💰 Budget (€)</label>
                     <input type="number" id="budgetInput" value="35000">
                 </div>
-
                 <div class="input-group">
                     <label>🔌 Ricarica</label>
                     <select id="chargingInput">
@@ -171,8 +143,7 @@
                         <option value="yes">Casa</option>
                     </select>
                 </div>
-
-                <button class="btn-main" onclick="runAnalysis()">Analizza Veicoli 🚀</button>
+                <button class="btn-main" onclick="runFastAnalysis()">Analizza Ora 🚀</button>
             </div>
 
             <div class="map-wrapper">
@@ -184,7 +155,6 @@
             <h2 style="margin-bottom:20px;">Veicoli Consigliati</h2>
             <div id="car-list" class="car-grid"></div>
         </div>
-
     </div>
 
     <script>
@@ -193,12 +163,13 @@
             { brand: "Tesla", model: "Model 3", price: 42990, type: "Elettrica", range: 513, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/8/82/2019_Tesla_Model_3_Long_Range_AWD_Front.jpg/800px-2019_Tesla_Model_3_Long_Range_AWD_Front.jpg" },
             { brand: "Fiat", model: "500e", price: 29950, type: "Elettrica", range: 320, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7f/Fiat_500_Electric_La_Prima_Genf_2020_1X7A5372.jpg/800px-Fiat_500_Electric_La_Prima_Genf_2020_1X7A5372.jpg" },
             { brand: "VW", model: "Golf 8", price: 34500, type: "Diesel", range: 1100, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c9/2020_Volkswagen_Golf_Style_2.0_Front.jpg/800px-2020_Volkswagen_Golf_Style_2.0_Front.jpg" },
-            { brand: "Jeep", model: "Avenger", price: 26300, type: "Benzina", range: 700, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/2/27/Jeep_Avenger_1.2_Turbo_Summit_%E2%80%93_f_%E2%80%93_16042023.jpg/800px-Jeep_Avenger_1.2_Turbo_Summit_%E2%80%93_f_%E2%80%93_16042023.jpg" }
+            { brand: "Jeep", model: "Avenger", price: 26300, type: "Benzina", range: 700, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/2/27/Jeep_Avenger_1.2_Turbo_Summit_%E2%80%93_f_%E2%80%93_16042023.jpg/800px-Jeep_Avenger_1.2_Turbo_Summit_%E2%80%93_f_%E2%80%93_16042023.jpg" },
+            { brand: "MG", model: "MG4", price: 30000, type: "Elettrica", range: 350, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/6/64/MG4_EV_Dabok.jpg/800px-MG4_EV_Dabok.jpg" }
         ];
-        const PRICES = { petrol: 1.85, diesel: 1.72, ev: 0.55 }; // €/unit
-        const CONS = { petrol: 7.0, diesel: 5.5, ev: 16.0 }; // l/100km or kWh/100km
+        const PRICES = { petrol: 1.85, diesel: 1.72, ev: 0.55 }; 
+        const CONS = { petrol: 7.0, diesel: 5.5, ev: 16.0 };
 
-        let map, markers = [], routeLayer;
+        let map, routeLayer;
         let startPos = null, endPos = null;
 
         // --- INIT ---
@@ -206,7 +177,11 @@
             initMap();
             initAutocomplete('originInput', 'list-origin', true);
             initAutocomplete('destInput', 'list-dest', false);
-            initStars(); animateStars();
+            // Stars
+            const canvas=document.getElementById('warp-canvas'), ctx=canvas.getContext('2d');
+            let w=canvas.width=innerWidth, h=canvas.height=innerHeight, stars=Array(100).fill().map(()=>({x:Math.random()*w,y:Math.random()*h,z:Math.random()*w}));
+            (function anim(){ ctx.clearRect(0,0,w,h); ctx.fillStyle='#888'; stars.forEach(s=>{s.z-=10;if(s.z<=0)s.z=w; let x=(s.x-w/2)*(w/s.z)*2+w/2, y=(s.y-h/2)*(w/s.z)*2+h/2; if(x>0&&x<w&&y>0&&y<h) ctx.fillRect(x,y,2,2)}); requestAnimationFrame(anim); })();
+            window.onresize=()=>{w=canvas.width=innerWidth; h=canvas.height=innerHeight;};
         };
 
         function initMap() {
@@ -215,12 +190,10 @@
             routeLayer = L.layerGroup().addTo(map);
         }
 
-        // --- AUTOCOMPLETE & GEOCODING ---
         function initAutocomplete(inputId, listId, isStart) {
             const inp = document.getElementById(inputId);
             const list = document.getElementById(listId);
             let timer;
-
             inp.addEventListener('input', () => {
                 clearTimeout(timer);
                 if(inp.value.length < 3) { list.style.display='none'; return; }
@@ -237,7 +210,7 @@
                                 list.style.display = 'none';
                                 const coords = { lat: parseFloat(d.lat), lon: parseFloat(d.lon) };
                                 if(isStart) startPos = coords;
-                                else { endPos = coords; calculateRoute(); }
+                                else { endPos = coords; calculateRoute(); } // Auto Calc Trigger
                             };
                             list.appendChild(div);
                         });
@@ -247,14 +220,13 @@
             document.addEventListener('click', e => { if(e.target !== inp) list.style.display='none'; });
         }
 
-        // --- CORE LOGIC ---
         async function calculateRoute() {
             if(!startPos || !endPos) return;
             const kmInp = document.getElementById('kmInput');
             kmInp.placeholder = "Calcolo...";
 
-            // Draw Route (OSRM)
             try {
+                // Route OSRM
                 const url = `https://router.project-osrm.org/route/v1/driving/${startPos.lon},${startPos.lat};${endPos.lon},${endPos.lat}?overview=full&geometries=geojson`;
                 const res = await fetch(url);
                 const data = await res.json();
@@ -264,64 +236,58 @@
                     const km = Math.round(route.distance / 1000);
                     kmInp.value = km;
 
-                    // Draw Map
+                    // Draw Map immediately
                     routeLayer.clearLayers();
                     L.marker(startPos).addTo(routeLayer).bindPopup("Partenza");
                     L.marker(endPos).addTo(routeLayer).bindPopup("Arrivo").openPopup();
                     L.geoJSON(route.geometry, {style: {color: '#2997ff', weight: 5}}).addTo(routeLayer);
                     
-                    // Simulate Chargers along route
+                    // Simulate Chargers
                     const pts = route.geometry.coordinates;
                     for(let i=1; i<4; i++) {
                         let idx = Math.floor((pts.length/4)*i);
-                        // Add Charger Icon
-                        const icon = L.divIcon({className: 'c-icon', html: '⚡', iconSize:[20,20]});
-                        L.marker([pts[idx][1], pts[idx][0]], {icon: icon}).addTo(routeLayer).bindPopup("Colonnina Fast");
+                        L.circleMarker([pts[idx][1], pts[idx][0]], {radius:5, color:'#ffd700', fillOpacity:1}).addTo(routeLayer);
                     }
-                    
                     map.fitBounds(L.latLngBounds([startPos, endPos]), {padding:[50,50]});
                 }
             } catch(e) {
-                console.log("Route Error", e);
                 // Fallback Line
                 routeLayer.clearLayers();
                 L.polyline([startPos, endPos], {color:'red', dashArray:'5,5'}).addTo(routeLayer);
                 map.fitBounds(L.latLngBounds([startPos, endPos]));
-                kmInp.value = 100; // Default fallback
+                kmInp.value = 100; // Fallback
             }
         }
 
-        function runAnalysis() {
+        function runFastAnalysis() {
             const km = parseFloat(document.getElementById('kmInput').value);
             const budget = parseFloat(document.getElementById('budgetInput').value);
             
-            if(!km) return alert("Attendi il calcolo dei Km o inseriscili a mano.");
+            if(!km) return alert("Inserisci i Km!");
 
-            // Update Dashboard
+            // 1. Dashboard
             document.getElementById('dashboard-bar').style.display = 'flex';
             document.getElementById('d-km').innerText = km + ' km';
-            
-            const cPetrol = (km/100) * CONS.petrol * PRICES.petrol;
-            const cDiesel = (km/100) * CONS.diesel * PRICES.diesel;
-            const cEv = (km/100) * CONS.ev * PRICES.ev; // Assuming mix/public
+            document.getElementById('d-petrol').innerText = "€" + ((km/100) * CONS.petrol * PRICES.petrol).toFixed(2);
+            document.getElementById('d-diesel').innerText = "€" + ((km/100) * CONS.diesel * PRICES.diesel).toFixed(2);
+            document.getElementById('d-ev').innerText = "€" + ((km/100) * CONS.ev * PRICES.ev).toFixed(2);
 
-            // Animate Numbers
-            animateValue("d-petrol", 0, cPetrol, 1000);
-            animateValue("d-diesel", 0, cDiesel, 1000);
-            animateValue("d-ev", 0, cEv, 1000);
-
-            // Show Results
+            // 2. Cars
             const resSection = document.getElementById('results');
             const carList = document.getElementById('car-list');
             resSection.style.display = 'block';
             
             const filtered = CARS.filter(c => c.price <= budget);
-            
+            if(filtered.length === 0) {
+                carList.innerHTML = "<p style='color:#aaa; text-align:center; width:100%;'>Nessuna auto nel budget.</p>";
+                return;
+            }
+
             carList.innerHTML = filtered.map(c => {
-                let tripCost = 0;
-                if(c.type === 'Elettrica') tripCost = (km/100) * CONS.ev * 0.50; // Avg
-                else if(c.type === 'Diesel') tripCost = (km/100) * CONS.diesel * PRICES.diesel;
-                else tripCost = (km/100) * CONS.petrol * PRICES.petrol;
+                let cost = 0;
+                if(c.type === 'Elettrica') cost = (km/100) * CONS.ev * PRICES.ev;
+                else if(c.type === 'Diesel') cost = (km/100) * CONS.diesel * PRICES.diesel;
+                else cost = (km/100) * CONS.petrol * PRICES.petrol;
 
                 return `
                 <div class="car-card">
@@ -329,46 +295,18 @@
                     <div class="car-body">
                         <h3 class="car-title">${c.brand} ${c.model}</h3>
                         <span class="car-price">€${c.price.toLocaleString()}</span>
-                        <div class="spec-row"><span>Costo Viaggio:</span><b style="color:${c.type==='Elettrica'?'var(--accent)':'#fff'}">€${tripCost.toFixed(2)}</b></div>
+                        <div class="spec-row"><span>Costo Viaggio:</span><b style="color:${c.type==='Elettrica'?'var(--accent)':'#fff'}">€${cost.toFixed(2)}</b></div>
                         <div class="spec-row"><span>Tipo:</span><span>${c.type}</span></div>
                     </div>
                 </div>`;
             }).join('');
 
-            window.scrollTo({ top: document.getElementById('dashboard-bar').offsetTop - 100, behavior: 'smooth' });
+            // 3. Scroll
+            window.scrollTo({ top: document.getElementById('dashboard-bar').offsetTop - 80, behavior: 'smooth' });
+            
+            // 4. Force map resize
+            setTimeout(() => map.invalidateSize(), 300);
         }
-
-        function animateValue(id, start, end, duration) {
-            let obj = document.getElementById(id);
-            let range = end - start;
-            let minTimer = 50;
-            let stepTime = Math.abs(Math.floor(duration / (range*10)));
-            stepTime = Math.max(stepTime, minTimer);
-            let startTime = new Date().getTime();
-            let endTime = startTime + duration;
-            let timer;
-            function run() {
-                let now = new Date().getTime();
-                let remaining = Math.max((endTime - now) / duration, 0);
-                let value = Math.round((end - (remaining * range)) * 100) / 100;
-                obj.innerHTML = "€" + value.toFixed(2);
-                if (value == end) clearInterval(timer);
-            }
-            timer = setInterval(run, stepTime);
-            run();
-        }
-
-        // --- WARP BG ---
-        const canvas = document.getElementById('warp-canvas');
-        const ctx = canvas.getContext('2d');
-        let w, h, stars=[];
-        function initStars() { w=canvas.width=window.innerWidth; h=canvas.height=window.innerHeight; stars=Array(200).fill().map(()=>({x:Math.random()*w,y:Math.random()*h,z:Math.random()*w})); }
-        function animateStars() {
-            ctx.fillStyle=getComputedStyle(document.body).getPropertyValue('--bg-dark'); ctx.fillRect(0,0,w,h); ctx.fillStyle='#888';
-            stars.forEach(s=>{ s.z-=10; if(s.z<=0) s.z=w; let x=(s.x-w/2)*(w/s.z)*2+w/2; let y=(s.y-h/2)*(w/s.z)*2+h/2; if(x>0&&x<w&&y>0&&y<h) ctx.fillRect(x,y,2,2); });
-            requestAnimationFrame(animateStars);
-        }
-        window.addEventListener('resize', initStars);
     </script>
 </body>
 </html>
