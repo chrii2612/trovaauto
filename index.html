@@ -9,7 +9,7 @@
     <meta name="apple-mobile-web-app-title" content="AutoMatch">
     <link rel="apple-touch-icon" href="https://upload.wikimedia.org/wikipedia/commons/thumb/1/1b/Apple_logo_grey.svg/1200px-Apple_logo_grey.svg.png">
     
-    <title>AutoMatch Pro</title>
+    <title>AutoMatch Pro - Travel</title>
     
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
@@ -22,13 +22,13 @@
             --ios-green: #34C759;
             --ios-orange: #FF9500;
             --ios-red: #FF3B30;
+            --ios-purple: #5856D6;
             --ios-bg: #F2F2F7;
             --ios-card: #FFFFFF;
             --ios-text: #000000;
             --ios-text-sec: #8E8E93;
             --ios-separator: rgba(60, 60, 67, 0.18);
             --shadow-sm: 0 2px 8px rgba(0,0,0,0.04);
-            --shadow-float: 0 12px 40px rgba(0,0,0,0.15);
             --font-main: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, sans-serif;
         }
 
@@ -50,7 +50,7 @@
 
         h1, h2, h3 { letter-spacing: -0.02em; margin: 0; }
 
-        /* Shake Animation */
+        /* Animation Error Shake */
         @keyframes shake { 0%, 100% {transform: translateX(0);} 25% {transform: translateX(-5px);} 75% {transform: translateX(5px);} }
         .input-error { animation: shake 0.3s ease-in-out; border: 1px solid var(--ios-red) !important; }
 
@@ -90,169 +90,83 @@
             background: rgba(120,120,128,0.12); color: var(--ios-blue); 
         }
 
-        /* iOS SWITCH */
-        .switch-container { display: flex; align-items: center; justify-content: space-between; width: 100%; }
+        /* iOS SWITCH & INPUTS */
         .ios-switch {
-            position: relative; appearance: none; width: 50px; height: 30px;
-            background: #e9e9ea; border-radius: 25px; transition: 0.3s; outline: none; cursor: pointer;
+            appearance: none; width: 50px; height: 30px; background: #e9e9ea; border-radius: 25px; transition: 0.3s; outline: none; cursor: pointer; position: relative;
         }
         body.dark-mode .ios-switch { background: #39393d; }
-        .ios-switch::after {
-            content: ''; position: absolute; top: 2px; left: 2px;
-            width: 26px; height: 26px; border-radius: 50%; background: white;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.2); transition: 0.3s;
-        }
+        .ios-switch::after { content: ''; position: absolute; top: 2px; left: 2px; width: 26px; height: 26px; border-radius: 50%; background: white; box-shadow: 0 2px 5px rgba(0,0,0,0.2); transition: 0.3s; }
         .ios-switch:checked { background: var(--ios-green); }
         .ios-switch:checked::after { transform: translateX(20px); }
 
-        /* WIZARD & INPUTS */
         #app-section { display: none; padding-top: 80px; min-height: 100vh; flex-direction: column; align-items: center; opacity: 0; transition: opacity 0.5s; padding-bottom: 100px; }
         .wizard-container { width: 100%; max-width: 600px; padding: 0 20px; }
-        
         .progress-dots { display: flex; justify-content: center; gap: 8px; margin-bottom: 30px; }
         .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--ios-separator); transition: 0.3s; }
         .dot.active { background: var(--ios-blue); transform: scale(1.2); }
-
         .step { display: none; animation: slideUpFade 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
         .step.active { display: block; }
         @keyframes slideUpFade { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* iOS LIST */
-        .ios-list { 
-            background: var(--ios-card); border-radius: 12px; 
-            box-shadow: var(--shadow-sm); margin-bottom: 25px; 
-            position: relative; z-index: 10;
-        }
-        .ios-item { 
-            display: flex; align-items: center; padding: 16px 20px; 
-            border-bottom: 0.5px solid var(--ios-separator); 
-            position: relative; 
-        }
-        .ios-item:first-child { border-top-left-radius: 12px; border-top-right-radius: 12px; }
-        .ios-item:last-child { border-bottom: none; border-bottom-left-radius: 12px; border-bottom-right-radius: 12px; }
+        .ios-list { background: var(--ios-card); border-radius: 12px; box-shadow: var(--shadow-sm); margin-bottom: 25px; position: relative; z-index: 10; }
+        .ios-item { display: flex; align-items: center; padding: 16px 20px; border-bottom: 0.5px solid var(--ios-separator); position: relative; }
+        .ios-item:last-child { border-bottom: none; }
         .ios-item i { font-size: 1.4rem; color: var(--ios-blue); margin-right: 15px; width: 24px; text-align: center; }
         .ios-content { flex: 1; position: relative; }
-
         input, select { width: 100%; border: none; background: transparent; font-size: 1.1rem; color: var(--ios-text); font-family: inherit; outline: none; padding: 0; margin-top: 2px; }
+        input[type="datetime-local"] { color: var(--ios-blue); font-weight: 600; }
         label { font-size: 0.75rem; color: var(--ios-text-sec); font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase; }
 
-        /* SUGGESTIONS */
-        .suggestions { 
-            background: var(--ios-card); border-radius: 12px; 
-            position: absolute; top: 100%; left: -20px; width: calc(100% + 40px); 
-            margin-top: 10px; max-height: 250px; overflow-y: auto; display: none; 
-            box-shadow: var(--shadow-float); z-index: 9999; border: 0.5px solid var(--ios-separator); 
-        }
+        .suggestions { background: var(--ios-card); border-radius: 12px; position: absolute; top: 100%; left: -20px; width: calc(100% + 40px); margin-top: 10px; max-height: 250px; overflow-y: auto; display: none; box-shadow: 0 10px 30px rgba(0,0,0,0.15); z-index: 9999; border: 0.5px solid var(--ios-separator); }
         .s-item { padding: 14px 20px; border-bottom: 0.5px solid var(--ios-separator); font-size: 1rem; cursor: pointer; }
-        .s-item:last-child { border-bottom: none; }
-        .s-item:active, .s-item:hover { background: rgba(0,0,0,0.05); }
+        .s-item:active { background: rgba(0,0,0,0.05); }
 
-        /* RESULTS & BENTO GRID */
+        /* RESULTS */
         #results-container { width: 100%; max-width: 1000px; display: none; padding: 0 20px 80px 20px; }
-        
-        .bento-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; width: 100%; margin-top: 40px; }
-        .bento-card {
-            background: var(--ios-card); border-radius: 24px; padding: 25px;
-            box-shadow: var(--shadow-sm); display: flex; flex-direction: column; align-items: center; text-align: center;
-            transition: 0.3s; border: 1px solid rgba(0,0,0,0.03);
-        }
-        .bento-card:hover { transform: translateY(-5px); box-shadow: var(--shadow-float); }
-        .bento-icon { font-size: 2.5rem; color: var(--ios-blue); margin-bottom: 15px; }
-        .bento-title { font-weight: 700; font-size: 1.1rem; margin-bottom: 5px; }
-        .bento-desc { font-size: 0.9rem; color: var(--ios-text-sec); }
-
-        .widget-row { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px; }
-        
-        .glass-card {
-            background: var(--ios-card); padding: 20px; border-radius: 18px;
-            box-shadow: var(--shadow-sm); display: flex; flex-direction: column; justify-content: space-between;
-            border: 1px solid rgba(0,0,0,0.03); position: relative; overflow: hidden;
-        }
-        
-        .weather-widget { background: linear-gradient(135deg, #5AC8FA, #007AFF); color: white; border: none; }
-        .weather-icon { font-size: 2.5rem; margin-bottom: 5px; }
-        .weather-bg { position: absolute; top:-20px; right:-20px; font-size: 8rem; opacity: 0.2; transform: rotate(10deg); pointer-events: none; }
-
-        /* MAP */
-        .map-wrapper { 
-            height: 300px; width: 100%; background: #e5e5ea; border-radius: 18px; 
-            overflow: hidden; margin-bottom: 15px; box-shadow: var(--shadow-sm); 
-            position: relative; z-index: 1;
-        }
+        .map-wrapper { height: 300px; width: 100%; background: #e5e5ea; border-radius: 18px; overflow: hidden; margin-bottom: 15px; box-shadow: var(--shadow-sm); position: relative; z-index: 1; }
         #map { width: 100%; height: 100%; z-index: 1; }
-        .nav-btn-row { display: flex; gap: 10px; margin-bottom: 25px; }
-        .nav-action-btn {
-            background: var(--ios-card); color: var(--ios-blue);
-            flex: 1; padding: 12px; border-radius: 12px; font-weight: 600; font-size: 0.9rem;
-            display: flex; align-items: center; justify-content: center; gap: 8px;
-            box-shadow: var(--shadow-sm);
+        
+        /* TRANSPORT CARDS */
+        .transport-grid { display: grid; grid-template-columns: 1fr; gap: 12px; margin-bottom: 30px; }
+        .transport-card { 
+            background: var(--ios-card); padding: 15px; border-radius: 16px; 
+            display: flex; align-items: center; justify-content: space-between;
+            box-shadow: var(--shadow-sm); transition: 0.2s; cursor: pointer;
         }
+        .transport-card:active { transform: scale(0.98); background: rgba(0,0,0,0.02); }
+        .t-left { display: flex; align-items: center; gap: 15px; }
+        .t-icon { width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; }
+        .t-meta { font-size: 0.85rem; color: var(--ios-text-sec); }
+        .t-price { font-weight: 700; font-size: 1.1rem; color: var(--ios-text); }
+        .t-btn { font-size: 0.75rem; font-weight: 700; color: var(--ios-blue); background: rgba(0,122,255,0.1); padding: 5px 12px; border-radius: 15px; margin-left: 10px; }
+
+        /* BENTO & WIDGETS */
+        .bento-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; width: 100%; margin-top: 30px; }
+        .bento-card { background: var(--ios-card); border-radius: 24px; padding: 25px; box-shadow: var(--shadow-sm); display: flex; flex-direction: column; align-items: center; text-align: center; }
+        .glass-card { background: var(--ios-card); padding: 20px; border-radius: 18px; box-shadow: var(--shadow-sm); position: relative; overflow: hidden; }
+        .weather-widget { background: linear-gradient(135deg, #5AC8FA, #007AFF); color: white; border: none; }
+        .weather-bg { position: absolute; top:-20px; right:-20px; font-size: 8rem; opacity: 0.2; transform: rotate(10deg); pointer-events: none; }
 
         /* CAR CARDS */
         .car-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
-        .car-card {
-            background: var(--ios-card); border-radius: 18px; overflow: hidden;
-            box-shadow: var(--shadow-sm); transition: 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-            position: relative; border: 1px solid transparent; cursor: pointer;
-        }
-        .car-card:active { transform: scale(0.97); }
+        .car-card { background: var(--ios-card); border-radius: 18px; overflow: hidden; box-shadow: var(--shadow-sm); cursor: pointer; }
         .car-img-box { height: 160px; overflow: hidden; position: relative; background: #eee; }
-        .car-img { width: 100%; height: 100%; object-fit: cover; transition: 0.5s; }
-        
-        .badge-rec {
-            position: absolute; top: 10px; right: 10px; background: rgba(255,255,255,0.9);
-            color: var(--ios-blue); font-size: 0.7rem; font-weight: 700; padding: 4px 10px;
-            border-radius: 20px; backdrop-filter: blur(10px); box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            display: flex; align-items: center; gap: 4px; z-index: 10;
-        }
+        .car-img { width: 100%; height: 100%; object-fit: cover; }
+        .badge-rec { position: absolute; top: 10px; right: 10px; background: rgba(255,255,255,0.9); color: var(--ios-blue); font-size: 0.7rem; font-weight: 700; padding: 4px 10px; border-radius: 20px; backdrop-filter: blur(10px); z-index: 10; }
 
         /* MODALS */
-        .modal-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.5); backdrop-filter: blur(8px); z-index: 4000;
-            display: none; align-items: flex-end; justify-content: center;
-            opacity: 0; transition: opacity 0.3s;
-        }
-        .sheet-modal {
-            background: var(--ios-card); width: 100%; max-width: 600px;
-            border-radius: 30px 30px 0 0; padding: 30px; padding-bottom: max(30px, env(safe-area-inset-bottom));
-            transform: translateY(100%); transition: transform 0.4s cubic-bezier(0.19, 1, 0.22, 1);
-        }
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); backdrop-filter: blur(8px); z-index: 4000; display: none; align-items: flex-end; justify-content: center; opacity: 0; transition: opacity 0.3s; }
+        .sheet-modal { background: var(--ios-card); width: 100%; max-width: 600px; border-radius: 30px 30px 0 0; padding: 30px; padding-bottom: max(30px, env(safe-area-inset-bottom)); transform: translateY(100%); transition: transform 0.4s cubic-bezier(0.19, 1, 0.22, 1); }
         .sheet-handle { width: 40px; height: 5px; background: var(--ios-separator); border-radius: 10px; margin: 0 auto 25px auto; }
-        .popup-modal {
-            background: var(--ios-card); width: 85%; max-width: 340px; border-radius: 20px; padding: 25px;
-            transform: scale(0.9); transition: 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-            text-align: center; box-shadow: var(--shadow-float);
-        }
-
-        /* MENU BUTTONS */
-        .list-btn {
-            display: flex; align-items: center; gap: 15px; width: 100%; padding: 16px; margin-bottom: 8px; border-radius: 12px;
-            background: rgba(120,120,128,0.08); text-align: left; font-weight: 600; font-size: 1rem;
-            border: none; cursor: pointer; color: var(--ios-text);
-        }
-        .list-btn:active { background: rgba(120,120,128,0.15); }
-
-        /* TOAST ALERT (Dynamic Island Style) */
-        #toast-alert {
-            position: fixed; top: 10px; left: 50%; transform: translateX(-50%) translateY(-100px);
-            background: rgba(0,0,0,0.85); color: #fff; padding: 12px 25px; border-radius: 40px;
-            display: flex; align-items: center; gap: 10px; z-index: 5000;
-            backdrop-filter: blur(10px); box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-            transition: 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); width: max-content; max-width: 90%;
-            font-size: 0.9rem; font-weight: 600;
-        }
+        .popup-modal { background: var(--ios-card); width: 85%; max-width: 340px; border-radius: 20px; padding: 25px; transform: scale(0.9); transition: 0.3s; text-align: center; box-shadow: 0 12px 40px rgba(0,0,0,0.15); }
+        
+        .list-btn { display: flex; align-items: center; gap: 15px; width: 100%; padding: 16px; margin-bottom: 8px; border-radius: 12px; background: rgba(120,120,128,0.08); text-align: left; font-weight: 600; font-size: 1rem; border: none; cursor: pointer; color: var(--ios-text); }
+        
+        #toast-alert { position: fixed; top: 10px; left: 50%; transform: translateX(-50%) translateY(-100px); background: rgba(0,0,0,0.85); color: #fff; padding: 12px 25px; border-radius: 40px; display: flex; align-items: center; gap: 10px; z-index: 5000; backdrop-filter: blur(10px); transition: 0.5s; font-size: 0.9rem; font-weight: 600; width: max-content; }
         #toast-alert.show { transform: translateX(-50%) translateY(0); }
-        #toast-alert.warning { background: rgba(255, 149, 0, 0.9); color: black; }
+        #toast-alert.warning { background: rgba(255, 149, 0, 0.95); color: black; }
 
-        /* INSTALL PROMPT */
-        #install-prompt {
-            position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
-            background: var(--ios-card); padding: 15px 20px; border-radius: 16px;
-            box-shadow: var(--shadow-float); display: none; align-items: center; gap: 15px;
-            z-index: 3000; border: 1px solid var(--ios-separator); width: 90%; max-width: 400px;
-        }
-
+        .theme-tog { width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: rgba(120,120,128,0.15); transition: 0.3s; cursor: pointer; }
     </style>
 </head>
 <body>
@@ -263,23 +177,17 @@
             <span>AutoMatch</span>
         </div>
         <div style="display:flex; gap:10px;">
-            <div class="icon-btn" onclick="haptic(); openShareSheet()">
-                <i class="ph-bold ph-share-network"></i>
-            </div>
-            <div class="icon-btn" onclick="haptic(); toggleSettings()">
-                <i class="ph-fill ph-gear"></i>
-            </div>
+            <div class="icon-btn" onclick="haptic(); openShareSheet()"><i class="ph-bold ph-share-network"></i></div>
+            <div class="icon-btn" onclick="haptic(); toggleSettings()"><i class="ph-fill ph-gear"></i></div>
         </div>
     </nav>
 
-    <div id="toast-alert"><i class="ph-fill ph-warning-circle"></i> <span id="toast-msg">Avviso</span></div>
+    <div id="toast-alert"><i class="ph-fill ph-info"></i> <span id="toast-msg">Info</span></div>
 
     <div id="settings-modal" class="modal-overlay" style="align-items:center;" onclick="if(event.target===this) toggleSettings()">
         <div class="popup-modal">
             <h2 style="margin-bottom:20px;">Impostazioni</h2>
-            <button class="list-btn" onclick="document.body.classList.toggle('dark-mode'); haptic();">
-                <i class="ph-fill ph-moon-stars"></i> Light / Dark Mode
-            </button>
+            <button class="list-btn" onclick="document.body.classList.toggle('dark-mode'); haptic();"><i class="ph-fill ph-moon-stars"></i> Tema Chiaro/Scuro</button>
             <button class="btn-pri" style="margin-top:20px;" onclick="toggleSettings()">Chiudi</button>
         </div>
     </div>
@@ -295,60 +203,19 @@
         </div>
     </div>
 
-    <div id="nav-sheet" class="modal-overlay" onclick="if(event.target===this) closeNavSheet()">
-        <div class="sheet-modal">
-            <div class="sheet-handle"></div>
-            <h3 style="margin-bottom:20px; text-align:center;">Naviga con...</h3>
-            <button class="list-btn" onclick="openMapApp('apple')"><i class="ph-fill ph-map-trifold"></i> Apple Maps</button>
-            <button class="list-btn" onclick="openMapApp('google')"><i class="ph-fill ph-google-logo" style="color:#EA4335;"></i> Google Maps</button>
-            <button class="list-btn" onclick="openMapApp('waze')"><i class="ph-fill ph-car" style="color:#33CCFF;"></i> Waze</button>
-            <button class="btn-sec" style="margin-top:15px;" onclick="closeNavSheet()">Annulla</button>
-        </div>
-    </div>
-
-    <div id="info-modal" class="modal-overlay" style="align-items:center;" onclick="if(event.target===this) closeInfo()">
-        <div class="popup-modal">
-            <div id="info-icon" style="font-size:3rem; color:var(--ios-blue); margin-bottom:15px;"></div>
-            <h2 id="info-title" style="margin-bottom:10px;"></h2>
-            <p id="info-desc" style="color:var(--ios-text-sec); line-height:1.5;"></p>
-            <button class="btn-pri" style="margin-top:20px;" onclick="closeInfo()">OK</button>
-        </div>
-    </div>
-
-    <div id="install-prompt">
-        <i class="ph-fill ph-export" style="font-size:2rem; color:var(--ios-blue);"></i>
-        <div>
-            <div style="font-weight:700;">Installa App</div>
-            <div style="font-size:0.8rem; color:var(--ios-text-sec);">Tocca condividi e poi "Aggiungi alla schermata Home"</div>
-        </div>
-        <i class="ph-bold ph-x" style="margin-left:auto; cursor:pointer;" onclick="document.getElementById('install-prompt').style.display='none'"></i>
-    </div>
-
     <div id="landing-page" style="padding-top:100px; text-align:center; padding-bottom: 40px;">
         <div style="max-width:800px; margin:0 auto; padding:20px;">
-            <span style="color:var(--ios-blue); font-weight:700; letter-spacing:1px; font-size:0.8rem; text-transform:uppercase; margin-bottom:15px; display:block;">Pianificatore Intelligente</span>
-            <h1 style="font-size:3rem; line-height:1.1; margin-bottom:20px;">Viaggia meglio.<br>Spendi meno.</h1>
+            <span style="color:var(--ios-blue); font-weight:700; letter-spacing:1px; font-size:0.8rem; text-transform:uppercase; margin-bottom:15px; display:block;">Pianificatore Multimodale</span>
+            <h1 style="font-size:3rem; line-height:1.1; margin-bottom:20px;">Auto, Treno<br>o Aereo?</h1>
             <p style="color:var(--ios-text-sec); font-size:1.2rem; margin-bottom:40px; max-width: 500px; margin-left:auto; margin-right:auto;">
-                Calcolo pedaggi, consumi reali e confronto costi in tempo reale.
+                Confronta mezzi, calcola pedaggi reali e trova l'opzione migliore per il tuo viaggio.
             </p>
             <button class="btn-main" onclick="haptic(); goToApp()">Inizia Configurazione</button>
             
             <div class="bento-grid">
-                <div class="bento-card">
-                    <i class="ph-fill ph-map-pin-line bento-icon"></i>
-                    <div class="bento-title">Smart Route</div>
-                    <div class="bento-desc">Percorsi reali con pedaggi inclusi.</div>
-                </div>
-                <div class="bento-card">
-                    <i class="ph-fill ph-lightning bento-icon" style="color:var(--ios-orange)"></i>
-                    <div class="bento-title">EV Ready</div>
-                    <div class="bento-desc">Stima soste di ricarica intelligenti.</div>
-                </div>
-                <div class="bento-card">
-                    <i class="ph-fill ph-piggy-bank bento-icon" style="color:var(--ios-green)"></i>
-                    <div class="bento-title">Risparmio</div>
-                    <div class="bento-desc">Confronta Benzina vs Elettrico.</div>
-                </div>
+                <div class="bento-card"><i class="ph-fill ph-car bento-icon"></i><b>Auto</b><small>TCO e Pedaggi</small></div>
+                <div class="bento-card"><i class="ph-fill ph-train bento-icon" style="color:var(--ios-purple)"></i><b>Treno</b><small>Stima e Orari</small></div>
+                <div class="bento-card"><i class="ph-fill ph-airplane-tilt bento-icon" style="color:var(--ios-orange)"></i><b>Aereo</b><small>Low cost vs Drive</small></div>
             </div>
         </div>
     </div>
@@ -358,8 +225,11 @@
             <div class="progress-dots"><div class="dot active" id="d1"></div><div class="dot" id="d2"></div><div class="dot" id="d3"></div></div>
             
             <div class="step active" id="step-1">
-                <h2>Il tuo Viaggio</h2>
-                <p>Da dove parti e dove vuoi andare?</p>
+                <div style="display:flex; justify-content:space-between; align-items:start;">
+                    <h2>Il Viaggio</h2>
+                    <div id="server-status" style="font-size:0.8rem; font-weight:700; color:var(--ios-green); background:rgba(52, 199, 89, 0.1); padding:4px 10px; border-radius:20px;">Online</div>
+                </div>
+                <p>Dove e quando?</p>
                 <div class="ios-list">
                     <div class="ios-item" style="z-index: 20;">
                         <i class="ph-fill ph-navigation-arrow"></i>
@@ -376,13 +246,19 @@
                         </div>
                         <i class="ph-bold ph-x-circle" id="clearDest" onclick="haptic(); clearDestination()" style="display:none; color:var(--ios-text-sec); cursor:pointer;"></i>
                     </div>
+                    <div class="ios-item">
+                        <i class="ph-fill ph-calendar-blank"></i>
+                        <div class="ios-content">
+                            <label>Data e Ora Partenza</label>
+                            <input type="datetime-local" id="tripDate">
+                        </div>
+                    </div>
                 </div>
                 <button class="btn-pri" onclick="haptic(); validateStep1()">Avanti</button>
             </div>
 
             <div class="step" id="step-2">
                 <h2>Abitudini</h2>
-                <p>Dettagli per una stima precisa.</p>
                 <div class="ios-list">
                     <div class="ios-item">
                         <i class="ph-fill ph-road-horizon"></i>
@@ -395,10 +271,7 @@
                         <i class="ph-fill ph-house-line"></i>
                         <div class="ios-content">
                             <label>Garage?</label>
-                            <select id="chargingInput">
-                                <option value="no">No, ricarica pubblica</option>
-                                <option value="yes">Sì, ricarica domestica</option>
-                            </select>
+                            <select id="chargingInput"><option value="no">No, pubblica</option><option value="yes">Sì, domestica</option></select>
                         </div>
                     </div>
                 </div>
@@ -410,16 +283,12 @@
 
             <div class="step" id="step-3">
                 <h2>Preferenze</h2>
-                <p>Vuoi solo i costi o cerchi un'auto?</p>
-                
+                <p>Vuoi acquistare un'auto?</p>
                 <div class="ios-list">
                     <div class="ios-item">
-                        <div class="ios-content">
-                            <span style="font-size:1rem; font-weight:500;">Voglio acquistare un'auto</span>
-                        </div>
+                        <div class="ios-content"><span style="font-size:1rem; font-weight:500;">Cerco auto nuova</span></div>
                         <input type="checkbox" id="buyToggle" class="ios-switch" onchange="toggleBudgetInput()">
                     </div>
-                    
                     <div class="ios-item" id="budgetRow" style="display:none;">
                         <i class="ph-fill ph-wallet"></i>
                         <div class="ios-content">
@@ -428,68 +297,61 @@
                         </div>
                     </div>
                 </div>
-
                 <div style="display: flex; gap: 15px;">
                     <button class="btn-sec" onclick="haptic(); prevStep(2)">Indietro</button>
-                    <button class="btn-pri" onclick="haptic(); runAnalysis()" id="btn-final-action">Calcola Costi Viaggio</button>
+                    <button class="btn-pri" onclick="haptic(); runAnalysis()" id="btn-final-action">Calcola Costi</button>
                 </div>
             </div>
         </div>
 
         <div id="skeleton-loader" style="display:none; width:100%; max-width:800px; padding:20px;">
             <div class="skeleton" style="height:300px; width:100%; margin-bottom:20px; border-radius:18px;"></div>
-            <div style="display:flex; gap:15px; margin-bottom:20px;">
-                <div class="skeleton" style="height:100px; flex:1; border-radius:18px;"></div>
-                <div class="skeleton" style="height:100px; flex:1; border-radius:18px;"></div>
-            </div>
+            <div class="skeleton" style="height:150px; width:100%; border-radius:18px;"></div>
         </div>
 
         <div id="results-container">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
                 <h2>Il tuo Viaggio</h2>
-                <button onclick="haptic(); location.reload()" style="background:var(--ios-separator); border:none; width:36px; height:36px; border-radius:50%; display:flex; align-items:center; justify-content:center; cursor:pointer;"><i class="ph-bold ph-arrow-counter-clockwise"></i></button>
+                <button onclick="haptic(); location.reload()" style="background:var(--ios-separator); border:none; width:36px; height:36px; border-radius:50%; display:flex; align-items:center; justify-content:center;"><i class="ph-bold ph-arrow-counter-clockwise"></i></button>
             </div>
             
-            <div class="map-wrapper" id="map-container">
-                <div id="map"></div>
-            </div>
-            
-            <div class="nav-btn-row">
-                <button class="nav-action-btn" onclick="haptic(); openNavSheet()">
-                    <i class="ph-fill ph-navigation-arrow" style="font-size:1.2rem;"></i> Avvia Navigazione
-                </button>
-            </div>
+            <div class="map-wrapper" id="map-container"><div id="map"></div></div>
+            <div style="text-align:center; margin-bottom:20px;"><button class="btn-sec" onclick="openNavSheet()" style="padding:10px 20px; font-size:0.9rem;">Naviga <i class="ph-bold ph-navigation-arrow"></i></button></div>
 
-            <div class="widget-row">
-                <div class="glass-card">
-                    <label>Distanza Totale</label>
-                    <div style="font-size:1.8rem; font-weight:700;" id="t-km">--</div>
-                    <small style="color:var(--ios-text-sec);" id="t-start-end">--</small>
-                </div>
-                <div class="glass-card weather-widget" id="weather-box">
-                    <i class="ph-fill ph-cloud-sun weather-bg"></i>
-                    <div>
-                        <label style="color:rgba(255,255,255,0.8);">Meteo Arrivo</label>
-                        <div id="w-temp" style="font-size:2rem; font-weight:700;">--°</div>
+            <h3 style="margin-bottom:10px; font-size:0.9rem; text-transform:uppercase; color:var(--ios-text-sec);">Confronto Mezzi</h3>
+            <div class="transport-grid">
+                <div class="transport-card">
+                    <div class="t-left">
+                        <div class="t-icon" style="background:#EBF2FF; color:var(--ios-blue)"><i class="ph-fill ph-car"></i></div>
+                        <div><div style="font-weight:600;">Auto</div><div class="t-meta" id="drive-time">--h</div></div>
                     </div>
-                    <div style="display:flex; align-items:center; gap:5px; font-size:0.9rem;">
-                        <i class="ph-fill ph-thermometer" id="w-icon"></i> <span id="w-desc">Loading...</span>
+                    <div class="t-price" id="drive-cost">€--</div>
+                </div>
+                <div class="transport-card" onclick="openTrainLink()">
+                    <div class="t-left">
+                        <div class="t-icon" style="background:#F2E6FF; color:var(--ios-purple)"><i class="ph-fill ph-train"></i></div>
+                        <div><div style="font-weight:600;">Treno</div><div class="t-meta" id="train-time">--h</div></div>
+                    </div>
+                    <div style="display:flex; align-items:center;">
+                        <div class="t-price" id="train-cost">€--</div>
+                        <div class="t-btn">Vedi Offerte</div>
                     </div>
                 </div>
+                <div class="transport-card" id="card-plane" onclick="openPlaneLink()">
+                    <div class="t-left">
+                        <div class="t-icon" style="background:#FFF3E0; color:var(--ios-orange)"><i class="ph-fill ph-airplane-tilt"></i></div>
+                        <div><div style="font-weight:600;">Aereo</div><div class="t-meta" id="plane-time">--h</div></div>
+                    </div>
+                    <div style="display:flex; align-items:center;">
+                        <div class="t-price" id="plane-cost">€--</div>
+                        <div class="t-btn">Vedi Offerte</div>
+                    </div>
+                </div>
             </div>
 
-            <h3 style="margin: 20px 0 10px 0; font-size:0.9rem; text-transform:uppercase; color:var(--ios-text-sec);">Smart Insights (Clicca per info)</h3>
-            <div class="vibe-grid" class="bento-grid" style="display:grid; grid-template-columns:1fr 1fr; gap:15px;">
-                <div class="bento-card" style="padding:15px; cursor:pointer;" onclick="haptic(); showInfo('tree')">
-                    <i class="ph-fill ph-tree bento-icon" style="font-size:2rem; color:var(--ios-green)"></i>
-                    <div style="font-size:0.7rem; color:var(--ios-text-sec); font-weight:600;">ECO INDEX</div>
-                    <div style="font-weight:700; font-size:1rem;"><span id="vibe-trees">--</span> vs Diesel</div>
-                </div>
-                <div class="bento-card" style="padding:15px; cursor:pointer;" onclick="haptic(); showInfo('flight')">
-                    <i class="ph-fill ph-airplane-tilt bento-icon" style="font-size:2rem; color:var(--ios-blue)"></i>
-                    <div style="font-size:0.7rem; color:var(--ios-text-sec); font-weight:600;">VS AEREO</div>
-                    <div style="font-weight:700; font-size:1rem;" id="vibe-flight-cost">--</div>
-                </div>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:15px; margin-bottom:25px;">
+                <div class="glass-card"><label>Distanza</label><div style="font-size:1.5rem; font-weight:700;" id="t-km">--</div></div>
+                <div class="glass-card weather-widget"><i class="ph-fill ph-cloud-sun weather-bg"></i><label style="color:rgba(255,255,255,0.8)">Meteo Arrivo</label><div style="font-size:1.5rem; font-weight:700;" id="w-temp">--°</div></div>
             </div>
 
             <div id="car-results-wrapper" style="display:none;">
@@ -503,72 +365,101 @@
         <div class="sheet-modal" id="sheet-content">
             <div class="sheet-handle"></div>
             <div style="display:flex; justify-content:space-between; align-items:start; margin-bottom:20px;">
-                <div>
-                    <span style="font-size:0.8rem; color:var(--ios-text-sec); text-transform:uppercase; letter-spacing:1px;" id="m-brand">BRAND</span>
-                    <h2 id="m-title" style="margin:0; font-size:1.8rem;">Model</h2>
-                </div>
-                <span id="m-price-tag" style="background:var(--ios-bg); padding:5px 10px; border-radius:10px; font-weight:600; font-size:0.9rem;">€0</span>
+                <div><span style="font-size:0.8rem; color:var(--ios-text-sec);" id="m-brand">BRAND</span><h2 id="m-title" style="margin:0;">Model</h2></div>
+                <span id="m-price-tag" style="background:var(--ios-bg); padding:5px 10px; border-radius:10px; font-weight:600;">€0</span>
             </div>
             <div class="ios-list">
-                <div class="ios-item"><div class="ios-content">Costo Carburante</div><b id="m-fuel">--</b></div>
-                <div class="ios-item"><div class="ios-content">Pedaggio Autostrada</div><b id="m-toll">--</b></div>
-                <div class="ios-item" id="row-ev-stops" style="display:none;">
-                    <i class="ph-fill ph-charging-station" style="color:var(--ios-orange); font-size:1.2rem; margin-right:10px; width:auto;"></i>
-                    <div class="ios-content" style="color:var(--ios-orange); font-weight:600;">Soste Ricarica</div>
-                    <b id="m-stops" style="color:var(--ios-orange)">--</b>
-                </div>
+                <div class="ios-item"><div class="ios-content">Carburante</div><b id="m-fuel">--</b></div>
+                <div class="ios-item"><div class="ios-content">Pedaggio</div><b id="m-toll">--</b></div>
             </div>
             <div style="background:var(--ios-bg); padding:20px; border-radius:18px; margin-bottom:20px;">
-                <label>Costo Totale Stimato</label>
-                <div id="m-total" style="font-size:2rem; font-weight:700; color:var(--ios-text);">--</div>
+                <label>Totale Viaggio</label><div id="m-total" style="font-size:2rem; font-weight:700;">--</div>
             </div>
-            <button class="btn-pri" onclick="haptic(); forceCloseModal()">Chiudi Scheda</button>
+            <button class="btn-pri" onclick="forceCloseModal()">Chiudi</button>
+        </div>
+    </div>
+
+    <div id="nav-sheet" class="modal-overlay" onclick="if(event.target===this) closeNavSheet()">
+        <div class="sheet-modal">
+            <div class="sheet-handle"></div>
+            <h3 style="margin-bottom:20px; text-align:center;">Naviga con...</h3>
+            <button class="list-btn" onclick="openMapApp('apple')"><i class="ph-fill ph-map-trifold"></i> Apple Maps</button>
+            <button class="list-btn" onclick="openMapApp('google')"><i class="ph-fill ph-google-logo" style="color:#EA4335;"></i> Google Maps</button>
+            <button class="list-btn" onclick="openMapApp('waze')"><i class="ph-fill ph-car" style="color:#33CCFF;"></i> Waze</button>
+            <button class="btn-sec" style="margin-top:15px;" onclick="closeNavSheet()">Annulla</button>
         </div>
     </div>
 
     <script>
-        const CONFIG = { prices: { petrol: 1.84, diesel: 1.71, kwh_public: 0.62, kwh_home: 0.25, flight_km: 0.12, flight_base: 40 }, toll_rate: 0.075, co2: { diesel: 120, tree: 20000 } };
         const PLACEHOLDER_IMG = "https://placehold.co/600x400/EEE/AAA?text=Auto";
         const CARS_DB = [
             { brand: "Tesla", model: "Model 3", price: 42990, type: "Elettrica", range: 513, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/8/82/2019_Tesla_Model_3_Long_Range_AWD_Front.jpg/800px-2019_Tesla_Model_3_Long_Range_AWD_Front.jpg" },
             { brand: "Fiat", model: "500e", price: 29950, type: "Elettrica", range: 320, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7f/Fiat_500_Electric_La_Prima_Genf_2020_1X7A5372.jpg/800px-Fiat_500_Electric_La_Prima_Genf_2020_1X7A5372.jpg" },
             { brand: "VW", model: "Golf 8", price: 34500, type: "Diesel", range: 1000, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c9/2020_Volkswagen_Golf_Style_2.0_Front.jpg/800px-2020_Volkswagen_Golf_Style_2.0_Front.jpg" },
-            { brand: "Jeep", model: "Avenger", price: 24300, type: "Benzina", range: 650, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/2/27/Jeep_Avenger_1.2_Turbo_Summit_%E2%80%93_f_%E2%80%93_16042023.jpg/800px-Jeep_Avenger_1.2_Turbo_Summit_%E2%80%93_f_%E2%80%93_16042023.jpg" },
-            { brand: "MG", model: "MG4", price: 30790, type: "Elettrica", range: 350, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/6/64/MG4_EV_Dabok.jpg/800px-MG4_EV_Dabok.jpg" }
+            { brand: "Jeep", model: "Avenger", price: 24300, type: "Benzina", range: 650, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/2/27/Jeep_Avenger_1.2_Turbo_Summit_%E2%80%93_f_%E2%80%93_16042023.jpg/800px-Jeep_Avenger_1.2_Turbo_Summit_%E2%80%93_f_%E2%80%93_16042023.jpg" }
         ];
-
+        
         window.startCoords = null; window.endCoords = null; window.calculatedKm = 0; window.routeDataGlobal = null; window.wantsToBuy = false;
-        const POPULAR_CITIES = ["Roma", "Milano", "Napoli", "Torino", "Bologna", "Firenze", "Venezia", "Bari", "Palermo", "Genova"];
+        const POPULAR_CITIES = ["Roma", "Milano", "Napoli", "Torino", "Bologna", "Firenze", "Venezia", "Bari"];
 
-        function haptic() { if(navigator.vibrate) navigator.vibrate(12); }
-        function showToast(msg, isWarn=false) { const t=document.getElementById('toast-alert'); document.getElementById('toast-msg').innerText=msg; if(isWarn) t.classList.add('warning'); else t.classList.remove('warning'); t.classList.add('show'); setTimeout(()=>t.classList.remove('show'), 3500); }
+        function haptic() { if(navigator.vibrate) navigator.vibrate(10); }
+        function showToast(msg, warn=false) { const t=document.getElementById('toast-alert'); t.innerHTML=warn?`<i class='ph-fill ph-warning'></i> ${msg}`:`<i class='ph-fill ph-info'></i> ${msg}`; t.className=warn?'warning show':'show'; setTimeout(()=>t.classList.remove('show'),3500); }
 
         let map, markersLayer, routeLayer;
         window.onload = function() {
+            // Set default date to now
+            const now = new Date(); now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+            document.getElementById('tripDate').value = now.toISOString().slice(0,16);
+            
+            // Map Init
             map = L.map('map', {zoomControl: false, dragging: !L.Browser.mobile, tap: !L.Browser.mobile}).setView([41.9, 12.5], 5);
             L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', { attribution: '', maxZoom: 19 }).addTo(map);
             markersLayer = L.layerGroup().addTo(map); routeLayer = L.layerGroup().addTo(map);
-            initAutocomplete('originInput', 'list-origin', true); initAutocomplete('destInput', 'list-dest', false);
             
-            // iOS PWA Hint
-            const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
-            const isStandAlone = window.matchMedia('(display-mode: standalone)').matches;
-            if(isIOS && !isStandAlone) { setTimeout(()=>document.getElementById('install-prompt').style.display='flex', 3000); }
+            // Check Server
+            fetch('https://nominatim.openstreetmap.org/search?q=Rome&format=json&limit=1').then(r=>{if(!r.ok)throw new Error();})
+            .catch(()=> { document.getElementById('server-status').innerText="Offline (Stima Attiva)"; document.getElementById('server-status').style.color="var(--ios-orange)"; });
+
+            initAutocomplete('originInput', 'list-origin', true); initAutocomplete('destInput', 'list-dest', false);
+            document.getElementById('destInput').addEventListener('input', function() { document.getElementById('clearDest').style.display = this.value.length > 0 ? 'block' : 'none'; });
         };
 
-        function toggleBudgetInput() {
-            window.wantsToBuy = document.getElementById('buyToggle').checked;
-            const row = document.getElementById('budgetRow');
-            const btn = document.getElementById('btn-final-action');
-            if(window.wantsToBuy) { row.style.display = 'flex'; btn.innerText = "Trova Auto Ideale"; }
-            else { row.style.display = 'none'; btn.innerText = "Calcola Costi Viaggio"; }
+        // --- PUBLIC TRANSPORT DEEP LINKS ---
+        function getTripData() {
+            return {
+                origin: document.getElementById('originInput').value,
+                dest: document.getElementById('destInput').value,
+                date: document.getElementById('tripDate').value // YYYY-MM-DDTHH:MM
+            };
         }
 
-        // --- NAVIGATION & LOGIC ---
+        function openTrainLink() {
+            const d = getTripData();
+            // Trainline Generic Search Structure
+            // Fallback to Google Search if specific deep link fails logic
+            const q = `Treno da ${d.origin} a ${d.dest}`;
+            window.open(`https://www.google.com/search?q=${encodeURIComponent(q)}`, '_blank');
+        }
+
+        function openPlaneLink() {
+            const d = getTripData();
+            // Google Flights Deep Link format: https://www.google.com/travel/flights?q=Flights%20to%20London%20from%20Rome%20on%202023-10-10
+            const datePart = d.date.split('T')[0];
+            const q = `Flights to ${d.dest} from ${d.origin} on ${datePart}`;
+            window.open(`https://www.google.com/travel/flights?q=${encodeURIComponent(q)}`, '_blank');
+        }
+
+        // --- LOGIC ---
+        function toggleBudgetInput() {
+            window.wantsToBuy = document.getElementById('buyToggle').checked;
+            document.getElementById('budgetRow').style.display = window.wantsToBuy ? 'flex' : 'none';
+            document.getElementById('btn-final-action').innerText = window.wantsToBuy ? "Trova Auto" : "Calcola Viaggio";
+        }
+
+        function nextStep(s) { document.querySelectorAll('.step').forEach(e=>e.classList.remove('active')); document.getElementById(`step-${s}`).classList.add('active'); [1,2,3].forEach(i=>document.getElementById(`d${i}`).classList.remove('active')); document.getElementById(`d${s}`).classList.add('active'); }
+        function prevStep(s) { nextStep(s); }
         function goToApp() { document.getElementById('landing-page').style.display='none'; document.getElementById('app-section').style.display='flex'; setTimeout(()=>document.getElementById('app-section').style.opacity='1',50); }
-        function nextStep(step) { document.querySelectorAll('.step').forEach(s => s.classList.remove('active')); document.getElementById(`step-${step}`).classList.add('active'); [1,2,3].forEach(i=>document.getElementById(`d${i}`).classList.remove('active')); document.getElementById(`d${step}`).classList.add('active'); }
-        function prevStep(step) { nextStep(step); }
-        
+
         function clearDestination() {
             document.getElementById('destInput').value = ''; document.getElementById('clearDest').style.display = 'none';
             window.endCoords = null; window.routeDataGlobal = null; window.calculatedKm = 0;
@@ -577,27 +468,24 @@
         }
 
         async function validateStep1() {
-            const originInp = document.getElementById('originInput'); const destInp = document.getElementById('destInput');
-            if(!originInp.value) { haptic(); return alert("Inserisci Partenza"); }
-            if(!window.startCoords) window.startCoords = await resolveCity(originInp.value);
+            const o = document.getElementById('originInput'); const d = document.getElementById('destInput');
+            if(!o.value) { haptic(); return alert("Inserisci partenza"); }
+            if(!window.startCoords) window.startCoords = await resolveCity(o.value);
             
-            if(destInp.value.trim() !== "") {
-                if(!window.endCoords) window.endCoords = await resolveCity(destInp.value);
+            if(d.value.trim()!=="") {
+                if(!window.endCoords) window.endCoords = await resolveCity(d.value);
                 if(window.endCoords) {
                     try { window.routeDataGlobal = await fetchRoute(window.startCoords, window.endCoords); } catch(e){}
-                    const kmInput = document.getElementById('kmInput');
-                    const kmMsg = document.getElementById('km-msg');
-                    
+                    const kIn = document.getElementById('kmInput'); const kM = document.getElementById('km-msg');
                     if(window.routeDataGlobal) {
                         window.calculatedKm = Math.round(window.routeDataGlobal.distance/1000);
-                        kmInput.className = 'locked'; kmMsg.style.color = 'var(--ios-green)'; kmMsg.innerText = "Percorso Stradale OK";
+                        kIn.className='locked'; kM.style.color='var(--ios-green)'; kM.innerText="Percorso Stradale OK";
                     } else {
-                        // FALLBACK WARNING
-                        showToast("⚠️ Server Navigazione Offline: stima linea d'aria", true);
+                        showToast("Server Navigazione Offline: uso linea d'aria", true);
                         window.calculatedKm = Math.round(getDistanceFromLatLonInKm(window.startCoords.lat, window.startCoords.lon, window.endCoords.lat, window.endCoords.lon));
-                        kmInput.className = 'warning'; kmMsg.style.color = 'var(--ios-orange)'; kmMsg.innerText = "Stima Lineare (Server Busy)";
+                        kIn.className='warning'; kM.style.color='var(--ios-orange)'; kM.innerText="Stima Lineare";
                     }
-                    kmInput.value = window.calculatedKm; kmInput.setAttribute('readonly', true); kmMsg.style.display = 'block';
+                    kIn.value = window.calculatedKm; kIn.setAttribute('readonly',true); kM.style.display='block';
                 }
             }
             nextStep(2);
@@ -606,19 +494,17 @@
         async function runAnalysis() {
             const km = window.calculatedKm > 0 ? window.calculatedKm : parseFloat(document.getElementById('kmInput').value);
             if(!km) return alert("Inserisci KM");
-            const budget = parseFloat(document.getElementById('budgetInput').value);
-
+            
             document.getElementById('wizard-box').style.display='none';
             document.getElementById('skeleton-loader').style.display='block';
-            
+
             setTimeout(async () => {
                 if(window.endCoords) await fetchWeather(window.endCoords.lat, window.endCoords.lon);
-                else document.getElementById('weather-box').style.display = 'none';
-
+                
                 document.getElementById('skeleton-loader').style.display='none';
                 document.getElementById('results-container').style.display='block';
                 
-                // Map Logic
+                // MAP & ROUTE
                 setTimeout(() => {
                     map.invalidateSize(); markersLayer.clearLayers(); routeLayer.clearLayers();
                     if(window.startCoords) {
@@ -633,71 +519,80 @@
                 }, 200);
 
                 document.getElementById('t-km').innerText = km + " km";
-                document.getElementById('t-start-end').innerText = `${document.getElementById('originInput').value} -> ${document.getElementById('destInput').value || '?'}`;
-
-                // Smart Insights
-                const trees = ((km * CONFIG.co2.diesel) / CONFIG.co2.tree).toFixed(1);
-                document.getElementById('vibe-trees').innerText = trees > 0.1 ? trees + " 🌳" : "< 1 🌳";
                 
-                const driveCost = ((km/100)*16*CONFIG.prices.kwh_public).toFixed(0);
-                const flightCost = (CONFIG.prices.flight_base + (km * CONFIG.prices.flight_km)).toFixed(0);
-                document.getElementById('vibe-flight-cost').innerText = parseFloat(driveCost) < parseFloat(flightCost) ? `Risparmi €${flightCost - driveCost}` : `Aereo conviene`;
+                // --- TRANSPORT ESTIMATES ---
+                // 1. CAR
+                const driveCost = ((km/100)*6.5*1.8 + (km*0.075)).toFixed(0); // Avg fuel + toll
+                const driveTime = (km / 90).toFixed(1); // Avg 90km/h
+                document.getElementById('drive-cost').innerText = "€" + driveCost;
+                document.getElementById('drive-time').innerText = driveTime + "h";
 
-                // Cars Rendering (Only if Buying)
-                const carWrap = document.getElementById('car-results-wrapper');
-                const carGrid = document.getElementById('car-results');
+                // 2. TRAIN (Estimate based on date urgency)
+                const tripDate = new Date(document.getElementById('tripDate').value);
+                const daysDiff = (tripDate - new Date()) / (1000 * 3600 * 24);
+                let trainRate = 0.15; // Base per km
+                if(daysDiff < 2) trainRate = 0.25; // Last minute expensive
+                else if(daysDiff > 14) trainRate = 0.10; // Early bird cheap
+                
+                const trainCost = (km * trainRate).toFixed(0);
+                const trainTime = (km / 120).toFixed(1); // Avg Train speed
+                document.getElementById('train-cost').innerText = "€" + trainCost;
+                document.getElementById('train-time').innerText = trainTime + "h";
+
+                // 3. PLANE
+                if(km < 300) {
+                    document.getElementById('card-plane').style.display = 'none';
+                } else {
+                    document.getElementById('card-plane').style.display = 'flex';
+                    let planeBase = 40; 
+                    if(daysDiff < 7) planeBase = 120; // Last minute flight
+                    const planeCost = (planeBase + (km * 0.05)).toFixed(0);
+                    const planeTime = "3.5h"; // Flight + Airport (Standardized)
+                    document.getElementById('plane-cost').innerText = "€" + planeCost;
+                    document.getElementById('plane-time').innerText = planeTime;
+                }
+
+                // 4. CARS (If buying)
                 if(window.wantsToBuy) {
-                    carWrap.style.display = 'block';
-                    const homeCharge = document.getElementById('chargingInput').value === 'yes';
-                    const validCars = CARS_DB.filter(c => c.price <= (budget * 1.3));
-                    if(validCars.length === 0) carGrid.innerHTML = "<p style='text-align:center; color:#999; grid-column:1/-1;'>Nessun veicolo nel budget.</p>";
+                    document.getElementById('car-results-wrapper').style.display = 'block';
+                    const budget = parseFloat(document.getElementById('budgetInput').value);
+                    const filtered = CARS_DB.filter(c => c.price <= (budget*1.3));
+                    const grid = document.getElementById('car-results');
+                    if(filtered.length === 0) grid.innerHTML = "<p style='color:#888'>Nessuna auto nel budget.</p>";
                     else {
-                        carGrid.innerHTML = validCars.map(c => {
-                            let cost = 0;
-                            if(c.type==='Elettrica') cost = (km/100)*16*(homeCharge?CONFIG.prices.kwh_home:CONFIG.prices.kwh_public);
-                            else if(c.type==='Diesel') cost = (km/100)*5.5*CONFIG.prices.diesel;
-                            else cost = (km/100)*7.0*CONFIG.prices.petrol;
-                            
-                            const badge = (c.type==='Elettrica' && c.price<=budget) ? `<div class="badge-rec"><i class="ph-fill ph-star" style="color:#FF9500"></i> Consigliata</div>` : '';
-                            return `<div class="car-card" onclick="haptic(); openModal('${c.brand}','${c.model}',${c.price},${cost.toFixed(2)},'${c.type}',${c.range||0},${km})">${badge}<div class="car-img-box"><img src="${c.img}" class="car-img" loading="lazy" onerror="this.src='${PLACEHOLDER_IMG}'"></div><div style="padding:15px;"><div style="font-weight:700;">${c.brand} ${c.model}</div><div style="color:#888; font-size:0.9rem;">€${c.price.toLocaleString()}</div><div style="margin-top:10px; padding-top:10px; border-top:1px solid #eee; display:flex; justify-content:space-between;"><small>COSTO VIAGGIO</small><b>€${cost.toFixed(2)}</b></div></div></div>`;
+                        grid.innerHTML = filtered.map(c => {
+                            let fc = (c.type==='Elettrica') ? (km/100)*16*0.6 : (km/100)*6*1.8;
+                            return `<div class="car-card" onclick="openModal('${c.brand}','${c.model}',${c.price},${fc.toFixed(0)},${km})"><div class="car-img-box"><img src="${c.img}" class="car-img"></div><div style="padding:15px;"><b>${c.brand} ${c.model}</b><br><small>€${c.price.toLocaleString()}</small></div></div>`
                         }).join('');
                     }
                 } else {
-                    carWrap.style.display = 'none';
+                    document.getElementById('car-results-wrapper').style.display = 'none';
                 }
 
-            }, 1000);
+            }, 800);
         }
 
-        function openModal(brand, model, price, fuelCost, type, range, km) {
+        // --- SHARED MODAL & UTILS ---
+        function openModal(brand, model, price, fuel, km) {
             document.getElementById('m-brand').innerText = brand; document.getElementById('m-title').innerText = model;
             document.getElementById('m-price-tag').innerText = "€" + price.toLocaleString();
-            document.getElementById('m-fuel').innerText = "€" + fuelCost;
-            
-            const toll = (km * CONFIG.toll_rate).toFixed(2);
-            document.getElementById('m-toll').innerText = "€" + toll;
-            
-            const rowEv = document.getElementById('row-ev-stops');
-            if(type === 'Elettrica') {
-                rowEv.style.display = 'flex';
-                const stops = Math.max(0, Math.floor(km / (range*0.8)));
-                document.getElementById('m-stops').innerText = stops === 0 ? "Nessuna" : stops + " Stops";
-            } else rowEv.style.display = 'none';
-
-            document.getElementById('m-total').innerText = "€" + (parseFloat(fuelCost)+parseFloat(toll)).toFixed(2);
+            document.getElementById('m-fuel').innerText = "€" + fuel;
+            document.getElementById('m-toll').innerText = "€" + (km * 0.075).toFixed(0);
+            document.getElementById('m-total').innerText = "€" + (parseFloat(fuel) + (km*0.075)).toFixed(0);
             const m = document.getElementById('modal-overlay'); const s = document.getElementById('sheet-content');
             m.style.display='flex'; setTimeout(()=>{m.style.opacity='1'; s.style.transform='translateY(0)';},10);
         }
-
-        // --- SHARE & NAV ---
-        function getShareText() {
-            return `🚗 *Viaggio AutoMatch*\n📍 ${document.getElementById('originInput').value} ➡️ ${document.getElementById('destInput').value}\n📏 ${window.calculatedKm} km\n🔗 Crea il tuo viaggio: https://chrii2612.github.io/trovaauto/`;
-        }
-        function openShareSheet() { const m=document.getElementById('share-sheet'); const s=m.querySelector('.sheet-modal'); m.style.display='flex'; setTimeout(()=>{m.style.opacity='1'; s.style.transform='translateY(0)';},10); }
+        function forceCloseModal() { const m=document.getElementById('modal-overlay'); const s=document.getElementById('sheet-content'); s.style.transform='translateY(100%)'; m.style.opacity='0'; setTimeout(()=>m.style.display='none',300); }
+        function closeModal(e){ if(e.target.classList.contains('modal-overlay')) { if(e.target.id==='nav-sheet')closeNavSheet(); else if(e.target.id==='share-sheet')closeShareSheet(); else forceCloseModal(); }}
+        
+        function openShareSheet() { if(!window.calculatedKm)return alert("Pianifica!"); const m=document.getElementById('share-sheet'); const s=m.querySelector('.sheet-modal'); m.style.display='flex'; setTimeout(()=>{m.style.opacity='1'; s.style.transform='translateY(0)';},10); }
         function closeShareSheet() { const m=document.getElementById('share-sheet'); const s=m.querySelector('.sheet-modal'); s.style.transform='translateY(100%)'; m.style.opacity='0'; setTimeout(()=>{m.style.display='none';},300); }
-        function shareWhatsApp() { window.open(`https://wa.me/?text=${encodeURIComponent(getShareText())}`, '_blank'); closeShareSheet(); }
-        function shareMail() { window.open(`mailto:?subject=Il mio viaggio&body=${encodeURIComponent(getShareText())}`, '_blank'); closeShareSheet(); }
-        function shareNative() { if(navigator.share) navigator.share({title:'Trip', text:getShareText()}); closeShareSheet(); }
+        function shareWhatsApp() { 
+            const txt = `🚗 Viaggio AutoMatch\n${document.getElementById('originInput').value} -> ${document.getElementById('destInput').value}\nData: ${document.getElementById('tripDate').value}\n🔗 https://chrii2612.github.io/trovaauto/`;
+            window.open(`https://wa.me/?text=${encodeURIComponent(txt)}`, '_blank'); closeShareSheet(); 
+        }
+        function shareMail() { window.open(`mailto:?subject=Viaggio&body=${encodeURIComponent("Il mio viaggio pianificato su AutoMatch: https://chrii2612.github.io/trovaauto/")}`, '_blank'); closeShareSheet(); }
+        function shareNative() { if(navigator.share) navigator.share({title:'Trip', url:'https://chrii2612.github.io/trovaauto/'}); closeShareSheet(); }
 
         function openNavSheet() { const m=document.getElementById('nav-sheet'); const s=m.querySelector('.sheet-modal'); m.style.display='flex'; setTimeout(()=>{m.style.opacity='1'; s.style.transform='translateY(0)';},10); }
         function closeNavSheet() { const m=document.getElementById('nav-sheet'); const s=m.querySelector('.sheet-modal'); s.style.transform='translateY(100%)'; m.style.opacity='0'; setTimeout(()=>{m.style.display='none';},300); }
@@ -708,24 +603,14 @@
              if(app==='waze') window.open(`https://waze.com/ul?ll=${d}&navigate=yes`);
              closeNavSheet();
         }
-
         function toggleSettings() { const m=document.getElementById('settings-modal'); const c=m.querySelector('.popup-modal'); if(m.style.display==='flex'){m.style.opacity='0';c.style.transform='scale(0.9)';setTimeout(()=>m.style.display='none',300);}else{m.style.display='flex';setTimeout(()=>{m.style.opacity='1';c.style.transform='scale(1)';},10);} }
-        function forceCloseModal() { const m=document.getElementById('modal-overlay'); const s=document.getElementById('sheet-content'); s.style.transform='translateY(100%)'; m.style.opacity='0'; setTimeout(()=>m.style.display='none',300); }
-        function closeModal(e){ if(e.target.classList.contains('modal-overlay')) { if(e.target.id==='nav-sheet')closeNavSheet(); else if(e.target.id==='share-sheet')closeShareSheet(); else if(e.target.id==='info-modal')closeInfo(); else forceCloseModal(); }}
-        function showInfo(t) { 
-            const m=document.getElementById('info-modal'); const c=m.querySelector('.popup-modal'); const i=document.getElementById('info-icon');
-            if(t==='tree'){i.className='ph-fill ph-tree'; document.getElementById('info-title').innerText='Eco Index'; document.getElementById('info-desc').innerText="Un albero maturo assorbe ~20kg di CO2 l'anno. Questo viaggio in EV risparmia emissioni pari al lavoro di questi alberi.";}
-            else{i.className='ph-fill ph-airplane-tilt'; document.getElementById('info-title').innerText='Confronto Aereo'; document.getElementById('info-desc').innerText="Confronto costo energia+pedaggi vs biglietto aereo low-cost medio per questa tratta.";}
-            m.style.display='flex'; setTimeout(()=>{m.style.opacity='1';c.style.transform='scale(1)';},10);
-        }
-        function closeInfo(){ const m=document.getElementById('info-modal'); const c=m.querySelector('.popup-modal'); m.style.opacity='0'; c.style.transform='scale(0.9)'; setTimeout(()=>m.style.display='none',300); }
-        
+
+        async function resolveCity(name) { try { const res=await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(name)}&limit=1`); const data=await res.json(); if(data.length>0) return {lat:parseFloat(data[0].lat), lon:parseFloat(data[0].lon)}; } catch(e){} return null; }
+        async function fetchRoute(start, end) { const res=await fetch(`https://router.project-osrm.org/route/v1/driving/${start.lon},${start.lat};${end.lon},${end.lat}?overview=full&geometries=geojson`); if(!res.ok) return null; const data=await res.json(); return data.routes[0]; }
         async function fetchWeather(lat, lon) { try { const r=await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true`); const d=await r.json(); document.getElementById('w-temp').innerText=Math.round(d.current_weather.temperature)+"°"; }catch(e){} }
         function getDistanceFromLatLonInKm(lat1,lon1,lat2,lon2) { var R=6371; var dLat=deg2rad(lat2-lat1); var dLon=deg2rad(lon2-lon1); var a=Math.sin(dLat/2)*Math.sin(dLat/2)+Math.cos(deg2rad(lat1))*Math.cos(deg2rad(lat2))*Math.sin(dLon/2)*Math.sin(dLon/2); var c=2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a)); return R*c*1.3; }
         function deg2rad(deg) { return deg*(Math.PI/180); }
-        async function resolveCity(name) { try { const res=await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(name)}&limit=1`); const data=await res.json(); if(data.length>0) return {lat:parseFloat(data[0].lat), lon:parseFloat(data[0].lon)}; } catch(e){} return null; }
-        async function fetchRoute(start, end) { const res=await fetch(`https://router.project-osrm.org/route/v1/driving/${start.lon},${start.lat};${end.lon},${end.lat}?overview=full&geometries=geojson`); if(!res.ok) return null; const data=await res.json(); return data.routes[0]; }
-        function initAutocomplete(inputId, listId, isStart) { const inp=document.getElementById(inputId); const list=document.getElementById(listId); let timer; inp.addEventListener('focus', ()=>{ if(inp.value=='') showList(list, POPULAR_CITIES, inp, isStart, true); }); inp.addEventListener('input', ()=>{ clearTimeout(timer); document.getElementById('destInput').addEventListener('input', function() { document.getElementById('clearDest').style.display = this.value.length > 0 ? 'block' : 'none'; }); if(inp.value.length<3){list.style.display='none'; return;} timer=setTimeout(async()=>{ try{ const res=await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(inp.value)}&limit=5`); const data=await res.json(); showList(list, data, inp, isStart, false); }catch(e){} },300); }); document.addEventListener('click', e=>{ if(e.target!==inp) list.style.display='none'; }); }
+        function initAutocomplete(inputId, listId, isStart) { const inp=document.getElementById(inputId); const list=document.getElementById(listId); let timer; inp.addEventListener('focus', ()=>{ if(inp.value=='') showList(list, POPULAR_CITIES, inp, isStart, true); }); inp.addEventListener('input', ()=>{ clearTimeout(timer); if(inp.value.length<3){list.style.display='none'; return;} timer=setTimeout(async()=>{ try{ const res=await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(inp.value)}&limit=5`); const data=await res.json(); showList(list, data, inp, isStart, false); }catch(e){} },300); }); document.addEventListener('click', e=>{ if(e.target!==inp) list.style.display='none'; }); }
         function showList(list, data, inp, isStart, isPop) { list.innerHTML=''; list.style.display='block'; data.forEach(d => { const div=document.createElement('div'); div.className='s-item'; div.innerText=isPop?d:d.display_name.split(',')[0]; div.onclick=()=>{ haptic(); inp.value=div.innerText; list.style.display='none'; if(isStart) window.startCoords=null; else window.endCoords=null; }; list.appendChild(div); }); }
     </script>
 </body>
