@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AutoMatch Pro - Intelligent Logic</title>
+    <title>AutoMatch Pro - Final Logic Fix</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;500;700;900&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
@@ -17,11 +17,11 @@
             --bg-dark: #050507;
             --text-main: #ffffff;
             --text-sub: #94a3b8;
-            --glass-bg: rgba(20, 20, 22, 0.85);
+            --glass-bg: rgba(20, 20, 22, 0.9);
             --glass-border: rgba(255, 255, 255, 0.1);
             --glass-blur: blur(30px);
             --input-bg: rgba(255, 255, 255, 0.05);
-            --card-bg: rgba(30, 30, 35, 0.7);
+            --card-bg: rgba(30, 30, 35, 0.8);
         }
 
         body.light-mode {
@@ -29,7 +29,7 @@
             --bg-dark: #f0f2f5;
             --text-main: #1a1a1a;
             --text-sub: #666666;
-            --glass-bg: rgba(255, 255, 255, 0.9);
+            --glass-bg: rgba(255, 255, 255, 0.95);
             --glass-border: rgba(0, 0, 0, 0.1);
             --input-bg: #ffffff;
             --card-bg: #ffffff;
@@ -47,7 +47,7 @@
             position: fixed; top: 0; left: 0; width: 100%; padding: 20px 40px; 
             display: flex; justify-content: space-between; align-items: center; 
             z-index: 1000; box-sizing: border-box; 
-            background: linear-gradient(to bottom, rgba(0,0,0,0.8), transparent);
+            background: linear-gradient(to bottom, rgba(0,0,0,0.9), transparent);
         }
         .logo { font-weight: 800; font-size: 1.5rem; letter-spacing: -1px; cursor: pointer; }
         .nav-controls { display: flex; gap: 15px; }
@@ -72,7 +72,6 @@
         }
         .btn-main:hover { transform: scale(1.05) translateY(-3px); filter: brightness(1.1); }
 
-        /* Floating Cards */
         .float-card { 
             position: absolute; padding: 20px; width: 180px; border-radius: 20px; 
             text-align: left; animation: float 8s ease-in-out infinite; z-index: 1;
@@ -125,9 +124,6 @@
             box-sizing: border-box; font-family: 'Inter', sans-serif;
         }
         input:focus { border-color: var(--primary); background: rgba(255,255,255,0.08); }
-        /* Stile Input Bloccato */
-        input:disabled, input[readonly] { background: rgba(0,0,0,0.2); border-color: var(--accent); color: var(--accent); font-weight: 700; cursor: not-allowed; opacity: 1; }
-        
         .input-icon { position: absolute; left: 15px; top: 48px; font-size: 1.2rem; color: var(--text-sub); }
 
         .suggestions { position: absolute; top: 105%; left: 0; width: 100%; background: #1a1a1a; border: 1px solid var(--primary); border-radius: 12px; z-index: 100; max-height: 250px; overflow-y: auto; display: none; }
@@ -209,7 +205,7 @@
             <div class="detail-block">
                 <div class="detail-text">
                     <h2>Analisi Costi Reale</h2>
-                    <p>Non limitarti al prezzo di listino. AutoMatch calcola il costo totale di possesso (TCO) basandosi sul tuo utilizzo reale.</p>
+                    <p>Non limitarti al prezzo di listino. AutoMatch calcola il costo totale di possesso (TCO) basandosi sul tuo utilizzo reale. Inserisci i tuoi km giornalieri e scopri quanto risparmieresti davvero passando all'elettrico.</p>
                 </div>
                 <div class="detail-img-box"><img src="https://images.unsplash.com/photo-1593941707882-a5bba14938c7?q=80&w=1000&auto=format&fit=crop" class="detail-img"></div>
             </div>
@@ -228,7 +224,7 @@
             <div class="progress-bar"><div class="progress-fill" id="p-bar"></div></div>
 
             <div class="step active" id="step-1">
-                <h2>Il tuo Viaggio</h2>
+                <h2>Il tuo Viaggio 🇮🇹</h2>
                 <div class="input-group">
                     <label>📍 Partenza</label>
                     <i class="ph ph-map-pin input-icon"></i>
@@ -238,7 +234,7 @@
                 <div class="input-group">
                     <label>🏁 Destinazione (Opzionale)</label>
                     <i class="ph ph-flag input-icon"></i>
-                    <input type="text" id="destInput" placeholder="Seleziona o lascia vuoto..." autocomplete="off">
+                    <input type="text" id="destInput" placeholder="Seleziona destinazione..." autocomplete="off">
                     <div id="list-dest" class="suggestions"></div>
                 </div>
                 <div class="btn-row">
@@ -249,14 +245,22 @@
 
             <div class="step" id="step-2">
                 <h2>Abitudini</h2>
-                <p id="km-desc" style="color:var(--text-sub); margin-bottom:20px; font-size:0.9rem;"></p>
+                <p id="km-desc" style="color:var(--text-sub); margin-bottom:20px; font-size:0.9rem;">Definisci l'uso del veicolo.</p>
                 
-                <div class="input-group">
-                    <label>🛣️ Km Previsti</label>
-                    <i class="ph ph-road-horizon input-icon"></i>
-                    <input type="number" id="kmInput" placeholder="Es. 50">
-                    <small id="km-hint" style="color:var(--accent); display:none; margin-top:5px; font-weight:700;">✅ Distanza Calcolata Automaticamente</small>
+                <div id="km-container">
+                    <div class="input-group">
+                        <label>🛣️ Km Previsti (Manuale)</label>
+                        <i class="ph ph-road-horizon input-icon"></i>
+                        <input type="number" id="kmInput" placeholder="Es. 50">
+                    </div>
                 </div>
+                
+                <div id="km-auto-container" style="display:none; text-align:center; padding:20px; background:rgba(0,255,0,0.1); border:1px solid var(--accent); border-radius:12px; margin-bottom:20px;">
+                    <i class="ph-fill ph-check-circle" style="color:var(--accent); font-size:2rem;"></i>
+                    <h3 style="color:var(--accent); margin:10px 0;">Distanza Calcolata</h3>
+                    <div id="km-auto-val" style="font-size:2rem; font-weight:800;">-- km</div>
+                </div>
+
                 <div class="input-group">
                     <label>⚡ Ricarica</label>
                     <select id="chargingInput">
@@ -265,7 +269,7 @@
                     </select>
                 </div>
                 <div class="btn-row">
-                    <button class="btn-sec" onclick="prevStep()">Indietro</button>
+                    <button class="btn-sec" onclick="prevStep(1)">Indietro</button>
                     <button class="btn-pri" onclick="nextStep(3)">Avanti <i class="ph-bold ph-caret-right"></i></button>
                 </div>
             </div>
@@ -278,7 +282,7 @@
                     <input type="number" id="budgetInput" placeholder="35000" value="35000">
                 </div>
                 <div class="btn-row">
-                    <button class="btn-sec" onclick="prevStep()">Indietro</button>
+                    <button class="btn-sec" onclick="prevStep(2)">Indietro</button>
                     <button class="btn-pri" style="background:var(--accent); color:#000;" onclick="runAnalysis()">Lancia Analisi 🚀</button>
                 </div>
             </div>
@@ -327,11 +331,9 @@
         // --- GLOBALS ---
         window.startCoords = null;
         window.endCoords = null;
-        window.routeDataGlobal = null; // Store route data
-        let currentStep = 1;
-
-        const POPULAR_CITIES = ["Roma", "Milano", "Napoli", "Torino", "Palermo", "Genova", "Bologna", "Firenze"];
+        window.calcKm = 0; // Store Calculated KM
         
+        const POPULAR_CITIES = ["Roma", "Milano", "Napoli", "Torino", "Palermo", "Genova", "Bologna", "Firenze"];
         const CARS_DB = [
             { brand: "Tesla", model: "Model 3", price: 42990, type: "Elettrica", range: 513, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/8/82/2019_Tesla_Model_3_Long_Range_AWD_Front.jpg/800px-2019_Tesla_Model_3_Long_Range_AWD_Front.jpg" },
             { brand: "Fiat", model: "500e", price: 29950, type: "Elettrica", range: 320, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7f/Fiat_500_Electric_La_Prima_Genf_2020_1X7A5372.jpg/800px-Fiat_500_Electric_La_Prima_Genf_2020_1X7A5372.jpg" },
@@ -345,22 +347,25 @@
 
         let map, markersLayer, routeLayer;
 
+        // --- BACKGROUND ---
+        const canvas = document.getElementById('warp-canvas');
+        const ctx = canvas.getContext('2d');
+        let w, h, stars = [];
+        const initStars = () => { w = canvas.width = window.innerWidth; h = canvas.height = window.innerHeight; stars = Array(150).fill().map(() => ({x: Math.random()*w, y: Math.random()*h, z: Math.random()*w})); };
+        const drawStars = () => {
+            ctx.clearRect(0,0,w,h); ctx.fillStyle = '#888';
+            stars.forEach(s => { s.z -= 5; if(s.z<=0) s.z=w; let x = (s.x-w/2)*(w/s.z)*2 + w/2; let y = (s.y-h/2)*(w/s.z)*2 + h/2; if(x>0 && x<w && y>0 && y<h) ctx.fillRect(x,y,2,2); });
+            requestAnimationFrame(drawStars);
+        };
+        window.addEventListener('resize', initStars); initStars(); drawStars();
+
         // --- INIT ---
         window.onload = function() {
-            // Map Init
             map = L.map('map').setView([41.9, 12.5], 5);
             L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: 'OSM' }).addTo(map);
             markersLayer = L.layerGroup().addTo(map); routeLayer = L.layerGroup().addTo(map);
-
             initAutocomplete('originInput', 'list-origin', true);
             initAutocomplete('destInput', 'list-dest', false);
-            
-            // BG Anim
-            const canvas = document.getElementById('warp-canvas'); const ctx = canvas.getContext('2d');
-            let w, h, stars=[];
-            const initStars = () => { w=canvas.width=innerWidth; h=canvas.height=innerHeight; stars=Array(150).fill().map(()=>({x:Math.random()*w,y:Math.random()*h,z:Math.random()*w})); };
-            const drawStars = () => { ctx.clearRect(0,0,w,h); ctx.fillStyle='#888'; stars.forEach(s=>{ s.z-=5; if(s.z<=0) s.z=w; let x=(s.x-w/2)*(w/s.z)*2+w/2; let y=(s.y-h/2)*(w/s.z)*2+h/2; if(x>0&&x<w&&y>0&&y<h) ctx.fillRect(x,y,2,2); }); requestAnimationFrame(drawStars); };
-            window.addEventListener('resize', initStars); initStars(); drawStars();
         };
 
         function goToApp() {
@@ -372,184 +377,186 @@
                 map.invalidateSize();
             }, 500);
         }
+        
         function goToHome() { location.reload(); }
         function toggleTheme() { document.body.classList.toggle('light-mode'); }
 
-        // --- WIZARD NAV ---
+        // --- NAV LOGIC ---
         function nextStep(step) {
             document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
             document.getElementById(`step-${step}`).classList.add('active');
             document.getElementById('p-bar').style.width = step === 1 ? '33%' : step === 2 ? '66%' : '100%';
-            currentStep = step;
         }
-        function prevStep() { nextStep(currentStep - 1); }
+        function prevStep(step) { nextStep(step); }
 
-        // --- LOGIC STEP 1 -> 2 (INTELLIGENT CHECK) ---
+        // --- VALIDATION & AUTO-CALC ---
         async function validateStep1() {
             const origin = document.getElementById('originInput').value;
             const dest = document.getElementById('destInput').value;
-            const kmInput = document.getElementById('kmInput');
-            const kmHint = document.getElementById('km-hint');
-            const kmDesc = document.getElementById('km-desc');
+            
+            if(!origin) return alert("Inserisci la partenza!");
+            
+            document.getElementById('loader').style.display='flex';
 
-            if(!origin) return alert("Inserisci almeno la partenza!");
-
-            document.getElementById('loader').style.display = 'flex';
-
-            // 1. Resolve Origin Coords if not already
+            // Resolve Origin
             if(!window.startCoords) {
-                const c = await resolveCity(origin);
-                if(c) window.startCoords = c; 
-                else { alert("Città partenza non trovata!"); document.getElementById('loader').style.display = 'none'; return; }
+                try {
+                    const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(origin)}&limit=1&countrycodes=it`);
+                    const data = await res.json();
+                    if(data.length>0) window.startCoords = {lat: parseFloat(data[0].lat), lon: parseFloat(data[0].lon)};
+                } catch(e){}
             }
 
-            // 2. Resolve Dest Logic
+            // Resolve Dest & Route
             if(dest) {
-                 if(!window.endCoords) {
-                    const c = await resolveCity(dest);
-                    if(c) window.endCoords = c;
-                 }
-                 
-                 if(window.endCoords) {
-                     // CALCULATE ROUTE
-                     const routeData = await fetchRoute(window.startCoords, window.endCoords);
-                     if(routeData) {
-                         window.routeDataGlobal = routeData;
-                         const km = Math.round(routeData.distance/1000);
-                         
-                         // SET UI FOR AUTO MODE
-                         kmInput.value = km;
-                         kmInput.disabled = true; // LOCK INPUT
-                         kmHint.style.display = 'block';
-                         kmDesc.innerText = "Distanza calcolata automaticamente dal percorso.";
-                     }
-                 }
+                if(!window.endCoords) {
+                     try {
+                        const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(dest)}&limit=1&countrycodes=it`);
+                        const data = await res.json();
+                        if(data.length>0) window.endCoords = {lat: parseFloat(data[0].lat), lon: parseFloat(data[0].lon)};
+                    } catch(e){}
+                }
+
+                if(window.startCoords && window.endCoords) {
+                    try {
+                        const r = await fetch(`https://router.project-osrm.org/route/v1/driving/${window.startCoords.lon},${window.startCoords.lat};${window.endCoords.lon},${window.endCoords.lat}?overview=false`);
+                        const d = await r.json();
+                        if(d.routes.length>0) {
+                            window.calcKm = Math.round(d.routes[0].distance/1000);
+                            
+                            // UI CHANGE: HIDE MANUAL INPUT, SHOW AUTO DATA
+                            document.getElementById('km-container').style.display = 'none';
+                            document.getElementById('km-auto-container').style.display = 'block';
+                            document.getElementById('km-auto-val').innerText = window.calcKm + " km";
+                            document.getElementById('km-desc').innerText = "Distanza calcolata automaticamente.";
+                            
+                            // PRE-FILL TRIP DATA
+                            const duration = Math.round(d.routes[0].duration / 60);
+                            document.getElementById('t-time').innerText = Math.floor(duration/60) + "h " + (duration%60) + "m";
+                        }
+                    } catch(e) {}
+                }
             } else {
-                // MANUAL MODE
-                window.routeDataGlobal = null;
-                window.endCoords = null;
-                kmInput.value = '';
-                kmInput.disabled = false; // UNLOCK INPUT
-                kmInput.placeholder = "Es. 50 km/giorno";
-                kmHint.style.display = 'none';
-                kmDesc.innerText = "Non hai una destinazione, inserisci i km giornalieri stimati.";
+                // RESET TO MANUAL
+                window.calcKm = 0;
+                document.getElementById('km-container').style.display = 'block';
+                document.getElementById('km-auto-container').style.display = 'none';
+                document.getElementById('km-desc').innerText = "Non hai una destinazione, inserisci i km manuali.";
             }
 
-            document.getElementById('loader').style.display = 'none';
+            document.getElementById('loader').style.display='none';
+            
+            // FILL TRIP CARD DATA
+            document.getElementById('t-start').innerText = origin;
+            document.getElementById('t-end').innerText = dest || "N/D";
+            
             nextStep(2);
         }
 
-        async function resolveCity(name) {
-            try {
-                const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(name)}&limit=1&countrycodes=it`);
-                const data = await res.json();
-                if(data.length>0) return {lat: parseFloat(data[0].lat), lon: parseFloat(data[0].lon)};
-            } catch(e) {}
-            return null;
-        }
-
-        async function fetchRoute(start, end) {
-            try {
-                const res = await fetch(`https://router.project-osrm.org/route/v1/driving/${start.lon},${start.lat};${end.lon},${end.lat}?overview=full&geometries=geojson`);
-                const data = await res.json();
-                return (data.routes && data.routes.length > 0) ? data.routes[0] : null;
-            } catch(e) { return null; }
-        }
-
-        // --- AUTOCOMPLETE UI ---
+        // --- AUTOCOMPLETE ---
         function initAutocomplete(inputId, listId, isStart) {
             const inp = document.getElementById(inputId);
             const list = document.getElementById(listId);
             let timer;
 
-            inp.addEventListener('focus', () => { if(inp.value.length===0) showList(list, POPULAR_CITIES, inp, isStart, true); });
+            inp.addEventListener('focus', () => {
+                if(inp.value.length === 0) showList(list, POPULAR_CITIES, inp, isStart, true);
+            });
+
             inp.addEventListener('input', () => {
                 clearTimeout(timer);
-                if(inp.value.length<3) { list.style.display='none'; return; }
-                timer = setTimeout(async()=>{
+                if(inp.value.length === 0) { showList(list, POPULAR_CITIES, inp, isStart, true); return; }
+                timer = setTimeout(async () => {
                     try {
-                        const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(inp.value)}&limit=5&countrycodes=it`);
+                        const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(inp.value)}&limit=5&addressdetails=1&countrycodes=it`);
                         const data = await res.json();
                         showList(list, data, inp, isStart, false);
-                    } catch(e){}
+                    } catch(e) {}
                 }, 300);
             });
-            document.addEventListener('click', e => { if(e.target!==inp) list.style.display='none'; });
+            document.addEventListener('click', e => { if(e.target !== inp) list.style.display='none'; });
         }
 
         function showList(list, data, inp, isStart, isPop) {
-            list.innerHTML=''; list.style.display='block';
-            if(isPop) list.innerHTML='<div class="s-pop">Città Popolari</div>';
-            
-            data.forEach(d => {
-                const div = document.createElement('div'); div.className='s-item';
-                const name = isPop ? d : d.display_name.split(',')[0];
-                div.innerText = name;
-                div.onclick = () => {
-                    inp.value = name; list.style.display='none';
-                    if(!isPop) {
-                        const c = {lat: parseFloat(d.lat), lon: parseFloat(d.lon)};
-                        if(isStart) window.startCoords = c; else window.endCoords = c;
-                    } else {
-                        // If selected from pop list, reset coords to force resolve later
-                        if(isStart) window.startCoords=null; else window.endCoords=null;
-                    }
-                };
-                list.appendChild(div);
-            });
+            list.innerHTML = '';
+            if(data.length > 0) {
+                list.style.display = 'block';
+                if(isPop) list.innerHTML = '<div class="s-pop">Città Popolari</div>';
+                
+                data.forEach(d => {
+                    const div = document.createElement('div'); div.className = 's-item';
+                    const name = isPop ? d : d.display_name.split(',')[0];
+                    div.innerText = name;
+                    div.onclick = () => {
+                        inp.value = name; list.style.display = 'none';
+                        if(!isPop) {
+                            const c = { lat: parseFloat(d.lat), lon: parseFloat(d.lon) };
+                            if(isStart) window.startCoords = c; else window.endCoords = c;
+                        } else {
+                            // If pop city, reset coords to force resolve in validateStep1
+                             if(isStart) window.startCoords=null; else window.endCoords=null;
+                        }
+                    };
+                    list.appendChild(div);
+                });
+            } else { list.style.display = 'none'; }
         }
 
-        // --- FINAL ANALYSIS ---
-        function runAnalysis() {
-            const km = parseFloat(document.getElementById('kmInput').value);
-            const budget = parseFloat(document.getElementById('budgetInput').value);
+        // --- ANALYSIS ---
+        async function runAnalysis() {
+            // Get KM (Auto or Manual)
+            let km = window.calcKm;
+            if(km === 0) km = parseFloat(document.getElementById('kmInput').value);
             
             if(!km) return alert("Km mancanti!");
+            
+            const budget = parseFloat(document.getElementById('budgetInput').value);
 
             document.getElementById('loader').style.display='flex';
             document.getElementById('wizard-box').style.display='none';
             
-            setTimeout(() => {
+            setTimeout(async () => {
                 const resCont = document.getElementById('results-container');
                 resCont.style.display='block';
                 setTimeout(()=>resCont.style.opacity='1',50);
 
-                // 1. FILL TRIP CARD
-                document.getElementById('t-start').innerText = document.getElementById('originInput').value;
-                document.getElementById('t-end').innerText = document.getElementById('destInput').value || "N/D";
+                // Update Trip KM display
                 document.getElementById('t-km').innerText = km + " km";
-                
-                let timeTxt = "--";
-                if(window.routeDataGlobal) {
-                    const m = Math.round(window.routeDataGlobal.duration/60);
-                    timeTxt = `${Math.floor(m/60)}h ${m%60}m`;
-                }
-                document.getElementById('t-time').innerText = timeTxt;
 
-                // 2. RENDER MAP
+                // MAP RENDER
                 document.getElementById('map-container').style.display='block';
                 map.invalidateSize();
                 markersLayer.clearLayers(); routeLayer.clearLayers();
 
                 if(window.startCoords) {
                     L.marker(window.startCoords).addTo(markersLayer);
-                    if(window.endCoords && window.routeDataGlobal) {
+                    if(window.endCoords) {
                         L.marker(window.endCoords).addTo(markersLayer);
-                        L.geoJSON(window.routeDataGlobal.geometry, {style:{color:'#00f2ff', weight:5}}).addTo(routeLayer);
-                        map.fitBounds(L.latLngBounds([window.startCoords, window.endCoords]), {padding:[50,50]});
-                        
-                        // Fake Chargers
-                        const pts = window.routeDataGlobal.geometry.coordinates;
-                        for(let i=1; i<4; i++) {
-                            let idx = Math.floor((pts.length/4)*i);
-                            L.circleMarker([pts[idx][1], pts[idx][0]], {radius:6, color:'#ffd700', fillOpacity:1}).addTo(markersLayer).bindPopup("Colonnina");
+                        // Draw Route
+                        try {
+                            const r = await fetch(`https://router.project-osrm.org/route/v1/driving/${window.startCoords.lon},${window.startCoords.lat};${window.endCoords.lon},${window.endCoords.lat}?overview=full&geometries=geojson`);
+                            const d = await r.json();
+                            if(d.routes.length > 0) {
+                                L.geoJSON(d.routes[0].geometry, {style:{color:'#00f2ff', weight:5}}).addTo(routeLayer);
+                                map.fitBounds(L.latLngBounds([window.startCoords, window.endCoords]), {padding:[50,50]});
+                                
+                                // Fake Chargers
+                                const pts = d.routes[0].geometry.coordinates;
+                                for(let i=1; i<4; i++) {
+                                    let idx = Math.floor((pts.length/4)*i);
+                                    L.circleMarker([pts[idx][1], pts[idx][0]], {radius:6, color:'#ffd700', fillOpacity:1}).addTo(markersLayer).bindPopup("Colonnina");
+                                }
+                            }
+                        } catch(e) {
+                             // Fallback
+                             L.polyline([window.startCoords, window.endCoords], {color:'red', dashArray:'5,10'}).addTo(routeLayer);
+                             map.fitBounds(L.latLngBounds([window.startCoords, window.endCoords]));
                         }
                     } else {
                         map.setView(window.startCoords, 10);
                     }
                 }
 
-                // 3. RENDER CARS
                 renderGrid(budget, km);
                 document.getElementById('loader').style.display='none';
 
@@ -580,7 +587,8 @@
                     <div class="car-content">
                         <h3 class="car-title">${c.brand} ${c.model}</h3>
                         <span class="car-price">€${c.price.toLocaleString()}</span>
-                        <div class="spec-row"><span>Costo:</span><span style="color:var(--accent)">€${cost.toFixed(2)}</span></div>
+                        <div class="spec-row"><span>Costo Viaggio:</span><span style="color:var(--accent)">€${cost.toFixed(2)}</span></div>
+                        <div class="spec-row"><span>Range:</span><span>${c.range || '-'} km</span></div>
                         <button class="action-btn">Dettagli</button>
                     </div>
                 </div>`;
