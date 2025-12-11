@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AutoMatch Pro - Logic Fixed</title>
+    <title>AutoMatch Pro - Logic Repaired</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;500;700;900&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
@@ -72,6 +72,7 @@
         }
         .btn-main:hover { transform: scale(1.05) translateY(-3px); filter: brightness(1.1); }
 
+        /* Floating Cards */
         .float-card { 
             position: absolute; padding: 20px; width: 180px; border-radius: 20px; 
             text-align: left; animation: float 8s ease-in-out infinite; z-index: 1;
@@ -124,13 +125,14 @@
             box-sizing: border-box; font-family: 'Inter', sans-serif;
         }
         input:focus { border-color: var(--primary); background: rgba(255,255,255,0.08); }
-        .input-icon { position: absolute; left: 15px; top: 48px; font-size: 1.2rem; color: var(--text-sub); }
-
+        
         /* Locked Input Style */
         input.locked { 
             border-color: var(--accent); color: var(--accent); font-weight: 700; cursor: not-allowed; opacity: 1; 
-            background: rgba(0, 255, 127, 0.05);
+            background: rgba(176, 251, 93, 0.05);
         }
+
+        .input-icon { position: absolute; left: 15px; top: 48px; font-size: 1.2rem; color: var(--text-sub); }
 
         .suggestions { position: absolute; top: 105%; left: 0; width: 100%; background: #1a1a1a; border: 1px solid var(--primary); border-radius: 12px; z-index: 100; max-height: 250px; overflow-y: auto; display: none; }
         .s-item { padding: 15px; cursor: pointer; color: #fff; border-bottom: 1px solid #333; }
@@ -222,6 +224,13 @@
                 </div>
                 <div class="detail-img-box"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c2/Plug_in_hybrid_charging.jpg/800px-Plug_in_hybrid_charging.jpg" class="detail-img"></div>
             </div>
+            <div class="detail-block">
+                <div class="detail-text">
+                    <h2>Community Green</h2>
+                    <p>Unisciti a migliaia di utenti che hanno scelto la mobilità sostenibile. Accedi per salvare i tuoi modelli preferiti e confronta i dati nel tempo.</p>
+                </div>
+                <div class="detail-img-box"><img src="https://images.unsplash.com/photo-1494976388531-d1058494cdd8?q=80&w=1000&auto=format&fit=crop" class="detail-img"></div>
+            </div>
         </section>
     </div>
 
@@ -240,7 +249,7 @@
                 <div class="input-group">
                     <label>🏁 Destinazione (Opzionale)</label>
                     <i class="ph ph-flag input-icon"></i>
-                    <input type="text" id="destInput" placeholder="Seleziona o scrivi destinazione..." autocomplete="off">
+                    <input type="text" id="destInput" placeholder="Seleziona o lascia vuoto..." autocomplete="off">
                     <div id="list-dest" class="suggestions"></div>
                 </div>
                 <div class="btn-row">
@@ -254,7 +263,7 @@
                 <p id="km-desc" style="color:var(--text-sub); margin-bottom:20px; font-size:0.9rem;">Definisci l'uso del veicolo.</p>
                 
                 <div class="input-group">
-                    <label id="lbl-km">🛣️ Km Previsti</label>
+                    <label>🛣️ Km Previsti</label>
                     <i class="ph ph-road-horizon input-icon"></i>
                     <input type="number" id="kmInput" placeholder="Es. 50">
                     <small id="km-msg" style="display:none; color:var(--accent); margin-top:8px; font-weight:600;"></small>
@@ -267,7 +276,6 @@
                         <option value="yes">Box Privato</option>
                     </select>
                 </div>
-
                 <div class="btn-row">
                     <button class="btn-sec" onclick="prevStep(1)">Indietro</button>
                     <button class="btn-pri" onclick="nextStep(3)">Avanti <i class="ph-bold ph-caret-right"></i></button>
@@ -331,9 +339,9 @@
         // --- GLOBALS ---
         window.startCoords = null;
         window.endCoords = null;
-        window.calculatedKm = 0; // Store auto-calculated distance
+        window.calculatedKm = 0; // Global store for auto-calc
         window.routeDataGlobal = null;
-
+        
         const POPULAR_CITIES = ["Roma", "Milano", "Napoli", "Torino", "Palermo", "Genova", "Bologna", "Firenze"];
         const CARS_DB = [
             { brand: "Tesla", model: "Model 3", price: 42990, type: "Elettrica", range: 513, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/8/82/2019_Tesla_Model_3_Long_Range_AWD_Front.jpg/800px-2019_Tesla_Model_3_Long_Range_AWD_Front.jpg" },
@@ -379,6 +387,7 @@
                 map.invalidateSize();
             }, 500);
         }
+        
         function goToHome() { location.reload(); }
         function toggleTheme() { document.body.classList.toggle('light-mode'); }
 
@@ -389,7 +398,7 @@
         }
         function prevStep(step) { nextStep(step); }
 
-        // --- VALIDATION & LOGIC (FIXED) ---
+        // --- VALIDATION & AUTO-CALC ---
         async function validateStep1() {
             const origin = document.getElementById('originInput').value;
             const dest = document.getElementById('destInput').value;
@@ -401,14 +410,14 @@
 
             document.getElementById('loader').style.display='flex';
 
-            // 1. RESOLVE ORIGIN
+            // Resolve Origin (Fallback if not set by click)
             if(!window.startCoords) {
                 const c = await resolveCity(origin);
                 if(c) window.startCoords = c;
             }
 
-            // 2. CHECK DESTINATION
-            if(dest.trim() !== "") {
+            // Resolve Dest & Route
+            if(dest) {
                 if(!window.endCoords) {
                     const c = await resolveCity(dest);
                     if(c) window.endCoords = c;
@@ -426,20 +435,18 @@
                         kmInput.setAttribute('readonly', true);
                         kmMsg.style.display = 'block';
                         kmMsg.innerHTML = `✅ Distanza Satellitare: ${window.calculatedKm} km`;
-                        document.getElementById('km-desc').innerText = "Abbiamo calcolato il tragitto per te.";
                     }
                 }
             } else {
                 // LOGIC: RESET TO MANUAL
                 window.calculatedKm = 0;
                 window.routeDataGlobal = null;
-                window.endCoords = null; // Reset End
+                window.endCoords = null;
                 
                 kmInput.value = '';
                 kmInput.classList.remove('locked');
                 kmInput.removeAttribute('readonly');
                 kmMsg.style.display = 'none';
-                document.getElementById('km-desc').innerText = "Non hai una destinazione, inserisci i km manuali.";
             }
 
             document.getElementById('loader').style.display='none';
@@ -489,12 +496,11 @@
         }
 
         // --- RUN ANALYSIS ---
-        function runAnalysis() {
-            // Priority: Calculated KM > Manual Input
+        async function runAnalysis() {
             let km = window.calculatedKm > 0 ? window.calculatedKm : parseFloat(document.getElementById('kmInput').value);
             const budget = parseFloat(document.getElementById('budgetInput').value);
             
-            if(!km || isNaN(km)) return alert("Inserisci i Km!");
+            if(!km) return alert("Inserisci i Km!");
 
             document.getElementById('loader').style.display='flex';
             document.getElementById('wizard-box').style.display='none';
@@ -568,7 +574,6 @@
                         <h3 class="car-title">${c.brand} ${c.model}</h3>
                         <span class="car-price">€${c.price.toLocaleString()}</span>
                         <div class="spec-row"><span>Costo Viaggio:</span><span style="color:var(--accent)">€${cost.toFixed(2)}</span></div>
-                        <div class="spec-row"><span>Range:</span><span>${c.range || '-'} km</span></div>
                         <button class="action-btn">Dettagli</button>
                     </div>
                 </div>`;
