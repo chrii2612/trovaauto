@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AutoMatch Pro - Live Data</title>
+    <title>AutoMatch Pro - Smooth Animations</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;500;700;900&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
@@ -139,7 +139,7 @@
         /* --- RESULTS LAYOUT --- */
         #results-container { width: 100%; max-width: 1200px; display: none; opacity: 0; transition: 0.5s; padding-bottom: 50px; }
         
-        /* NEW TRIP CARD (ICONS + DATA) */
+        /* TRIP CARD WITH ICONS */
         .trip-card { 
             background: var(--glass-bg); padding: 30px; border-radius: 24px; border: 1px solid var(--glass-border); 
             margin-bottom: 30px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; 
@@ -154,6 +154,7 @@
         .t-val { font-size: 1.3rem; font-weight: 700; color: var(--text-main); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
         .t-lbl { font-size: 0.7rem; text-transform: uppercase; color: var(--text-sub); letter-spacing: 1px; }
 
+        /* MARKET PRICES */
         .market-bar { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 40px; }
         .market-item { background: var(--input-bg); padding: 20px; border-radius: 18px; text-align: center; border: 1px solid var(--glass-border); }
         .m-price { font-size: 1.8rem; font-weight: 700; color: var(--text-main); }
@@ -215,7 +216,7 @@
             <div class="detail-block">
                 <div class="detail-text">
                     <h2>Analisi Costi Reale</h2>
-                    <p>Non limitarti al prezzo di listino. AutoMatch calcola il costo totale di possesso (TCO) basandosi sul tuo utilizzo reale. Inserisci i tuoi km giornalieri e scopri quanto risparmieresti davvero passando all'elettrico.</p>
+                    <p>Non limitarti al prezzo di listino. AutoMatch calcola il costo totale di possesso (TCO) basandosi sul tuo utilizzo reale.</p>
                 </div>
                 <div class="detail-img-box"><img src="https://images.unsplash.com/photo-1593941707882-a5bba14938c7?q=80&w=1000&auto=format&fit=crop" class="detail-img"></div>
             </div>
@@ -225,13 +226,6 @@
                     <p>L'ansia da autonomia è un ricordo del passato. Pianifica i tuoi viaggi lunghi e visualizza immediatamente le stazioni di ricarica compatibili lungo il percorso.</p>
                 </div>
                 <div class="detail-img-box"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c2/Plug_in_hybrid_charging.jpg/800px-Plug_in_hybrid_charging.jpg" class="detail-img"></div>
-            </div>
-            <div class="detail-block">
-                <div class="detail-text">
-                    <h2>Community Green</h2>
-                    <p>Unisciti a migliaia di utenti che hanno scelto la mobilità sostenibile. Accedi per salvare i tuoi modelli preferiti e confronta i dati nel tempo.</p>
-                </div>
-                <div class="detail-img-box"><img src="https://images.unsplash.com/photo-1494976388531-d1058494cdd8?q=80&w=1000&auto=format&fit=crop" class="detail-img"></div>
             </div>
         </section>
     </div>
@@ -275,7 +269,7 @@
                 <div id="km-auto-container" style="display:none; text-align:center; padding:20px; background:rgba(0,255,0,0.1); border:1px solid var(--accent); border-radius:12px; margin-bottom:20px;">
                     <i class="ph-fill ph-check-circle" style="color:var(--accent); font-size:2rem;"></i>
                     <h3 style="color:var(--accent); margin:10px 0;">Distanza Calcolata</h3>
-                    <div id="km-auto-val" style="font-size:2rem; font-weight:800; animation: pulse 1s infinite;">--</div>
+                    <div id="km-auto-val" style="font-size:2rem; font-weight:800;">--</div>
                     <small style="color:#aaa;">Coordinate Satellitari</small>
                 </div>
 
@@ -323,22 +317,22 @@
                 </div>
                 <div class="t-item">
                     <div class="t-icon-box"><i class="ph-fill ph-clock"></i></div>
-                    <div><div class="t-lbl">Tempo</div><div class="t-val" id="t-time">--</div></div>
+                    <div><div class="t-lbl">Tempo</div><div class="t-val" id="t-time" style="opacity:0; transition: opacity 1s;">--</div></div>
                 </div>
             </div>
 
             <div class="market-bar">
                 <div class="market-item">
                     <div class="m-lbl">Benzina</div>
-                    <div class="m-price" id="p-petrol">€1.84</div>
+                    <div class="m-price" id="p-petrol">€0.00</div>
                 </div>
                 <div class="market-item">
                     <div class="m-lbl">Diesel</div>
-                    <div class="m-price" id="p-diesel">€1.71</div>
+                    <div class="m-price" id="p-diesel">€0.00</div>
                 </div>
                 <div class="market-item">
                     <div class="m-lbl">Elettrico</div>
-                    <div class="m-price" id="p-ev">€0.58</div>
+                    <div class="m-price" id="p-ev">€0.00</div>
                 </div>
             </div>
 
@@ -371,6 +365,7 @@
         window.startCoords = null;
         window.endCoords = null;
         window.calcKm = 0;
+        window.routeDataGlobal = null;
         
         const POPULAR_CITIES = ["Roma", "Milano", "Napoli", "Torino", "Palermo", "Genova", "Bologna", "Firenze"];
         const CARS_DB = [
@@ -427,56 +422,51 @@
         }
         function prevStep(step) { nextStep(step); }
 
-        // --- INTELLIGENT LOGIC ---
+        // --- VALIDATION & AUTO-CALC ---
         async function validateStep1() {
             const origin = document.getElementById('originInput').value;
             const dest = document.getElementById('destInput').value;
-            const kmInput = document.getElementById('kmInput');
-
-            if(!origin) return alert("Inserisci almeno la partenza!");
-            document.getElementById('loader').style.display = 'flex';
+            
+            if(!origin) return alert("Inserisci la partenza!");
+            
+            document.getElementById('loader').style.display='flex';
 
             // Resolve Origin
             if(!window.startCoords) {
                 const c = await resolveCity(origin);
-                if(c) window.startCoords = c; 
-                else { alert("Città partenza non trovata!"); document.getElementById('loader').style.display = 'none'; return; }
+                if(c) window.startCoords = c;
             }
 
-            // Resolve Dest & Calculate
+            // Resolve Dest & Route
             if(dest) {
-                 if(!window.endCoords) {
+                if(!window.endCoords) {
                     const c = await resolveCity(dest);
                     if(c) window.endCoords = c;
-                 }
-                 
-                 if(window.endCoords) {
-                     const routeData = await fetchRoute(window.startCoords, window.endCoords);
-                     if(routeData) {
-                         window.routeDataGlobal = routeData;
-                         window.calcKm = Math.round(routeData.distance/1000);
-                         
-                         // UI: Hide Manual, Show Auto
-                         document.getElementById('km-container').style.display = 'none';
-                         document.getElementById('km-auto-container').style.display = 'block';
-                         
-                         // Start counter animation immediately
-                         animateCounter("km-auto-val", 0, window.calcKm, 1500, " km");
-                         
-                         document.getElementById('km-desc').innerText = "Distanza calcolata automaticamente.";
-                     }
-                 }
+                }
+
+                if(window.startCoords && window.endCoords) {
+                    const routeData = await fetchRoute(window.startCoords, window.endCoords);
+                    if(routeData) {
+                        window.routeDataGlobal = routeData;
+                        window.calcKm = Math.round(routeData.distance/1000);
+                        
+                        // UI CHANGE: HIDE MANUAL, SHOW AUTO
+                        document.getElementById('km-container').style.display = 'none';
+                        document.getElementById('km-auto-container').style.display = 'block';
+                        document.getElementById('km-auto-val').innerText = window.calcKm + " km";
+                        document.getElementById('km-desc').innerText = "Distanza calcolata automaticamente.";
+                    }
+                }
             } else {
-                // MANUAL MODE
-                window.routeDataGlobal = null;
-                window.endCoords = null;
+                // RESET TO MANUAL
                 window.calcKm = 0;
+                window.routeDataGlobal = null;
                 document.getElementById('km-container').style.display = 'block';
                 document.getElementById('km-auto-container').style.display = 'none';
                 document.getElementById('km-desc').innerText = "Non hai una destinazione, inserisci i km manuali.";
             }
 
-            document.getElementById('loader').style.display = 'none';
+            document.getElementById('loader').style.display='none';
             nextStep(2);
         }
 
@@ -497,49 +487,56 @@
             } catch(e) { return null; }
         }
 
+        // --- AUTOCOMPLETE ---
         function initAutocomplete(inputId, listId, isStart) {
             const inp = document.getElementById(inputId);
             const list = document.getElementById(listId);
             let timer;
-            inp.addEventListener('focus', () => { if(inp.value.length===0) showList(list, POPULAR_CITIES, inp, isStart, true); });
+
+            inp.addEventListener('focus', () => {
+                if(inp.value.length === 0) showList(list, POPULAR_CITIES, inp, isStart, true);
+            });
+
             inp.addEventListener('input', () => {
                 clearTimeout(timer);
-                if(inp.value.length===0) { showList(list, POPULAR_CITIES, inp, isStart, true); return; }
-                timer = setTimeout(async()=>{
+                if(inp.value.length === 0) { showList(list, POPULAR_CITIES, inp, isStart, true); return; }
+                timer = setTimeout(async () => {
                     try {
                         const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(inp.value)}&limit=5&addressdetails=1&countrycodes=it`);
                         const data = await res.json();
                         showList(list, data, inp, isStart, false);
-                    } catch(e){}
+                    } catch(e) {}
                 }, 300);
             });
-            document.addEventListener('click', e => { if(e.target!==inp) list.style.display='none'; });
+            document.addEventListener('click', e => { if(e.target !== inp) list.style.display='none'; });
         }
 
         function showList(list, data, inp, isStart, isPop) {
-            list.innerHTML=''; list.style.display='block';
-            if(isPop) list.innerHTML='<div class="s-pop">Città Popolari</div>';
-            
-            data.forEach(d => {
-                const div = document.createElement('div'); div.className='s-item';
-                const name = isPop ? d : d.display_name.split(',')[0];
-                div.innerText = name;
-                div.onclick = () => {
-                    inp.value = name; list.style.display='none';
-                    if(!isPop) {
-                        const c = {lat: parseFloat(d.lat), lon: parseFloat(d.lon)};
-                        if(isStart) window.startCoords = c; else window.endCoords = c;
-                    } else {
-                        // If selected from popular list, force resolve later
-                        if(isStart) window.startCoords=null; else window.endCoords=null;
-                    }
-                };
-                list.appendChild(div);
-            });
+            list.innerHTML = '';
+            if(data.length > 0) {
+                list.style.display = 'block';
+                if(isPop) list.innerHTML = '<div class="s-pop">Città Popolari</div>';
+                
+                data.forEach(d => {
+                    const div = document.createElement('div'); div.className = 's-item';
+                    const name = isPop ? d : d.display_name.split(',')[0];
+                    div.innerText = name;
+                    div.onclick = () => {
+                        inp.value = name; list.style.display = 'none';
+                        if(!isPop) {
+                            const c = { lat: parseFloat(d.lat), lon: parseFloat(d.lon) };
+                            if(isStart) window.startCoords = c; else window.endCoords = c;
+                        } else {
+                             if(isStart) window.startCoords=null; else window.endCoords=null;
+                        }
+                    };
+                    list.appendChild(div);
+                });
+            } else { list.style.display = 'none'; }
         }
 
-        // --- FINAL RESULTS ---
-        function runAnalysis() {
+        // --- ANALYSIS & ANIMATION ---
+        async function runAnalysis() {
             let km = window.calcKm;
             if(km === 0) km = parseFloat(document.getElementById('kmInput').value);
             const budget = parseFloat(document.getElementById('budgetInput').value);
@@ -558,30 +555,25 @@
                 document.getElementById('t-start').innerText = document.getElementById('originInput').value;
                 document.getElementById('t-end').innerText = document.getElementById('destInput').value || "N/D";
                 
-                // Animate Numbers on Dashboard
-                animateCounter("t-km", 0, km, 2000, " km");
+                // --- NEW SMOOTH ANIMATION CALLS ---
+                animateValue("t-km", 0, km, 2500, "", " km", false); // Longer duration for KM
                 
-                // Calculate Time
-                let timeTxt = "--";
+                // Time Fade-In
                 if(window.routeDataGlobal) {
                     const m = Math.round(window.routeDataGlobal.duration/60);
-                    timeTxt = `${Math.floor(m/60)}h ${m%60}m`;
-                    // Simple fade in for text
-                    document.getElementById('t-time').innerText = timeTxt;
-                    document.getElementById('t-time').style.opacity = 0;
+                    document.getElementById('t-time').innerText = `${Math.floor(m/60)}h ${m%60}m`;
                     setTimeout(()=>document.getElementById('t-time').style.opacity=1, 500);
-                } else {
-                     document.getElementById('t-time').innerText = "--";
-                }
+                } else { document.getElementById('t-time').innerText = "--"; document.getElementById('t-time').style.opacity=1; }
 
                 // 2. ANIMATE PRICES
                 const pPetrol = (km/100) * CONS.petrol * BASE_PRICES.petrol;
                 const pDiesel = (km/100) * CONS.diesel * BASE_PRICES.diesel;
-                const pEv = (km/100) * CONS.ev * BASE_PRICES.kwh_public; // Avg
+                const pEv = (km/100) * CONS.ev * BASE_PRICES.kwh_public;
                 
-                animateCounter("p-petrol", 0, pPetrol.toFixed(2), 1500, "", true);
-                animateCounter("p-diesel", 0, pDiesel.toFixed(2), 1500, "", true);
-                animateCounter("p-ev", 0, pEv.toFixed(2), 1500, "", true);
+                // --- NEW SMOOTH ANIMATION CALLS ---
+                animateValue("p-petrol", 0, pPetrol, 2000, "€", "", true);
+                animateValue("p-diesel", 0, pDiesel, 2000, "€", "", true);
+                animateValue("p-ev", 0, pEv, 2000, "€", "", true);
 
                 // 3. MAP
                 document.getElementById('map-container').style.display='block';
@@ -595,7 +587,6 @@
                         L.geoJSON(window.routeDataGlobal.geometry, {style:{color:'#00f2ff', weight:5}}).addTo(routeLayer);
                         map.fitBounds(L.latLngBounds([window.startCoords, window.endCoords]), {padding:[50,50]});
                         
-                        // Fake Chargers
                         const pts = window.routeDataGlobal.geometry.coordinates;
                         for(let i=1; i<4; i++) {
                             let idx = Math.floor((pts.length/4)*i);
@@ -612,26 +603,22 @@
             }, 1000);
         }
 
-        // --- ANIMATION HELPER ---
-        function animateCounter(id, start, end, duration, suffix = "", isFloat = false) {
-            let obj = document.getElementById(id);
-            let range = end - start;
-            let current = start;
-            let increment = end > start ? 1 : -1;
-            let stepTime = Math.abs(Math.floor(duration / range));
-            if(isFloat) { stepTime = 20; increment = range / (duration/20); } // Smooth float
-            
-            let timer = setInterval(function() {
-                current += increment;
-                let displayVal = isFloat ? current.toFixed(2) : Math.floor(current);
-                
-                if ((increment > 0 && current >= end) || (increment < 0 && current <= end)) {
-                    current = end;
-                    displayVal = isFloat ? Number(end).toFixed(2) : end;
-                    clearInterval(timer);
-                }
-                obj.innerText = (isFloat ? "€" : "") + displayVal + suffix;
-            }, stepTime);
+        // --- NEW SMOOTH ANIMATION FUNCTION (requestAnimationFrame + Easing) ---
+        function animateValue(id, start, end, duration, prefix = "", suffix = "", isFloat = false) {
+            const obj = document.getElementById(id);
+            start = parseFloat(start); end = parseFloat(end);
+            if (start === end) { obj.innerText = prefix + (isFloat ? end.toFixed(2) : end) + suffix; return; }
+            const range = end - start; let startTime = null;
+            function step(timestamp) {
+                if (!startTime) startTime = timestamp;
+                const progress = Math.min((timestamp - startTime) / duration, 1);
+                const easeOutProgress = 1 - Math.pow(1 - progress, 3); // Cubic Ease Out
+                let currentVal = start + (range * easeOutProgress);
+                obj.innerText = prefix + (isFloat ? currentVal.toFixed(2) : Math.floor(currentVal)) + suffix;
+                if (progress < 1) window.requestAnimationFrame(step);
+                else obj.innerText = prefix + (isFloat ? end.toFixed(2) : end) + suffix; // Ensure final value
+            }
+            window.requestAnimationFrame(step);
         }
 
         function renderGrid(budget, km) {
