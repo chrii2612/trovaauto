@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>AutoMatch Pro - Final Experience</title>
+    <title>AutoMatch Pro - Ultimate</title>
     
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
@@ -16,8 +16,7 @@
             --ios-green: #34C759;
             --ios-orange: #FF9500;
             --ios-red: #FF3B30;
-            --ios-indigo: #5856D6;
-            --ios-teal: #30B0C7;
+            --ios-purple: #AF52DE;
             --ios-bg: #F2F2F7;
             --ios-card: #FFFFFF;
             --ios-text: #000000;
@@ -61,12 +60,12 @@
         body.dark-mode .nav-bar { background: rgba(28,28,30,0.85); }
 
         /* BUTTONS */
-        .btn-main, .btn-pri, .btn-sec {
+        .btn-main, .btn-pri, .btn-sec, .icon-btn {
             font-family: inherit; border: none; cursor: pointer; outline: none;
             transition: all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1);
             position: relative; overflow: hidden;
         }
-        .btn-main:active, .btn-pri:active, .btn-sec:active { transform: scale(0.96); opacity: 0.8; }
+        .btn-main:active, .btn-pri:active, .btn-sec:active, .icon-btn:active { transform: scale(0.92); opacity: 0.8; }
         
         .btn-main {
             padding: 16px 32px; font-size: 1.1rem; font-weight: 600;
@@ -78,6 +77,12 @@
             border-radius: 14px; font-weight: 600; width: 100%; font-size: 1rem;
         }
         .btn-sec { background: rgba(120,120,128,0.12); color: var(--ios-blue); padding: 16px; border-radius: 14px; font-weight: 600; width: 100%; }
+        
+        .icon-btn { 
+            width: 40px; height: 40px; border-radius: 50%; 
+            display: flex; align-items: center; justify-content: center; 
+            background: rgba(120,120,128,0.12); color: var(--ios-blue); 
+        }
 
         /* WIZARD & INPUTS */
         #app-section { display: none; padding-top: 80px; min-height: 100vh; flex-direction: column; align-items: center; opacity: 0; transition: opacity 0.5s; padding-bottom: 100px; }
@@ -122,7 +127,7 @@
         .s-item:active, .s-item:hover { background: rgba(0,0,0,0.05); }
 
         /* RESULTS & WIDGETS */
-        #results-container { width: 100%; max-width: 1000px; display: none; padding: 0 20px 60px 20px; }
+        #results-container { width: 100%; max-width: 1000px; display: none; padding: 0 20px 80px 20px; }
         .widget-row { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px; }
         
         .glass-card {
@@ -136,12 +141,15 @@
         .weather-bg { position: absolute; top:-20px; right:-20px; font-size: 8rem; opacity: 0.2; transform: rotate(10deg); pointer-events: none; }
 
         /* LIFESTYLE WIDGETS */
-        .vibe-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 25px; }
+        .vibe-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-bottom: 25px; }
         .vibe-item { 
-            background: var(--ios-card); border-radius: 16px; padding: 15px 10px; text-align: center; 
-            box-shadow: var(--shadow-sm); display: flex; flex-direction: column; align-items: center; justify-content: center;
+            background: var(--ios-card); border-radius: 16px; padding: 15px; 
+            box-shadow: var(--shadow-sm); display: flex; align-items: center; gap: 15px;
         }
-        .vibe-icon { width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; margin-bottom: 8px; }
+        .vibe-icon-box { 
+            width: 44px; height: 44px; border-radius: 12px; 
+            display: flex; align-items: center; justify-content: center; font-size: 1.4rem; 
+        }
 
         /* MAP */
         .map-wrapper { 
@@ -188,19 +196,22 @@
         }
         .sheet-handle { width: 40px; height: 5px; background: var(--ios-separator); border-radius: 10px; margin: 0 auto 25px auto; }
         
-        .theme-tog { width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: rgba(120,120,128,0.15); transition: 0.3s; cursor: pointer; }
-        .theme-tog:active { transform: rotate(15deg) scale(0.9); }
-
-        /* DYNAMIC ISLAND ALERT */
-        #dynamic-alert {
-            position: fixed; top: 20px; left: 50%; transform: translateX(-50%) translateY(-100px);
-            background: #000; color: #fff; padding: 10px 20px; border-radius: 30px;
-            display: flex; align-items: center; gap: 10px; z-index: 5000;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.2); transition: 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            font-size: 0.9rem; font-weight: 600; width: fit-content;
+        /* SETTINGS MODAL */
+        #settings-modal {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5); backdrop-filter: blur(8px); z-index: 5000;
+            display: none; align-items: center; justify-content: center; opacity: 0; transition: 0.3s;
         }
-        #dynamic-alert.show { transform: translateX(-50%) translateY(0); }
-        #dynamic-alert i { color: var(--ios-green); }
+        .settings-card {
+            background: var(--ios-card); width: 85%; max-width: 350px; border-radius: 20px; padding: 25px;
+            transform: scale(0.9); transition: 0.3s; box-shadow: var(--shadow-float);
+        }
+        .lang-btn {
+            display: block; width: 100%; padding: 12px; margin-bottom: 8px; border-radius: 12px;
+            background: rgba(120,120,128,0.1); text-align: center; font-weight: 600; font-size: 1rem;
+            border: 2px solid transparent; cursor: pointer;
+        }
+        .lang-btn.active { border-color: var(--ios-blue); color: var(--ios-blue); background: rgba(0, 122, 255, 0.1); }
 
     </style>
 </head>
@@ -211,21 +222,42 @@
             <i class="ph-fill ph-steering-wheel" style="color:var(--ios-blue); font-size:1.6rem;"></i>
             <span>AutoMatch</span>
         </div>
-        <div class="theme-tog" onclick="haptic(); document.body.classList.toggle('dark-mode')">
-            <i class="ph-fill ph-moon-stars" style="font-size: 1.2rem;"></i>
+        <div style="display:flex; gap:10px;">
+            <div class="icon-btn" onclick="haptic(); shareTrip()">
+                <i class="ph-bold ph-share-network"></i>
+            </div>
+            <div class="icon-btn" onclick="haptic(); toggleSettings()">
+                <i class="ph-fill ph-gear"></i>
+            </div>
         </div>
     </nav>
 
-    <div id="dynamic-alert"><i class="ph-fill ph-check-circle"></i> Viaggio Configurato</div>
+    <div id="settings-modal" onclick="if(event.target===this) toggleSettings()">
+        <div class="settings-card">
+            <h2 style="margin-bottom:20px; text-align:center;" data-key="settings">Impostazioni</h2>
+            
+            <label style="margin-bottom:10px; display:block;" data-key="language">Lingua</label>
+            <div class="lang-btn active" onclick="setLang('it')" id="lang-it">🇮🇹 Italiano</div>
+            <div class="lang-btn" onclick="setLang('en')" id="lang-en">🇬🇧 English</div>
+            <div class="lang-btn" onclick="setLang('es')" id="lang-es">🇪🇸 Español</div>
+
+            <hr style="border:0; border-top:1px solid var(--ios-separator); margin:20px 0;">
+            
+            <label style="margin-bottom:10px; display:block;" data-key="appearance">Aspetto</label>
+            <div class="lang-btn" onclick="document.body.classList.toggle('dark-mode'); haptic();">🌓 Light / Dark</div>
+
+            <button class="btn-pri" style="margin-top:20px;" onclick="toggleSettings()" data-key="close">Chiudi</button>
+        </div>
+    </div>
 
     <div id="landing-page" style="padding-top:100px; text-align:center; padding-bottom: 40px;">
         <div style="max-width:800px; margin:0 auto; padding:20px;">
-            <span style="color:var(--ios-blue); font-weight:700; letter-spacing:1px; font-size:0.8rem; text-transform:uppercase; margin-bottom:15px; display:block;">Pianificatore Intelligente</span>
-            <h1 style="font-size:3rem; line-height:1.1; margin-bottom:20px;">Viaggia meglio.<br>Spendi meno.</h1>
-            <p style="color:var(--ios-text-sec); font-size:1.2rem; margin-bottom:40px; max-width: 500px; margin-left:auto; margin-right:auto;">
+            <span style="color:var(--ios-blue); font-weight:700; letter-spacing:1px; font-size:0.8rem; text-transform:uppercase; margin-bottom:15px; display:block;" data-key="hero_tag">Pianificatore Intelligente</span>
+            <h1 style="font-size:3rem; line-height:1.1; margin-bottom:20px;" data-key="hero_title">Viaggia meglio.<br>Spendi meno.</h1>
+            <p style="color:var(--ios-text-sec); font-size:1.2rem; margin-bottom:40px; max-width: 500px; margin-left:auto; margin-right:auto;" data-key="hero_sub">
                 Calcolo pedaggi, soste di ricarica intelligenti e confronto costi in tempo reale.
             </p>
-            <button class="btn-main" onclick="haptic(); goToApp()">Inizia Configurazione</button>
+            <button class="btn-main" onclick="haptic(); goToApp()" data-key="btn_start">Inizia Configurazione</button>
             
             <div style="display:flex; justify-content:center; gap:30px; margin-top:60px; opacity:0.6;">
                 <div style="text-align:center;"><i class="ph ph-map-pin" style="font-size:2rem; margin-bottom:10px;"></i><br><small>Route</small></div>
@@ -243,41 +275,41 @@
             </div>
             
             <div class="step active" id="step-1">
-                <h2>Il tuo Viaggio</h2>
-                <p>Da dove parti e dove vuoi andare?</p>
+                <h2 data-key="step1_title">Il tuo Viaggio</h2>
+                <p data-key="step1_sub">Da dove parti e dove vuoi andare?</p>
                 
                 <div class="ios-list">
                     <div class="ios-item" style="z-index: 20;">
                         <i class="ph-fill ph-navigation-arrow"></i>
                         <div class="ios-content">
-                            <label>Partenza</label>
-                            <input type="text" id="originInput" placeholder="Città..." autocomplete="off">
+                            <label data-key="lbl_from">Partenza</label>
+                            <input type="text" id="originInput" placeholder="..." autocomplete="off">
                             <div id="list-origin" class="suggestions"></div>
                         </div>
                     </div>
                     <div class="ios-item" style="z-index: 10;">
                         <i class="ph-fill ph-flag-checkered"></i>
                         <div class="ios-content">
-                            <label>Destinazione</label>
-                            <input type="text" id="destInput" placeholder="Città..." autocomplete="off">
+                            <label data-key="lbl_to">Destinazione</label>
+                            <input type="text" id="destInput" placeholder="..." autocomplete="off">
                             <div id="list-dest" class="suggestions"></div>
                         </div>
                         <i class="ph-bold ph-x-circle" id="clearDest" onclick="haptic(); clearDestination()" style="display:none; color:var(--ios-text-sec); cursor:pointer;"></i>
                     </div>
                 </div>
 
-                <button class="btn-pri" onclick="haptic(); validateStep1()">Avanti</button>
+                <button class="btn-pri" onclick="haptic(); validateStep1()" data-key="btn_next">Avanti</button>
             </div>
 
             <div class="step" id="step-2">
-                <h2>Abitudini</h2>
-                <p>Dettagli per una stima precisa.</p>
+                <h2 data-key="step2_title">Abitudini</h2>
+                <p data-key="step2_sub">Dettagli per una stima precisa.</p>
 
                 <div class="ios-list">
                     <div class="ios-item">
                         <i class="ph-fill ph-road-horizon"></i>
                         <div class="ios-content">
-                            <label>Distanza (KM)</label>
+                            <label data-key="lbl_km">Distanza (KM)</label>
                             <input type="number" id="kmInput" placeholder="--">
                             <small id="km-msg" style="display:none; font-weight:600; margin-top:5px;"></small>
                         </div>
@@ -285,24 +317,24 @@
                     <div class="ios-item">
                         <i class="ph-fill ph-house-line"></i>
                         <div class="ios-content">
-                            <label>Hai un garage?</label>
+                            <label data-key="lbl_garage">Garage?</label>
                             <select id="chargingInput">
-                                <option value="no">No, ricarica pubblica</option>
-                                <option value="yes">Sì, ricarica domestica</option>
+                                <option value="no" data-key="opt_no">No, ricarica pubblica</option>
+                                <option value="yes" data-key="opt_yes">Sì, ricarica domestica</option>
                             </select>
                         </div>
                     </div>
                 </div>
 
                 <div style="display: flex; gap: 15px;">
-                    <button class="btn-sec" onclick="haptic(); prevStep(1)">Indietro</button>
-                    <button class="btn-pri" onclick="haptic(); nextStep(3)">Avanti</button>
+                    <button class="btn-sec" onclick="haptic(); prevStep(1)" data-key="btn_back">Indietro</button>
+                    <button class="btn-pri" onclick="haptic(); nextStep(3)" data-key="btn_next">Avanti</button>
                 </div>
             </div>
 
             <div class="step" id="step-3">
-                <h2>Budget</h2>
-                <p>Quanto vuoi spendere per l'auto?</p>
+                <h2 data-key="step3_title">Budget</h2>
+                <p data-key="step3_sub">Quanto vuoi spendere per l'auto?</p>
 
                 <div class="ios-list">
                     <div class="ios-item">
@@ -315,8 +347,8 @@
                 </div>
 
                 <div style="display: flex; gap: 15px;">
-                    <button class="btn-sec" onclick="haptic(); prevStep(2)">Indietro</button>
-                    <button class="btn-pri" onclick="haptic(); runAnalysis()">Calcola Tutto</button>
+                    <button class="btn-sec" onclick="haptic(); prevStep(2)" data-key="btn_back">Indietro</button>
+                    <button class="btn-pri" onclick="haptic(); runAnalysis()" data-key="btn_calc">Calcola Tutto</button>
                 </div>
             </div>
         </div>
@@ -332,7 +364,7 @@
 
         <div id="results-container">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
-                <h2>Il tuo Viaggio</h2>
+                <h2 data-key="res_title">Il tuo Viaggio</h2>
                 <button onclick="haptic(); location.reload()" style="background:var(--ios-separator); border:none; width:36px; height:36px; border-radius:50%; display:flex; align-items:center; justify-content:center; cursor:pointer;"><i class="ph-bold ph-arrow-counter-clockwise"></i></button>
             </div>
             
@@ -342,14 +374,14 @@
 
             <div class="widget-row">
                 <div class="glass-card">
-                    <label>Distanza Totale</label>
+                    <label data-key="w_dist">Distanza Totale</label>
                     <div style="font-size:1.8rem; font-weight:700;" id="t-km">--</div>
                     <small style="color:var(--ios-text-sec);" id="t-start-end">--</small>
                 </div>
                 <div class="glass-card weather-widget" id="weather-box">
                     <i class="ph-fill ph-cloud-sun weather-bg"></i>
                     <div>
-                        <label style="color:rgba(255,255,255,0.8);">Meteo Arrivo</label>
+                        <label style="color:rgba(255,255,255,0.8);" data-key="w_weather">Meteo Arrivo</label>
                         <div id="w-temp" style="font-size:2rem; font-weight:700;">--°</div>
                     </div>
                     <div style="display:flex; align-items:center; gap:5px; font-size:0.9rem;">
@@ -358,26 +390,33 @@
                 </div>
             </div>
 
-            <h3 style="margin: 20px 0 10px 0; font-size:0.9rem; text-transform:uppercase; color:var(--ios-text-sec);">Travel Vibes</h3>
+            <h3 style="margin: 20px 0 10px 0; font-size:0.9rem; text-transform:uppercase; color:var(--ios-text-sec);" data-key="smart_insights">Smart Insights</h3>
             <div class="vibe-grid">
                 <div class="vibe-item">
-                    <div class="vibe-icon" style="background:rgba(255, 45, 85, 0.1); color:#FF2D55;"><i class="ph-fill ph-music-notes"></i></div>
-                    <div style="font-size:0.7rem; color:var(--ios-text-sec); font-weight:600;">PLAYLIST</div>
-                    <div style="font-weight:700; font-size:0.9rem;" id="vibe-music">--</div>
+                    <div class="vibe-icon-box" style="background:rgba(52, 199, 89, 0.1); color:var(--ios-green);">
+                        <i class="ph-fill ph-tree"></i>
+                    </div>
+                    <div>
+                        <div style="font-size:0.7rem; color:var(--ios-text-sec); font-weight:600; text-transform:uppercase;" data-key="si_trees">Alberi Salvati</div>
+                        <div style="font-weight:700; font-size:0.9rem; line-height:1.2;">
+                            <span id="vibe-trees" style="font-size:1.1rem;">--</span> <span style="font-size:0.8rem">vs Diesel</span>
+                        </div>
+                    </div>
                 </div>
                 <div class="vibe-item">
-                    <div class="vibe-icon" style="background:rgba(52, 199, 89, 0.1); color:var(--ios-green);"><i class="ph-fill ph-leaf"></i></div>
-                    <div style="font-size:0.7rem; color:var(--ios-text-sec); font-weight:600;">ECO SCORE</div>
-                    <div style="font-weight:700; font-size:0.9rem;">A+</div>
-                </div>
-                <div class="vibe-item">
-                    <div class="vibe-icon" style="background:rgba(162, 132, 94, 0.1); color:#A2845E;"><i class="ph-fill ph-coffee"></i></div>
-                    <div style="font-size:0.7rem; color:var(--ios-text-sec); font-weight:600;">COFFEE IDX</div>
-                    <div style="font-weight:700; font-size:0.9rem;" id="vibe-coffee">--</div>
+                    <div class="vibe-icon-box" style="background:rgba(0, 122, 255, 0.1); color:var(--ios-blue);">
+                        <i class="ph-fill ph-airplane-tilt"></i>
+                    </div>
+                    <div>
+                        <div style="font-size:0.7rem; color:var(--ios-text-sec); font-weight:600; text-transform:uppercase;" data-key="si_flight">Vs Aereo</div>
+                        <div style="font-weight:700; font-size:0.9rem; line-height:1.2;">
+                            <span id="vibe-flight-cost" style="font-size:1.1rem;">--</span>
+                        </div>
+                    </div>
                 </div>
             </div>
 
-            <h3 style="margin: 30px 0 15px 0;">Veicoli Suggeriti</h3>
+            <h3 style="margin: 30px 0 15px 0;" data-key="rec_cars">Veicoli Suggeriti</h3>
             <div id="car-results" class="car-grid"></div>
         </div>
     </section>
@@ -395,71 +434,146 @@
             
             <div class="ios-list">
                 <div class="ios-item">
-                    <div class="ios-content">Costo Carburante (Viaggio)</div>
+                    <div class="ios-content" data-key="m_fuel">Costo Carburante</div>
                     <b id="m-fuel">--</b>
                 </div>
                 <div class="ios-item">
-                    <div class="ios-content">Pedaggio Stimato (Autostrada)</div>
+                    <div class="ios-content" data-key="m_toll">Pedaggio Autostrada</div>
                     <b id="m-toll">--</b>
                 </div>
                 <div class="ios-item" id="row-ev-stops" style="display:none;">
                     <i class="ph-fill ph-charging-station" style="color:var(--ios-orange); font-size:1.2rem; margin-right:10px; width:auto;"></i>
-                    <div class="ios-content" style="color:var(--ios-orange); font-weight:600;">Soste Ricarica Necessarie</div>
+                    <div class="ios-content" style="color:var(--ios-orange); font-weight:600;" data-key="m_stops">Soste Ricarica</div>
                     <b id="m-stops" style="color:var(--ios-orange)">--</b>
                 </div>
-                
                 <div class="ios-item" id="savings-row" style="display:none; background:rgba(52, 199, 89, 0.1);">
-                    <div class="ios-content" style="color:var(--ios-green); font-weight:600;">Risparmio vs Benzina</div>
+                    <div class="ios-content" style="color:var(--ios-green); font-weight:600;" data-key="m_save">Risparmio vs Benzina</div>
                     <b id="m-savings" style="color:var(--ios-green)">--</b>
                 </div>
             </div>
 
             <div style="background:var(--ios-bg); padding:20px; border-radius:18px; margin-bottom:20px;">
-                <label>Costo Totale Stimato (Fuel + Toll)</label>
+                <label data-key="m_total">Costo Totale Stimato</label>
                 <div id="m-total" style="font-size:2rem; font-weight:700; color:var(--ios-text);">--</div>
             </div>
             
-            <button class="btn-pri" onclick="haptic(); forceCloseModal()">Chiudi Scheda</button>
+            <button class="btn-pri" onclick="haptic(); forceCloseModal()" data-key="close">Chiudi Scheda</button>
         </div>
     </div>
 
     <script>
-        // --- CONSTANTS ---
-        const BASE_PRICES = { petrol: 1.84, diesel: 1.71, kwh_public: 0.58, kwh_home: 0.25 };
-        const TOLL_RATE = 0.075; // Average toll cost per km in Italy
-        const COFFEE_PRICE = 1.20; 
+        // --- CONSTANTS & CONFIG ---
+        const CONFIG = {
+            prices: { petrol: 1.84, diesel: 1.71, kwh_public: 0.62, kwh_home: 0.25, flight_km: 0.12, flight_base: 40 },
+            toll_rate: 0.075,
+            co2: { diesel: 120, ev: 0, tree_absorption: 20000 } // g per km / g per year
+        };
 
-        // Added 'range' property for EV logic
+        // --- EXPANDED CAR DATABASE (Mocking an API) ---
         const CARS_DB = [
-            { brand: "Tesla", model: "Model 3", price: 42990, type: "Elettrica", range: 500, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/8/82/2019_Tesla_Model_3_Long_Range_AWD_Front.jpg/800px-2019_Tesla_Model_3_Long_Range_AWD_Front.jpg" },
-            { brand: "Fiat", model: "500e", price: 29950, type: "Elettrica", range: 300, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7f/Fiat_500_Electric_La_Prima_Genf_2020_1X7A5372.jpg/800px-Fiat_500_Electric_La_Prima_Genf_2020_1X7A5372.jpg" },
-            { brand: "VW", model: "Golf 8", price: 34500, type: "Diesel", range: 900, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c9/2020_Volkswagen_Golf_Style_2.0_Front.jpg/800px-2020_Volkswagen_Golf_Style_2.0_Front.jpg" },
-            { brand: "Jeep", model: "Avenger", price: 24300, type: "Benzina", range: 600, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/2/27/Jeep_Avenger_1.2_Turbo_Summit_%E2%80%93_f_%E2%80%93_16042023.jpg/800px-Jeep_Avenger_1.2_Turbo_Summit_%E2%80%93_f_%E2%80%93_16042023.jpg" },
+            { brand: "Tesla", model: "Model 3", price: 42990, type: "Elettrica", range: 513, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/8/82/2019_Tesla_Model_3_Long_Range_AWD_Front.jpg/800px-2019_Tesla_Model_3_Long_Range_AWD_Front.jpg" },
+            { brand: "Tesla", model: "Model Y", price: 46990, type: "Elettrica", range: 455, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/7/73/Tesla_Model_Y_Performance_IMG_4905.jpg/800px-Tesla_Model_Y_Performance_IMG_4905.jpg" },
+            { brand: "Fiat", model: "500e", price: 29950, type: "Elettrica", range: 320, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7f/Fiat_500_Electric_La_Prima_Genf_2020_1X7A5372.jpg/800px-Fiat_500_Electric_La_Prima_Genf_2020_1X7A5372.jpg" },
+            { brand: "Volkswagen", model: "Golf 8", price: 34500, type: "Diesel", range: 1000, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c9/2020_Volkswagen_Golf_Style_2.0_Front.jpg/800px-2020_Volkswagen_Golf_Style_2.0_Front.jpg" },
+            { brand: "Jeep", model: "Avenger", price: 24300, type: "Benzina", range: 650, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/2/27/Jeep_Avenger_1.2_Turbo_Summit_%E2%80%93_f_%E2%80%93_16042023.jpg/800px-Jeep_Avenger_1.2_Turbo_Summit_%E2%80%93_f_%E2%80%93_16042023.jpg" },
             { brand: "MG", model: "MG4", price: 30790, type: "Elettrica", range: 350, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/6/64/MG4_EV_Dabok.jpg/800px-MG4_EV_Dabok.jpg" },
-            { brand: "Dacia", model: "Spring", price: 21000, type: "Elettrica", range: 220, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/53/Dacia_Spring_2022.jpg/800px-Dacia_Spring_2022.jpg" }
+            { brand: "Dacia", model: "Spring", price: 21000, type: "Elettrica", range: 230, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/53/Dacia_Spring_2022.jpg/800px-Dacia_Spring_2022.jpg" },
+            { brand: "Audi", model: "Q4 e-tron", price: 56000, type: "Elettrica", range: 480, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/59/Audi_Q4_e-tron_IMG_4803.jpg/800px-Audi_Q4_e-tron_IMG_4803.jpg" },
+            { brand: "Toyota", model: "Yaris Hybrid", price: 24000, type: "Benzina", range: 800, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9d/Toyota_Yaris_Hybrid_%28XP210%29_IMG_3655.jpg/800px-Toyota_Yaris_Hybrid_%28XP210%29_IMG_3655.jpg" },
+            { brand: "BMW", model: "i4", price: 59000, type: "Elettrica", range: 590, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4b/BMW_i4_M50_IMG_5330.jpg/800px-BMW_i4_M50_IMG_5330.jpg" },
+            { brand: "Peugeot", model: "e-208", price: 35000, type: "Elettrica", range: 362, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f6/Peugeot_e-208_GT_IMG_3688.jpg/800px-Peugeot_e-208_GT_IMG_3688.jpg" },
+            { brand: "Renault", model: "Megane E-Tech", price: 42000, type: "Elettrica", range: 450, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e3/Renault_Megane_E-Tech_Electric_IMG_5296.jpg/800px-Renault_Megane_E-Tech_Electric_IMG_5296.jpg" },
+            { brand: "BYD", model: "Atto 3", price: 38000, type: "Elettrica", range: 420, img: "https://upload.wikimedia.org/wikipedia/commons/thumb/2/23/BYD_Atto_3_IAA_2023_1X7A0456.jpg/800px-BYD_Atto_3_IAA_2023_1X7A0456.jpg" }
         ];
+        
+        // --- I18N (TRANSLATIONS) ---
+        const STRINGS = {
+            it: {
+                hero_tag: "Pianificatore Intelligente", hero_title: "Viaggia meglio.<br>Spendi meno.", hero_sub: "Confronta auto, calcola pedaggi e risparmia.", btn_start: "Inizia Configurazione",
+                step1_title: "Il tuo Viaggio", step1_sub: "Da dove parti e dove vuoi andare?", lbl_from: "Partenza", lbl_to: "Destinazione", btn_next: "Avanti",
+                step2_title: "Abitudini", step2_sub: "Dettagli per una stima precisa.", lbl_km: "Distanza (KM)", lbl_garage: "Garage?", opt_no: "No, pubblica", opt_yes: "Sì, privato", btn_back: "Indietro",
+                step3_title: "Budget", step3_sub: "Quanto vuoi spendere?", btn_calc: "Calcola Tutto",
+                res_title: "Report Viaggio", w_dist: "Distanza", w_weather: "Meteo Arrivo", smart_insights: "Smart Insights",
+                si_trees: "Ecologia", si_flight: "Vs Aereo", rec_cars: "Veicoli Consigliati",
+                m_fuel: "Costo Carburante", m_toll: "Pedaggio Autostrada", m_stops: "Soste Ricarica", m_save: "Risparmio vs Benzina", m_total: "Costo Totale", close: "Chiudi",
+                settings: "Impostazioni", language: "Lingua", appearance: "Aspetto"
+            },
+            en: {
+                hero_tag: "Smart Planner", hero_title: "Travel better.<br>Spend less.", hero_sub: "Compare cars, calculate tolls, and save.", btn_start: "Start Config",
+                step1_title: "Your Trip", step1_sub: "Where are you going?", lbl_from: "Start", lbl_to: "Destination", btn_next: "Next",
+                step2_title: "Habits", step2_sub: "Details for accuracy.", lbl_km: "Distance (KM)", lbl_garage: "Home Charger?", opt_no: "No, public", opt_yes: "Yes, private", btn_back: "Back",
+                step3_title: "Budget", step3_sub: "Your investment range?", btn_calc: "Calculate All",
+                res_title: "Trip Report", w_dist: "Distance", w_weather: "Arrival Weather", smart_insights: "Smart Insights",
+                si_trees: "Eco Impact", si_flight: "Vs Flight", rec_cars: "Recommended Cars",
+                m_fuel: "Fuel Cost", m_toll: "Estimated Toll", m_stops: "Charging Stops", m_save: "Savings vs Gas", m_total: "Total Cost", close: "Close",
+                settings: "Settings", language: "Language", appearance: "Appearance"
+            },
+            es: {
+                hero_tag: "Planificador Inteligente", hero_title: "Viaja mejor.<br>Gasta menos.", hero_sub: "Compara coches, peajes y ahorra.", btn_start: "Empezar",
+                step1_title: "Tu Viaje", step1_sub: "¿A dónde vas?", lbl_from: "Salida", lbl_to: "Destino", btn_next: "Siguiente",
+                step2_title: "Hábitos", step2_sub: "Detalles precisos.", lbl_km: "Distancia (KM)", lbl_garage: "¿Cargador en casa?", opt_no: "No, público", opt_yes: "Sí, privado", btn_back: "Atrás",
+                step3_title: "Presupuesto", step3_sub: "¿Cuánto quieres gastar?", btn_calc: "Calcular",
+                res_title: "Reporte de Viaje", w_dist: "Distancia", w_weather: "Clima Destino", smart_insights: "Datos Inteligentes",
+                si_trees: "Impacto Eco", si_flight: "Vs Avión", rec_cars: "Coches Recomendados",
+                m_fuel: "Combustible", m_toll: "Peaje", m_stops: "Paradas de Carga", m_save: "Ahorro vs Gasolina", m_total: "Costo Total", close: "Cerrar",
+                settings: "Ajustes", language: "Idioma", appearance: "Apariencia"
+            }
+        };
 
+        let curLang = 'it';
+        
         // GLOBALS
         window.startCoords = null; window.endCoords = null; window.calculatedKm = 0; window.routeDataGlobal = null; 
-        const POPULAR_CITIES = ["Roma", "Milano", "Napoli", "Torino", "Bologna", "Firenze", "Venezia", "Bari", "Palermo", "Genova"];
+        const POPULAR_CITIES = ["Roma", "Milano", "Napoli", "Torino", "Bologna", "Firenze", "Venezia", "Bari", "Palermo", "Genova", "Verona", "Paris", "Berlin", "Barcelona", "Munich", "Zurich"];
 
-        function haptic() { if(navigator.vibrate) navigator.vibrate(10); }
+        function haptic() { if(navigator.vibrate) navigator.vibrate(15); }
 
         let map, markersLayer, routeLayer;
         window.onload = function() {
             map = L.map('map', {zoomControl: false, dragging: !L.Browser.mobile, tap: !L.Browser.mobile}).setView([41.9, 12.5], 5);
             L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', { attribution: '', maxZoom: 19 }).addTo(map);
-            markersLayer = L.layerGroup().addTo(map); 
-            routeLayer = L.layerGroup().addTo(map);
-            
-            initAutocomplete('originInput', 'list-origin', true); 
-            initAutocomplete('destInput', 'list-dest', false);
-            
-            document.getElementById('destInput').addEventListener('input', function() { 
-                document.getElementById('clearDest').style.display = this.value.length > 0 ? 'block' : 'none'; 
-            });
+            markersLayer = L.layerGroup().addTo(map); routeLayer = L.layerGroup().addTo(map);
+            initAutocomplete('originInput', 'list-origin', true); initAutocomplete('destInput', 'list-dest', false);
+            document.getElementById('destInput').addEventListener('input', function() { document.getElementById('clearDest').style.display = this.value.length > 0 ? 'block' : 'none'; });
         };
 
+        // --- LANGUAGE & SETTINGS LOGIC ---
+        function toggleSettings() {
+            const m = document.getElementById('settings-modal');
+            const c = m.querySelector('.settings-card');
+            if(m.style.display === 'flex') {
+                m.style.opacity = '0'; c.style.transform = 'scale(0.9)';
+                setTimeout(()=>m.style.display='none',300);
+            } else {
+                m.style.display = 'flex'; setTimeout(()=>{m.style.opacity='1'; c.style.transform='scale(1)';},10);
+            }
+        }
+
+        function setLang(l) {
+            curLang = l;
+            document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById(`lang-${l}`).classList.add('active');
+            
+            document.querySelectorAll('[data-key]').forEach(el => {
+                const k = el.getAttribute('data-key');
+                if(STRINGS[l][k]) el.innerHTML = STRINGS[l][k];
+            });
+            haptic();
+        }
+
+        // --- SHARE LOGIC ---
+        function shareTrip() {
+            if(!window.calculatedKm) return alert("Configura prima un viaggio!");
+            const txt = `🚗 AutoMatch Trip\n${document.getElementById('originInput').value} ➡️ ${document.getElementById('destInput').value}\n📏 Distanza: ${window.calculatedKm} km\n💰 Stima Elettrico: €${document.getElementById('p-ev') ? document.getElementById('p-ev').innerText : '--'}\n🌱 AutoMatch Pro`;
+            
+            if (navigator.share) {
+                navigator.share({ title: 'Il mio viaggio AutoMatch', text: txt }).catch(console.error);
+            } else {
+                navigator.clipboard.writeText(txt).then(() => alert("Copiato negli appunti!"));
+            }
+        }
+
+        // --- NAVIGATION ---
         function goToApp() {
             document.getElementById('landing-page').style.opacity = '0';
             setTimeout(() => {
@@ -491,7 +605,7 @@
             if(!originInp.value) { originInp.parentElement.parentElement.classList.add('input-error'); setTimeout(()=>originInp.parentElement.parentElement.classList.remove('input-error'),400); haptic(); return; }
 
             if(!window.startCoords) window.startCoords = await resolveCity(originInp.value);
-            if(!window.startCoords) { alert("Partenza non trovata"); return; }
+            if(!window.startCoords) { alert("Partenza non valida"); return; }
 
             if(destInp.value.trim() !== "") {
                 if(!window.endCoords) window.endCoords = await resolveCity(destInp.value);
@@ -502,7 +616,7 @@
 
                     if(window.routeDataGlobal) {
                         window.calculatedKm = Math.round(window.routeDataGlobal.distance/1000);
-                        kmInput.classList.add('locked'); kmMsg.style.color = 'var(--ios-green)'; kmMsg.innerText = "Percorso Preciso";
+                        kmInput.classList.add('locked'); kmMsg.style.color = 'var(--ios-green)'; kmMsg.innerText = "Percorso OK";
                     } else {
                         window.calculatedKm = Math.round(getDistanceFromLatLonInKm(window.startCoords.lat, window.startCoords.lon, window.endCoords.lat, window.endCoords.lon));
                         kmInput.classList.add('warning'); kmMsg.style.color = 'var(--ios-orange)'; kmMsg.innerText = "Stima Lineare";
@@ -516,24 +630,18 @@
         async function runAnalysis() {
             const km = window.calculatedKm > 0 ? window.calculatedKm : parseFloat(document.getElementById('kmInput').value);
             const budget = parseFloat(document.getElementById('budgetInput').value);
-            if(!km) return alert("Inserisci i Km!");
+            if(!km) return alert("Inserisci KM");
 
             document.getElementById('wizard-box').style.display='none';
             document.getElementById('skeleton-loader').style.display='block';
             
             setTimeout(async () => {
-                // Fetch Weather
                 if(window.endCoords) await fetchWeather(window.endCoords.lat, window.endCoords.lon);
                 else document.getElementById('weather-box').style.display = 'none';
 
                 document.getElementById('skeleton-loader').style.display='none';
                 document.getElementById('results-container').style.display='block';
                 
-                // Show Dynamic Alert
-                document.getElementById('dynamic-alert').classList.add('show');
-                setTimeout(()=>document.getElementById('dynamic-alert').classList.remove('show'), 3000);
-
-                // Map Update
                 setTimeout(() => {
                     map.invalidateSize(); 
                     markersLayer.clearLayers(); routeLayer.clearLayers();
@@ -548,23 +656,34 @@
                     }
                 }, 200);
 
-                // Update Text Data
                 document.getElementById('t-km').innerText = km + " km";
                 document.getElementById('t-start-end').innerText = `${document.getElementById('originInput').value} -> ${document.getElementById('destInput').value || '?'}`;
                 
-                // FUN WIDGETS CALCULATION
-                // 1. Music (Avg Album 45 mins. Avg speed 90km/h = 1.5 min/km)
-                const hours = km / 90;
-                const albums = Math.max(1, Math.round(hours / 0.75)); 
-                document.getElementById('vibe-music').innerText = albums + " Album";
+                // --- SMART INSIGHTS CALCULATIONS ---
+                // 1. Trees Saved (vs Diesel)
+                // Diesel CO2 ~ 120g/km * km. EV ~ 0 (simplified local emissions). 
+                // Tree absorption ~ 20kg/year -> ~55g/day. Let's say per trip "impact equivalent".
+                const co2SavedGrams = km * CONFIG.co2.diesel; 
+                // Visualizing: 1 Tree absorbs ~20,000g per year. 
+                // Logic: How many trees would need a WHOLE YEAR to absorb this trip's emissions if done in diesel?
+                const trees = (co2SavedGrams / CONFIG.co2.tree_absorption).toFixed(1); 
+                document.getElementById('vibe-trees').innerText = trees > 0.1 ? trees + " 🌳" : "< 1 🌳";
 
-                // 2. Coffee Index (Avg Cost of trip / 1.20)
-                const estCost = (km/100) * 6.5 * 1.7; // Avg generic cost
-                const coffees = Math.round(estCost / COFFEE_PRICE);
-                document.getElementById('vibe-coffee').innerText = coffees + " Caffè";
+                // 2. Flight Comparison
+                // Flight cost approx base + km rate.
+                const flightCost = (CONFIG.prices.flight_base + (km * CONFIG.prices.flight_km)).toFixed(0);
+                const driveCost = ((km/100)*16*CONFIG.prices.kwh_public).toFixed(0); // Avg EV public
+                
+                let flightMsg = "";
+                if(parseFloat(driveCost) < parseFloat(flightCost)) {
+                    flightMsg = `Risparmi €${flightCost - driveCost}`;
+                } else {
+                    flightMsg = `Aereo conviene`;
+                }
+                document.getElementById('vibe-flight-cost').innerText = flightMsg;
 
                 // Render Cars
-                const pPetrol = (km/100)*7.0*BASE_PRICES.petrol;
+                const pPetrol = (km/100)*7.0*CONFIG.prices.petrol;
                 renderCars(budget, km, pPetrol);
 
             }, 1000);
@@ -585,23 +704,24 @@
         function renderCars(budget, km, refPetrolPrice) {
             const container = document.getElementById('car-results');
             const homeCharge = document.getElementById('chargingInput').value === 'yes';
-            const validCars = CARS_DB.filter(c => c.price <= (budget * 1.3));
+            // Budget tolerance +30%
+            const validCars = CARS_DB.filter(c => c.price <= (budget * 1.3)).sort((a,b)=>a.price - b.price);
             
-            if(validCars.length === 0) { container.innerHTML = "<div style='grid-column:1/-1; text-align:center; padding:20px; color:var(--ios-text-sec)'>Nessun veicolo trovato.</div>"; return; }
+            if(validCars.length === 0) { container.innerHTML = "<div style='grid-column:1/-1; text-align:center; padding:20px; color:var(--ios-text-sec)'>Nessun veicolo trovato. Alza il budget.</div>"; return; }
 
             container.innerHTML = validCars.map((c) => {
                 let cost = 0;
                 if(c.type === 'Elettrica') {
-                    const rate = homeCharge ? BASE_PRICES.kwh_home : BASE_PRICES.kwh_public;
+                    const rate = homeCharge ? CONFIG.prices.kwh_home : CONFIG.prices.kwh_public;
                     cost = (km/100) * 16 * rate;
-                } else if(c.type === 'Diesel') cost = (km/100) * 5.5 * BASE_PRICES.diesel;
-                else cost = (km/100) * 7.0 * BASE_PRICES.petrol;
+                } else if(c.type === 'Diesel') cost = (km/100) * 5.5 * CONFIG.prices.diesel;
+                else cost = (km/100) * 7.0 * CONFIG.prices.petrol;
                 
                 const isRec = (c.type === 'Elettrica' && c.price <= budget);
                 const badge = isRec ? `<div class="badge-rec"><i class="ph-fill ph-star" style="color:#FF9500"></i> Consigliata</div>` : '';
 
                 return `
-                <div class="car-card" onclick="haptic(); openModal('${c.brand}', '${c.model}', ${c.price}, ${cost.toFixed(2)}, ${refPetrolPrice.toFixed(2)}, '${c.type}', ${c.range}, ${km})">
+                <div class="car-card" onclick="haptic(); openModal('${c.brand}', '${c.model}', ${c.price}, ${cost.toFixed(2)}, ${refPetrolPrice.toFixed(2)}, '${c.type}', ${c.range || 0}, ${km})">
                     ${badge}
                     <div class="car-img-box"><img src="${c.img}" class="car-img" loading="lazy"></div>
                     <div style="padding:15px;">
@@ -621,28 +741,21 @@
             document.getElementById('m-title').innerText = model;
             document.getElementById('m-price-tag').innerText = "€" + price.toLocaleString();
             
-            // 1. Fuel Cost
             document.getElementById('m-fuel').innerText = "€" + fuelCost;
             
-            // 2. Toll Cost (Highway)
-            const tollCost = (distance * TOLL_RATE).toFixed(2);
+            const tollCost = (distance * CONFIG.toll_rate).toFixed(2);
             document.getElementById('m-toll').innerText = "€" + tollCost;
 
-            // 3. EV Logic (Stops)
             const rowEv = document.getElementById('row-ev-stops');
             if(type === 'Elettrica') {
                 rowEv.style.display = 'flex';
-                // Logic: Buffer 20%. If distance > range*0.8, we need stops.
-                const effectiveRange = range * 0.8;
+                const effectiveRange = range * 0.8; // 80% real world
                 const stops = Math.max(0, Math.floor(distance / effectiveRange));
-                
-                if(stops === 0) document.getElementById('m-stops').innerText = "Nessuna (Autonomia OK)";
-                else document.getElementById('m-stops').innerText = stops + " Soste stimata/e";
+                document.getElementById('m-stops').innerText = stops === 0 ? "Nessuna" : stops + " Stops";
             } else {
                 rowEv.style.display = 'none';
             }
 
-            // 4. Savings Logic
             const savingsRow = document.getElementById('savings-row');
             if(type === 'Elettrica' && parseFloat(fuelCost) < parseFloat(refPetrol)) {
                 const save = parseFloat(refPetrol) - parseFloat(fuelCost);
@@ -650,7 +763,6 @@
                 document.getElementById('m-savings').innerText = "- €" + save.toFixed(2);
             } else { savingsRow.style.display = 'none'; }
 
-            // 5. Total
             const total = (parseFloat(fuelCost) + parseFloat(tollCost)).toFixed(2);
             document.getElementById('m-total').innerText = "€" + total;
 
@@ -669,12 +781,11 @@
         }
         function closeModal(e) { if(e.target.id === 'modal-overlay') forceCloseModal(); }
         
-        // Utils
         function getDistanceFromLatLonInKm(lat1,lon1,lat2,lon2) { var R=6371; var dLat=deg2rad(lat2-lat1); var dLon=deg2rad(lon2-lon1); var a=Math.sin(dLat/2)*Math.sin(dLat/2)+Math.cos(deg2rad(lat1))*Math.cos(deg2rad(lat2))*Math.sin(dLon/2)*Math.sin(dLon/2); var c=2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a)); return R*c*1.3; }
         function deg2rad(deg) { return deg*(Math.PI/180); }
-        async function resolveCity(name) { try { const res=await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(name)}&limit=1&countrycodes=it`); const data=await res.json(); if(data.length>0) return {lat:parseFloat(data[0].lat), lon:parseFloat(data[0].lon)}; } catch(e){} return null; }
+        async function resolveCity(name) { try { const res=await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(name)}&limit=1`); const data=await res.json(); if(data.length>0) return {lat:parseFloat(data[0].lat), lon:parseFloat(data[0].lon)}; } catch(e){} return null; }
         async function fetchRoute(start, end) { const res=await fetch(`https://router.project-osrm.org/route/v1/driving/${start.lon},${start.lat};${end.lon},${end.lat}?overview=full&geometries=geojson`); if(!res.ok) return null; const data=await res.json(); return data.routes[0]; }
-        function initAutocomplete(inputId, listId, isStart) { const inp=document.getElementById(inputId); const list=document.getElementById(listId); let timer; inp.addEventListener('focus', ()=>{ if(inp.value=='') showList(list, POPULAR_CITIES, inp, isStart, true); }); inp.addEventListener('input', ()=>{ clearTimeout(timer); if(inp.value.length<3){list.style.display='none'; return;} timer=setTimeout(async()=>{ try{ const res=await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(inp.value)}&limit=5&countrycodes=it`); const data=await res.json(); showList(list, data, inp, isStart, false); }catch(e){} },300); }); document.addEventListener('click', e=>{ if(e.target!==inp) list.style.display='none'; }); }
+        function initAutocomplete(inputId, listId, isStart) { const inp=document.getElementById(inputId); const list=document.getElementById(listId); let timer; inp.addEventListener('focus', ()=>{ if(inp.value=='') showList(list, POPULAR_CITIES, inp, isStart, true); }); inp.addEventListener('input', ()=>{ clearTimeout(timer); if(inp.value.length<3){list.style.display='none'; return;} timer=setTimeout(async()=>{ try{ const res=await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(inp.value)}&limit=5`); const data=await res.json(); showList(list, data, inp, isStart, false); }catch(e){} },300); }); document.addEventListener('click', e=>{ if(e.target!==inp) list.style.display='none'; }); }
         function showList(list, data, inp, isStart, isPop) { list.innerHTML=''; list.style.display='block'; data.forEach(d => { const div=document.createElement('div'); div.className='s-item'; div.innerText=isPop?d:d.display_name.split(',')[0]; div.onclick=()=>{ haptic(); inp.value=div.innerText; list.style.display='none'; if(isStart) window.startCoords=null; else window.endCoords=null; }; list.appendChild(div); }); }
     </script>
 </body>
