@@ -6,18 +6,17 @@
     
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="theme-color" content="#F2F2F7" media="(prefers-color-scheme: light)">
-    <meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)">
-    <title>AutoMatch Pro Ultimate</title>
+    <meta name="theme-color" content="#F2F2F7">
+    
+    <title>AutoMatch Pro</title>
     
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
     <style>
-        /* --- iOS 18 DESIGN TOKENS --- */
         :root {
-            --ios-blue: #007AFF;
+            --ios-accent: #007AFF;
             --ios-green: #34C759;
             --ios-orange: #FF9500;
             --ios-red: #FF3B30;
@@ -26,7 +25,7 @@
             --ios-card: rgba(255, 255, 255, 0.85);
             --ios-text: #000000;
             --ios-sub: #3C3C43;
-            --ios-blur: blur(30px);
+            --ios-blur: blur(35px);
             --ios-shadow: 0 8px 32px rgba(0,0,0,0.08);
             --spring: cubic-bezier(0.34, 1.56, 0.64, 1);
         }
@@ -40,177 +39,89 @@
         }
 
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        
-        body, html { 
-            margin: 0; padding: 0; height: 100%; 
-            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", Helvetica, Arial, sans-serif;
-            background: var(--ios-bg); color: var(--ios-text); 
-            overflow-x: hidden; scroll-behavior: smooth;
-        }
+        body, html { margin: 0; padding: 0; height: 100%; font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif; background: var(--ios-bg); color: var(--ios-text); overflow-x: hidden; scroll-behavior: smooth; }
 
-        /* SFONDO ANIMATO */
+        /* BACKGROUND */
         #wallpaper {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -10;
             background: radial-gradient(circle at 50% 0%, #a1c4fd 0%, #c2e9fb 50%, var(--ios-bg) 100%);
             opacity: 1; transition: opacity 0.5s;
         }
-        body.dark-mode #wallpaper { 
-            background: radial-gradient(circle at 50% 0%, #1a2a6c 0%, #000000 80%); 
-            opacity: 0.8; 
-        }
+        body.dark-mode #wallpaper { background: radial-gradient(circle at 50% 0%, #1a2a6c 0%, #000000 80%); opacity: 0.8; }
 
-        /* --- DYNAMIC ISLAND --- */
-        #island-wrap { 
-            position: fixed; top: -100px; left:0; width:100%; 
-            display:flex; justify-content:center; z-index:9999; 
-            transition: top 0.5s var(--spring); pointer-events:none; 
-        }
+        /* ISLAND */
+        #island-wrap { position: fixed; top: -100px; left:0; width:100%; display:flex; justify-content:center; z-index:9999; transition: top 0.5s var(--spring); pointer-events:none; }
         #island-wrap.show { top: 12px; }
-        
-        #dynamic-island { 
-            background: #000; color: #fff; padding: 0 25px; height: 46px; 
-            border-radius: 23px; display: flex; align-items: center; gap: 12px; 
-            box-shadow: 0 5px 20px rgba(0,0,0,0.3); pointer-events:auto; 
-            transform: scale(0.9); transition: transform 0.3s var(--spring); 
-        }
+        #dynamic-island { background: #000; color: #fff; padding: 0 25px; height: 46px; border-radius: 23px; display: flex; align-items: center; gap: 12px; box-shadow: 0 5px 20px rgba(0,0,0,0.3); pointer-events:auto; transform: scale(0.9); transition: transform 0.3s var(--spring); }
         #island-wrap.show #dynamic-island { transform: scale(1); }
         .di-msg { font-size: 0.9rem; font-weight: 600; white-space: nowrap; }
 
-        /* --- NAVBAR --- */
-        .nav-bar { 
-            position: fixed; top: 0; left: 0; width: 100%; height: 60px; padding: 0 20px; 
-            display: flex; justify-content: space-between; align-items: center; 
-            z-index: 2000; background: rgba(255,255,255,0.01); 
-            backdrop-filter: var(--ios-blur); -webkit-backdrop-filter: var(--ios-blur); 
-            border-bottom: 0.5px solid rgba(120,120,128,0.1); 
-        }
-        .logo { font-weight: 800; font-size: 1.4rem; display: flex; align-items: center; gap: 6px; cursor: pointer; letter-spacing: -0.5px; }
-        
-        .btn-scale { transition: transform 0.2s; cursor: pointer; }
-        .btn-scale:active { transform: scale(0.92); }
-        
-        .icon-btn { 
-            width: 38px; height: 38px; border-radius: 50%; 
-            display: flex; align-items: center; justify-content: center; 
-            background: rgba(120,120,128,0.15); font-size: 1.2rem; 
-            backdrop-filter: blur(10px); 
-        }
+        /* NAV */
+        .nav-bar { position: fixed; top: 0; left: 0; width: 100%; height: 60px; padding: 0 20px; display: flex; justify-content: space-between; align-items: center; z-index: 2000; background: rgba(255,255,255,0.01); backdrop-filter: var(--ios-blur); -webkit-backdrop-filter: var(--ios-blur); border-bottom: 0.5px solid rgba(120,120,128,0.1); }
+        .logo { font-weight: 800; font-size: 1.4rem; display: flex; align-items: center; gap: 6px; cursor: pointer; }
+        .icon-btn { width: 38px; height: 38px; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: rgba(120,120,128,0.15); font-size: 1.2rem; backdrop-filter: blur(10px); cursor: pointer; }
 
-        /* --- HOME (BENTO GRID) --- */
+        /* HOME */
         .bento-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; width: 100%; margin-top: 40px; }
-        .bento-card { 
-            background: var(--ios-card); backdrop-filter: blur(20px); border-radius: 24px; 
-            padding: 25px 20px; text-align: center; box-shadow: var(--ios-shadow); 
-            transition: 0.2s; border:1px solid rgba(255,255,255,0.2); 
-        }
-        .bento-card:hover { transform: scale(1.02); }
-        .bento-card.wide { 
-            grid-column: span 2; text-align: left; display: flex; 
-            justify-content: space-between; align-items: center; padding: 25px; 
-        }
+        .bento-card { background: var(--ios-card); backdrop-filter: blur(20px); border-radius: 24px; padding: 25px 20px; text-align: center; box-shadow: var(--ios-shadow); transition: 0.2s; border:1px solid rgba(255,255,255,0.2); cursor: pointer; }
+        .bento-card:active { transform: scale(0.96); }
+        .bento-card.wide { grid-column: span 2; text-align: left; display: flex; justify-content: space-between; align-items: center; padding: 25px; }
         .bento-icon { font-size: 2.2rem; color: var(--ios-blue); margin-bottom: 10px; }
         .bento-card.wide .bento-icon { margin-bottom: 0; font-size: 2.8rem; }
+        .btn-main { padding: 18px 40px; font-weight: 700; background: var(--ios-blue); color: #fff; border-radius: 40px; border:none; box-shadow: 0 10px 30px rgba(0, 122, 255, 0.4); font-size: 1.1rem; cursor: pointer; }
 
-        .btn-main { 
-            padding: 18px 40px; font-weight: 700; background: var(--ios-blue); color: #fff; 
-            border-radius: 40px; border:none; box-shadow: 0 10px 30px rgba(0, 122, 255, 0.4); font-size: 1.1rem; 
-        }
-
-        /* --- WIZARD & INPUTS --- */
-        #app-section { 
-            display: none; /* Hidden by default */
-            padding-top: 100px; padding-bottom: 100px; 
-            min-height: 100vh; flex-direction: column; align-items: center; 
-            opacity: 0; transition: 0.5s; z-index: 2; position: relative; 
-        }
+        /* WIZARD */
+        #app-section { display: none; padding-top: 100px; padding-bottom: 100px; min-height: 100vh; flex-direction: column; align-items: center; opacity: 0; transition: 0.3s; z-index: 2; position: relative; }
         .wizard-container { width: 100%; max-width: 600px; padding: 0 20px; }
         
         .step { display: none; animation: slideUp 0.4s var(--spring) forwards; }
         .step.active { display: block; }
         @keyframes slideUp { from {opacity:0; transform:translateY(30px);} to {opacity:1; transform:translateY(0);} }
 
-        .ios-list { 
-            background: var(--ios-card); border-radius: 18px; margin-bottom: 25px; 
-            box-shadow: var(--ios-shadow); position: relative; z-index: 10; backdrop-filter: blur(20px); 
-        }
+        .ios-list { background: var(--ios-card); border-radius: 18px; margin-bottom: 25px; box-shadow: var(--ios-shadow); position: relative; z-index: 10; backdrop-filter: blur(20px); }
         .ios-item { display: flex; align-items: center; padding: 18px 20px; border-bottom: 0.5px solid rgba(120,120,128,0.15); position: relative; }
         .ios-item:last-child { border-bottom: none; }
         .ios-item i { font-size: 1.4rem; color: var(--ios-blue); margin-right: 15px; width: 24px; text-align: center; }
         .ios-content { flex: 1; position: relative; }
-        
-        input, select { 
-            width: 100%; border: none; background: transparent; font-size: 1.1rem; 
-            color: var(--ios-text); outline: none; margin-top: 2px; 
-            font-family: inherit; font-weight: 500; 
-        }
+        input, select { width: 100%; border: none; background: transparent; font-size: 1.1rem; color: var(--ios-text); outline: none; margin-top: 2px; font-family: inherit; font-weight: 500; }
         label { font-size: 0.75rem; color: var(--ios-sub); font-weight: 700; text-transform: uppercase; display: block; margin-bottom: 4px; }
 
-        .suggestions { 
-            background: var(--ios-card); border-radius: 16px; position: absolute; 
-            top: 100%; left: -20px; width: calc(100% + 40px); max-height: 250px; 
-            overflow-y: auto; display: none; box-shadow: 0 15px 40px rgba(0,0,0,0.2); 
-            z-index: 9999; margin-top: 10px; backdrop-filter: blur(30px); 
-        }
-        .s-item { padding: 15px 20px; border-bottom: 0.5px solid rgba(120,120,128,0.1); cursor: pointer; transition: background 0.1s; }
-        .s-item:active { background: rgba(120,120,128,0.1); }
+        .suggestions { background: var(--ios-card); border-radius: 16px; position: absolute; top: 100%; left: -20px; width: calc(100% + 40px); max-height: 250px; overflow-y: auto; display: none; box-shadow: 0 15px 40px rgba(0,0,0,0.2); z-index: 9999; margin-top: 10px; backdrop-filter: blur(30px); }
+        .s-item { padding: 15px 20px; border-bottom: 0.5px solid rgba(120,120,128,0.1); cursor: pointer; }
         .s-pop { float: right; font-size: 0.7rem; color: var(--ios-blue); background: rgba(0,122,255,0.1); padding: 2px 6px; border-radius: 6px; font-weight: 600; }
 
-        .status-badge { 
-            font-size:0.75rem; font-weight:700; color:var(--ios-green); 
-            background:rgba(52, 199, 89, 0.15); padding:5px 12px; border-radius:20px; 
-            display:flex; align-items:center; gap:6px; 
-        }
+        .status-badge { font-size:0.75rem; font-weight:700; color:var(--ios-green); background:rgba(52, 199, 89, 0.15); padding:5px 12px; border-radius:20px; display:flex; align-items:center; gap:6px; }
         .status-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--ios-green); box-shadow: 0 0 8px var(--ios-green); animation: pulse 2s infinite; }
         @keyframes pulse { 0%{opacity:1} 50%{opacity:0.5} 100%{opacity:1} }
 
-        .btn-pri { background: var(--ios-blue); color: #fff; padding: 16px; border-radius: 16px; width: 100%; border:none; font-weight: 600; font-size: 1rem; }
-        .btn-sec { background: rgba(120,120,128,0.1); color: var(--ios-blue); padding: 16px; border-radius: 16px; width: 100%; border:none; font-weight: 600; }
+        .btn-pri { background: var(--ios-blue); color: #fff; padding: 16px; border-radius: 16px; width: 100%; border:none; font-weight: 600; font-size: 1rem; cursor: pointer; transition: 0.2s; }
+        .btn-pri:active { transform: scale(0.96); opacity: 0.9; }
+        .btn-sec { background: rgba(120,120,128,0.1); color: var(--ios-blue); padding: 16px; border-radius: 16px; width: 100%; border:none; font-weight: 600; cursor: pointer; }
 
-        /* --- RESULTS --- */
-        #results-container { 
-            width: 100%; max-width: 1000px; display: none; 
-            padding: 0 20px 80px 20px; position: relative; z-index: 2; 
-        }
-        .map-box { 
-            height: 350px; border-radius: 24px; overflow: hidden; margin-bottom: 20px; 
-            position: relative; z-index: 1; box-shadow: var(--ios-shadow); background: #eee; 
-        }
+        /* RESULTS */
+        #results-container { width: 100%; max-width: 1000px; display: none; padding: 0 20px 80px 20px; position: relative; z-index: 2; opacity: 0; transition: opacity 0.5s; }
+        .map-box { height: 350px; border-radius: 24px; overflow: hidden; margin-bottom: 20px; position: relative; z-index: 1; box-shadow: var(--ios-shadow); background: #eee; }
         #map { width: 100%; height: 100%; }
         
-        .trans-card { 
-            background: var(--ios-card); backdrop-filter: blur(20px); padding: 20px; 
-            border-radius: 22px; display: flex; align-items: center; justify-content: space-between; 
-            margin-bottom: 12px; box-shadow: var(--ios-shadow); cursor: pointer; transition: 0.2s; 
-        }
+        .trans-card { background: var(--ios-card); backdrop-filter: blur(20px); padding: 20px; border-radius: 22px; display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; box-shadow: var(--ios-shadow); cursor: pointer; transition: 0.2s; }
+        .trans-card:active { transform: scale(0.98); }
         .weather-card { background: linear-gradient(135deg, #007AFF, #5856D6); color: white; position: relative; overflow: hidden; border:none; }
         .weather-bg { position: absolute; top: -20px; right: -20px; font-size: 8rem; opacity: 0.2; transform: rotate(10deg); }
 
         .car-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 15px; margin-top: 15px; }
-        .car-card { background: var(--ios-card); border-radius: 20px; overflow: hidden; box-shadow: var(--ios-shadow); cursor: pointer; position: relative; }
+        .car-card { background: var(--ios-card); border-radius: 20px; overflow: hidden; box-shadow: var(--ios-shadow); cursor: pointer; position: relative; transition: 0.2s; }
+        .car-card:active { transform: scale(0.96); }
         .car-img { width: 100%; height: 160px; object-fit: cover; }
         .car-badge { position: absolute; top:10px; right:10px; background:rgba(255,255,255,0.9); padding:4px 10px; border-radius:20px; font-size:0.75rem; font-weight:800; color:var(--ios-blue); backdrop-filter:blur(10px); }
 
-        /* --- MODALS --- */
-        .overlay { 
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
-            background: rgba(0,0,0,0.4); backdrop-filter: blur(15px); 
-            z-index: 4000; display: none; align-items: flex-end; justify-content: center; 
-            opacity: 0; transition: opacity 0.3s; 
-        }
+        /* MODALS */
+        .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); backdrop-filter: blur(15px); z-index: 4000; display: none; align-items: flex-end; justify-content: center; opacity: 0; transition: opacity 0.3s; }
         .overlay.center { align-items: center; }
-        .sheet { 
-            background: var(--ios-card); width: 100%; max-width: 600px; 
-            border-radius: 35px 35px 0 0; padding: 35px 30px 50px 30px; 
-            transform: translateY(100%); transition: transform 0.5s var(--spring); 
-            box-shadow: 0 -10px 50px rgba(0,0,0,0.2); 
-        }
-        .popup { 
-            background: var(--ios-card); width: 85%; max-width: 320px; 
-            border-radius: 26px; padding: 30px; transform: scale(0.8); opacity: 0; 
-            transition: 0.4s var(--spring); text-align: center; 
-        }
+        .sheet { background: var(--ios-card); width: 100%; max-width: 600px; border-radius: 35px 35px 0 0; padding: 35px 30px 50px 30px; transform: translateY(100%); transition: transform 0.5s var(--spring); box-shadow: 0 -10px 50px rgba(0,0,0,0.2); }
+        .popup { background: var(--ios-card); width: 85%; max-width: 320px; border-radius: 26px; padding: 30px; transform: scale(0.8); opacity: 0; transition: 0.4s var(--spring); text-align: center; }
         .handle { width: 45px; height: 5px; background: rgba(120,120,128,0.3); border-radius: 3px; margin: 0 auto 30px auto; }
         .list-btn { display: flex; align-items: center; gap: 15px; width: 100%; padding: 16px; margin-bottom: 8px; border-radius: 16px; background: rgba(120,120,128,0.08); text-align: left; font-weight: 600; font-size: 1.05rem; border: none; cursor: pointer; color: var(--ios-text); }
+        
         .ios-switch { appearance: none; width: 50px; height: 30px; background: #e9e9ea; border-radius: 25px; position: relative; outline:none; transition:0.3s; cursor: pointer; }
         .ios-switch:checked { background: var(--ios-blue); }
         .ios-switch::after { content: ''; position: absolute; top: 2px; left: 2px; width: 26px; height: 26px; border-radius: 50%; background: white; transition: 0.3s var(--spring); box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
@@ -221,16 +132,16 @@
 
     <div id="wallpaper" class="ios-wallpaper"></div>
 
-    <div id="island-wrap"><div id="dynamic-island"><i class="ph-bold ph-bell di-icon"></i><span id="di-msg" class="di-msg">Avviso</span></div></div>
+    <div id="island-wrap"><div id="dynamic-island"><i class="ph-bold ph-bell di-icon" style="font-size:1.2rem;"></i><span id="di-msg" class="di-msg">Avviso</span></div></div>
 
     <nav class="nav-bar">
-        <div class="logo btn-scale" onclick="location.reload()">
+        <div class="logo" onclick="location.reload()">
             <i class="ph-fill ph-steering-wheel" style="color:var(--ios-blue); font-size:1.5rem;"></i>
             <span style="font-size:1.2rem;">AutoMatch</span>
         </div>
         <div style="display:flex; gap:10px;">
-            <div class="icon-btn btn-scale" onclick="openShare()"><i class="ph-bold ph-share-network"></i></div>
-            <div class="icon-btn btn-scale" onclick="toggleSettings()"><i class="ph-fill ph-gear"></i></div>
+            <div class="icon-btn" onclick="openShare()"><i class="ph-bold ph-share-network"></i></div>
+            <div class="icon-btn" onclick="toggleSettings()"><i class="ph-fill ph-gear"></i></div>
         </div>
     </nav>
 
@@ -239,14 +150,11 @@
             <span style="color:var(--ios-blue); font-weight:700; letter-spacing:1px; font-size:0.8rem; text-transform:uppercase; margin-bottom:15px; display:block; opacity:0.8;" data-key="hero_tag">iOS 26 Concept</span>
             <h1 style="font-size:3.5rem; line-height:1; margin-bottom:20px;" data-key="hero_title">Viaggia nel<br>Futuro.</h1>
             <p style="color:var(--ios-sub); font-size:1.2rem; margin-bottom:40px;" data-key="hero_sub">Confronta Auto, Treno e Aereo in tempo reale.</p>
-            <button class="btn-main btn-scale" onclick="goToApp()" data-key="btn_start">Inizia Ora</button>
+            <button class="btn-main" onclick="goToApp()" data-key="btn_start">Inizia Ora</button>
             
             <div class="bento-grid">
                 <div class="bento-card wide">
-                    <div>
-                        <div style="font-weight:700; font-size:1.2rem; margin-bottom:5px;">Smart Map</div>
-                        <div style="font-size:0.9rem; color:var(--ios-sub);">Analisi traffico e pedaggi.</div>
-                    </div>
+                    <div><div style="font-weight:700; font-size:1.2rem; margin-bottom:5px;">Smart Map</div><div style="font-size:0.9rem; color:var(--ios-sub);">Analisi traffico e pedaggi.</div></div>
                     <i class="ph-fill ph-map-trifold bento-icon"></i>
                 </div>
                 <div class="bento-card"><i class="ph-fill ph-train bento-icon" style="color:#AF52DE"></i><b data-key="card_train">Treni</b></div>
@@ -261,10 +169,10 @@
             <div class="step active" id="step-mode">
                 <h2 style="text-align:center; margin-bottom:30px;" data-key="mode_title">Come ti sposti?</h2>
                 <div style="display:grid; grid-template-columns:1fr 1fr; gap:15px;">
-                    <div class="bento-card btn-scale" onclick="selectMode('car')">
+                    <div class="bento-card" onclick="selectMode('car')">
                         <i class="ph-fill ph-car bento-icon" style="color:var(--ios-blue)"></i><div style="font-weight:700;" data-key="mode_car">Guido Io</div>
                     </div>
-                    <div class="bento-card btn-scale" onclick="selectMode('public')">
+                    <div class="bento-card" onclick="selectMode('public')">
                         <i class="ph-fill ph-train bento-icon" style="color:#AF52DE"></i><div style="font-weight:700;" data-key="mode_pub">Mezzi</div>
                     </div>
                 </div>
@@ -298,8 +206,8 @@
                     </div>
                 </div>
                 <div style="display:flex; gap:10px;">
-                    <button class="btn-sec btn-scale" onclick="prevStep('mode')" data-key="btn_back">Indietro</button>
-                    <button class="btn-pri btn-scale" onclick="validateStep1()" data-key="btn_next">Avanti</button>
+                    <button class="btn-sec" onclick="prevStep('mode')" data-key="btn_back">Indietro</button>
+                    <button class="btn-pri" onclick="validateStep1()" data-key="btn_next">Avanti</button>
                 </div>
             </div>
 
@@ -310,8 +218,8 @@
                     <div class="ios-item"><i class="ph-fill ph-house-line"></i><div class="ios-content"><label data-key="lbl_garage">Garage?</label><select id="chargingInput"><option value="no">No</option><option value="yes">Sì</option></select></div></div>
                 </div>
                 <div style="display:flex; gap:10px;">
-                    <button class="btn-sec btn-scale" onclick="prevStep(1)" data-key="btn_back">Indietro</button>
-                    <button class="btn-pri btn-scale" onclick="nextStep(3)" data-key="btn_next">Avanti</button>
+                    <button class="btn-sec" onclick="prevStep(1)" data-key="btn_back">Indietro</button>
+                    <button class="btn-pri" onclick="nextStep(3)" data-key="btn_next">Avanti</button>
                 </div>
             </div>
 
@@ -322,8 +230,8 @@
                     <div class="ios-item" id="budgetRow" style="display:none;"><div class="ios-content"><label>Budget (€)</label><input type="number" id="budgetInput" value="35000"></div></div>
                 </div>
                 <div style="display:flex; gap:10px;">
-                    <button class="btn-sec btn-scale" onclick="prevStep(2)" data-key="btn_back">Indietro</button>
-                    <button class="btn-pri btn-scale" onclick="runAnalysis()" data-key="btn_calc">Calcola</button>
+                    <button class="btn-sec" onclick="prevStep(2)" data-key="btn_back">Indietro</button>
+                    <button class="btn-pri" onclick="runAnalysis()" data-key="btn_calc">Calcola</button>
                 </div>
             </div>
         </div>
@@ -331,7 +239,7 @@
         <div id="results-container">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
                 <h2 data-key="res_title">Risultati</h2>
-                <button class="icon-btn btn-scale" onclick="location.reload()"><i class="ph-bold ph-arrow-counter-clockwise"></i></button>
+                <button class="icon-btn" onclick="location.reload()"><i class="ph-bold ph-arrow-counter-clockwise"></i></button>
             </div>
             
             <div class="map-box"><div id="map"></div></div>
@@ -358,7 +266,6 @@
                     </div>
                     <div style="font-weight:700; font-size:1.2rem;" id="drive-cost">--</div>
                 </div>
-                
                 <div id="car-buy-section" style="display:none; margin-top:30px;">
                     <h3 style="margin-bottom:15px;" data-key="rec_cars">Auto Consigliate</h3>
                     <div id="car-grid" class="car-grid"></div>
@@ -367,14 +274,14 @@
 
             <div id="res-public" style="display:none;">
                 <h3 style="margin-bottom:15px; font-size:0.9rem; text-transform:uppercase; color:var(--ios-sub);">Opzioni Migliori</h3>
-                <div class="trans-card btn-scale" onclick="openLink('train')">
+                <div class="trans-card" onclick="openLink('train')">
                     <div style="display:flex; align-items:center; gap:15px;">
                         <div style="background:#F2E6FF; width:45px; height:45px; border-radius:12px; display:flex; align-items:center; justify-content:center; color:#AF52DE;"><i class="ph-fill ph-train" style="font-size:1.5rem;"></i></div>
                         <div><div style="font-weight:700;">Treno</div><div style="font-size:0.85rem; color:var(--ios-sub);" id="train-time">--</div></div>
                     </div>
                     <div style="text-align:right;"><div style="font-weight:700; font-size:1.1rem;" id="train-cost">--</div><small style="color:var(--ios-blue);">Orari ›</small></div>
                 </div>
-                <div class="trans-card btn-scale" onclick="openLink('plane')" id="card-plane">
+                <div class="trans-card" onclick="openLink('plane')">
                     <div style="display:flex; align-items:center; gap:15px;">
                         <div style="background:#FFF3E0; width:45px; height:45px; border-radius:12px; display:flex; align-items:center; justify-content:center; color:#FF9500;"><i class="ph-fill ph-airplane-tilt" style="font-size:1.5rem;"></i></div>
                         <div><div style="font-weight:700;">Aereo</div><div style="font-size:0.85rem; color:var(--ios-sub);" id="plane-time">--</div></div>
@@ -414,7 +321,7 @@
             <div style="background:rgba(120,120,128,0.05); padding:25px; border-radius:20px; text-align:center;">
                 <label data-key="m_total">Costo Viaggio</label><div id="m-total" style="font-size:2.5rem; font-weight:800; letter-spacing:-1px;">--</div>
             </div>
-            <button class="btn-sec btn-scale" style="margin-top:20px;" onclick="closeModal('car')" data-key="close">Chiudi</button>
+            <button class="btn-sec" style="margin-top:20px; width:100%; font-weight:600;" onclick="closeModal('car')" data-key="close">Chiudi</button>
         </div>
     </div>
 
@@ -423,20 +330,31 @@
             <div class="handle"></div><h3 style="text-align:center; margin-bottom:20px;" data-key="share_title">Condividi</h3>
             <button class="list-btn" onclick="shareWa()"><i class="ph-fill ph-whatsapp-logo" style="color:#25D366; font-size:1.5rem;"></i> WhatsApp</button>
             <button class="list-btn" onclick="shareMail()"><i class="ph-fill ph-envelope-simple" style="color:#007AFF; font-size:1.5rem;"></i> Email</button>
-            <button class="btn-sec btn-scale" style="margin-top:20px;" onclick="closeModal('share')" data-key="close">Annulla</button>
+            <button class="btn-sec" style="margin-top:20px; width:100%; font-weight:600;" onclick="closeModal('share')" data-key="close">Annulla</button>
         </div>
     </div>
 
     <script>
-        // --- DATA ---
+        // --- DATABASE CITTÀ (FAIL-SAFE) ---
         const LOCALS={"Roma":{lat:41.9028,lon:12.4964},"Milano":{lat:45.4642,lon:9.1900},"Napoli":{lat:40.8518,lon:14.2681},"Torino":{lat:45.0703,lon:7.6869},"Bologna":{lat:44.4949,lon:11.3426},"Firenze":{lat:43.7696,lon:11.2558},"Venezia":{lat:45.4408,lon:12.3155},"Bari":{lat:41.1171,lon:16.8719},"Parigi":{lat:48.8566,lon:2.3522},"Londra":{lat:51.5074,lon:-0.1278},"Madrid":{lat:40.4168,lon:-3.7038},"Berlino":{lat:52.5200,lon:13.4050}};
         const CITIES = Object.keys(LOCALS);
-        const CARS=[{b:"Tesla",m:"Model 3",p:42990,t:"Elettrica",i:"https://upload.wikimedia.org/wikipedia/commons/thumb/8/82/2019_Tesla_Model_3_Long_Range_AWD_Front.jpg/800px-2019_Tesla_Model_3_Long_Range_AWD_Front.jpg"},{b:"Fiat",m:"500e",p:29950,t:"Elettrica",i:"https://upload.wikimedia.org/wikipedia/commons/thumb/7/7f/Fiat_500_Electric_La_Prima_Genf_2020_1X7A5372.jpg/800px-Fiat_500_Electric_La_Prima_Genf_2020_1X7A5372.jpg"},{b:"VW",m:"Golf 8",p:34500,t:"Diesel",i:"https://upload.wikimedia.org/wikipedia/commons/thumb/c/c9/2020_Volkswagen_Golf_Style_2.0_Front.jpg/800px-2020_Volkswagen_Golf_Style_2.0_Front.jpg"},{b:"Jeep",m:"Avenger",p:24300,t:"Benzina",i:"https://upload.wikimedia.org/wikipedia/commons/thumb/2/27/Jeep_Avenger_1.2_Turbo_Summit_%E2%80%93_f_%E2%80%93_16042023.jpg/800px-Jeep_Avenger_1.2_Turbo_Summit_%E2%80%93_f_%E2%80%93_16042023.jpg"},{b:"MG",m:"MG4",p:30790,t:"Elettrica",i:"https://upload.wikimedia.org/wikipedia/commons/thumb/6/64/MG4_EV_Dabok.jpg/800px-MG4_EV_Dabok.jpg"},{b:"Audi",m:"Q4",p:56000,t:"Elettrica",i:"https://upload.wikimedia.org/wikipedia/commons/thumb/5/59/Audi_Q4_e-tron_IMG_4803.jpg/800px-Audi_Q4_e-tron_IMG_4803.jpg"}];
         
+        // --- DATABASE AUTO ---
+        const CARS=[
+            {b:"Tesla",m:"Model 3",p:42990,t:"Elettrica",i:"https://upload.wikimedia.org/wikipedia/commons/thumb/8/82/2019_Tesla_Model_3_Long_Range_AWD_Front.jpg/800px-2019_Tesla_Model_3_Long_Range_AWD_Front.jpg"},
+            {b:"Fiat",m:"500e",p:29950,t:"Elettrica",i:"https://upload.wikimedia.org/wikipedia/commons/thumb/7/7f/Fiat_500_Electric_La_Prima_Genf_2020_1X7A5372.jpg/800px-Fiat_500_Electric_La_Prima_Genf_2020_1X7A5372.jpg"},
+            {b:"VW",m:"Golf 8",p:34500,t:"Diesel",i:"https://upload.wikimedia.org/wikipedia/commons/thumb/c/c9/2020_Volkswagen_Golf_Style_2.0_Front.jpg/800px-2020_Volkswagen_Golf_Style_2.0_Front.jpg"},
+            {b:"Jeep",m:"Avenger",p:24300,t:"Benzina",i:"https://upload.wikimedia.org/wikipedia/commons/thumb/2/27/Jeep_Avenger_1.2_Turbo_Summit_%E2%80%93_f_%E2%80%93_16042023.jpg/800px-Jeep_Avenger_1.2_Turbo_Summit_%E2%80%93_f_%E2%80%93_16042023.jpg"},
+            {b:"MG",m:"MG4",p:30790,t:"Elettrica",i:"https://upload.wikimedia.org/wikipedia/commons/thumb/6/64/MG4_EV_Dabok.jpg/800px-MG4_EV_Dabok.jpg"},
+            {b:"Audi",m:"Q4",p:56000,t:"Elettrica",i:"https://upload.wikimedia.org/wikipedia/commons/thumb/5/59/Audi_Q4_e-tron_IMG_4803.jpg/800px-Audi_Q4_e-tron_IMG_4803.jpg"}
+        ];
+        
+        // --- TRADUZIONI ---
         const STRINGS={it:{hero_tag:"iOS 26 Concept",hero_title:"Viaggia nel<br>Futuro.",hero_sub:"Confronta Auto, Treno e Aereo.",btn_start:"Inizia Ora",card_train:"Treni",card_eco:"Eco",mode_title:"Come ti sposti?",mode_car:"Guido Io",mode_pub:"Mezzi",s1_title:"Il Viaggio",lbl_from:"Partenza",lbl_to:"Destinazione",btn_back:"Indietro",btn_next:"Avanti",s2_title:"Info Auto",lbl_km:"Km Totali",lbl_garage:"Garage?",s3_title:"Opzioni",lbl_buy:"Cerco auto nuova",btn_calc:"Calcola",res_title:"Risultati",w_weather:"Meteo",w_eco:"Eco Impact",rec_cars:"Auto Consigliate",m_fuel:"Costo Carburante",m_toll:"Pedaggio",m_total:"Costo Viaggio",share_title:"Condividi",close:"Chiudi",settings:"Impostazioni"},en:{hero_tag:"iOS 26 Concept",hero_title:"Travel to<br>Future.",hero_sub:"Compare Car, Train, Plane.",btn_start:"Start Now",card_train:"Trains",card_eco:"Eco",mode_title:"Your Mode?",mode_car:"I Drive",mode_pub:"Public",s1_title:"The Trip",lbl_from:"Start",lbl_to:"Destination",btn_back:"Back",btn_next:"Next",s2_title:"Car Info",lbl_km:"Total Km",lbl_garage:"Garage?",s3_title:"Options",lbl_buy:"Buying new car",btn_calc:"Calculate",res_title:"Results",w_weather:"Weather",w_eco:"Eco Impact",rec_cars:"Recommended",m_fuel:"Fuel Cost",m_toll:"Toll",m_total:"Total Cost",share_title:"Share",close:"Close",settings:"Settings"},es:{hero_tag:"iOS 26 Concept",hero_title:"Viaja al<br>Futuro.",hero_sub:"Compara Auto, Tren, Avión.",btn_start:"Empezar",card_train:"Trenes",card_eco:"Eco",mode_title:"¿Tu Modo?",mode_car:"Conduzco",mode_pub:"Público",s1_title:"El Viaje",lbl_from:"Salida",lbl_to:"Destino",btn_back:"Atrás",btn_next:"Siguiente",s2_title:"Info Auto",lbl_km:"Km Totales",lbl_garage:"¿Garaje?",s3_title:"Opciones",lbl_buy:"Compro auto nuevo",btn_calc:"Calcular",res_title:"Resultados",w_weather:"Clima",w_eco:"Impacto Eco",rec_cars:"Recomendados",m_fuel:"Combustible",m_toll:"Peaje",m_total:"Costo Total",share_title:"Compartir",close:"Cerrar",settings:"Ajustes"}};
-        let curLang='it'; let state={mode:'car',start:null,end:null,km:0,geo:null};
+        let curLang='it'; 
+        let state={mode:'car',start:null,end:null,km:0,geo:null};
 
-        // --- ISLAND ---
+        // --- SISTEMA DYNAMIC ISLAND ---
         function notify(msg, type='neutral') {
             const w=document.getElementById('island-wrap'), d=document.getElementById('dynamic-island');
             const icon = type==='error'?'ph-warning-circle':(type==='success'?'ph-check-circle':'ph-info');
@@ -454,20 +372,18 @@
             L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png').addTo(map);
             window.map = map; window.markers = L.layerGroup().addTo(map); window.route = L.layerGroup().addTo(map);
             
+            document.addEventListener('click', e => { if(!e.target.closest('.ios-content')) document.querySelectorAll('.suggestions').forEach(s=>s.style.display='none'); });
+            
             // Check Server Status
             fetch('https://nominatim.openstreetmap.org/search?q=Rome&format=json').then(r=>{
                 if(r.ok) {
-                    const badge = document.getElementById('server-status');
-                    badge.innerHTML='<span class="status-dot"></span> Online';
-                    badge.style.color='var(--ios-green)';
+                    document.getElementById('server-status').innerHTML='<span class="status-dot"></span> Online';
+                    document.getElementById('server-status').style.color='var(--ios-green)';
                 }
             }).catch(()=>{
-                const badge = document.getElementById('server-status');
-                badge.innerHTML='<span class="status-dot" style="background:var(--ios-red);box-shadow:none;"></span> Offline';
-                badge.style.color='var(--ios-red)';
+                document.getElementById('server-status').innerHTML='<span class="status-dot" style="background:var(--ios-red);box-shadow:none;"></span> Offline';
+                document.getElementById('server-status').style.color='var(--ios-red)';
             });
-
-            document.addEventListener('click', e => { if(!e.target.closest('.ios-content')) document.querySelectorAll('.suggestions').forEach(s=>s.style.display='none'); });
         }
 
         // --- LANG & SETTINGS ---
@@ -519,12 +435,11 @@
             
             notify("Cerco Percorso...");
             
-            // Risoluzione Parallela
+            // Resolve Coordinates (Parallel)
             state.start = await resolveCitySafe(o);
             if(d) state.end = await resolveCitySafe(d);
             
             if(state.end) {
-                // Tenta Routing OSRM, fallback su calcolo matematico
                 try {
                     const r = await fetch(`https://router.project-osrm.org/route/v1/driving/${state.start.lon},${state.start.lat};${state.end.lon},${state.end.lat}?overview=full`);
                     const json = await r.json();
@@ -535,21 +450,17 @@
                 } catch { 
                     state.km = Math.round(dist(state.start, state.end)); 
                     state.geo = null; 
-                    notify("Modalità Stima Attiva", "neutral");
+                    notify("Stima Attiva", "neutral");
                 }
                 document.getElementById('kmInput').value = state.km;
             } else if(d) {
-                // Critical Fallback: User typed destination but API failed to find coords.
-                // We let them pass but they MUST enter KM manually.
                 notify("Città non trovata, inserisci KM manualmente", "error");
             }
             
-            // Logic Split
-            if(state.mode === 'public') runAnalysis();
-            else nextStep(2);
+            state.mode === 'public' ? runAnalysis() : nextStep(2);
         }
 
-        async function runAnalysis() {
+        function runAnalysis() {
             // FIX: If CAR mode, prioritize manual input. If PUBLIC, prioritize calculated.
             let km = state.km;
             if(state.mode === 'car') {
@@ -559,11 +470,16 @@
             
             if(!km || isNaN(km) || km <= 0) return notify("Inserisci KM validi", "error");
 
-            document.getElementById('app-section').style.display='none'; // Nasconde wizard
-            document.getElementById('results-container').style.display='block'; // Mostra risultati
-            
-            // Map Drawing (Fail-safe)
+            // CRITICAL: Hide wizard and show results immediately
+            document.getElementById('app-section').style.opacity = '0';
             setTimeout(() => {
+                document.getElementById('app-section').style.display = 'none';
+                const results = document.getElementById('results-container');
+                results.style.display = 'block';
+                // Trigger opacity fade in after display block
+                setTimeout(() => { results.style.opacity = '1'; }, 50);
+                
+                // Map Drawing
                 window.map.invalidateSize(); window.markers.clearLayers(); window.route.clearLayers();
                 if(state.start && state.end) {
                     L.polyline([state.start, state.end], {color:'#007AFF', dashArray: state.geo?null:'10,10', weight:4}).addTo(window.route);
@@ -572,7 +488,7 @@
                 }
             }, 300);
 
-            // Async Weather (Don't await)
+            // Weather Async
             if(state.end) {
                 fetch(`https://api.open-meteo.com/v1/forecast?latitude=${state.end.lat}&longitude=${state.end.lon}&current_weather=true`)
                 .then(r=>r.json()).then(d=>{ document.getElementById('w-temp').innerText = Math.round(d.current_weather.temperature)+"°"; })
@@ -580,14 +496,12 @@
             }
 
             document.getElementById('t-km').innerText = km + " km";
-            // Eco Logic: 120g CO2/km diesel. Tree absorbs 20kg/year.
-            const trees = ((km * 120) / 20000).toFixed(1);
-            document.getElementById('si-tree').innerText = trees > 0.1 ? trees + " Alb." : "< 1 Alb.";
+            document.getElementById('si-tree').innerText = ((km * 120) / 20000).toFixed(1) + " Alb.";
 
-            // Render Results based on Mode
+            // Show correct section
             if(state.mode === 'car') {
-                document.getElementById('res-car').style.display = 'block';
-                document.getElementById('res-public').style.display = 'none';
+                document.getElementById('res-car').style.display='block';
+                document.getElementById('res-public').style.display='none';
                 
                 const cost = ((km/100)*6.5*1.8 + (km*0.075)).toFixed(0);
                 document.getElementById('drive-cost').innerText = "€" + cost;
@@ -595,7 +509,7 @@
                 if(document.getElementById('buyToggle').checked) {
                     const budget = parseFloat(document.getElementById('budgetInput').value);
                     const grid = document.getElementById('car-grid');
-                    document.getElementById('car-buy-section').style.display = 'block';
+                    document.getElementById('car-buy-section').style.display='block';
                     grid.innerHTML = CARS.filter(c => c.p <= budget * 1.3).map(c => {
                         const fc = (c.t === 'Elettrica') ? (km/100)*16*0.6 : (km/100)*6*1.8;
                         return `<div class="car-card" onclick="openCarModal('${c.b}','${c.m}',${c.p},${fc.toFixed(0)},${km})">
@@ -604,10 +518,12 @@
                             <div style="padding:15px;"><b>${c.b} ${c.m}</b><br><small style="color:var(--ios-sub)">€${c.p.toLocaleString()}</small></div>
                         </div>`
                     }).join('') || "<p style='text-align:center; color:#999;'>Nessuna auto trovata nel budget.</p>";
+                } else {
+                    document.getElementById('car-buy-section').style.display='none';
                 }
             } else {
-                document.getElementById('res-public').style.display = 'block';
-                document.getElementById('res-car').style.display = 'none';
+                document.getElementById('res-public').style.display='block';
+                document.getElementById('res-car').style.display='none';
                 
                 const tCost = (km * 0.15).toFixed(0);
                 document.getElementById('train-cost').innerText = "€" + tCost;
@@ -622,13 +538,12 @@
 
         // --- MODALS & SHARE ---
         function openCarModal(b, m, p, f, k) {
-            document.getElementById('m-brand').innerText = b;
-            document.getElementById('m-model').innerText = m;
+            document.getElementById('m-brand').innerText = b; document.getElementById('m-model').innerText = m;
             document.getElementById('m-price').innerText = "€" + p.toLocaleString();
             document.getElementById('m-fuel').innerText = "€" + f;
             const t = (k * 0.075).toFixed(0);
             document.getElementById('m-toll').innerText = "€" + t;
-            document.getElementById('m-total').innerText = "€" + (parseFloat(f) + parseFloat(t)).toFixed(0);
+            document.getElementById('m-total').innerText = "€" + (parseFloat(f)+parseFloat(t)).toFixed(0);
             openModal('car');
         }
         
