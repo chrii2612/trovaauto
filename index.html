@@ -8,21 +8,21 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="theme-color" content="#F2F2F7" media="(prefers-color-scheme: light)">
     
-    <title>AutoMatch iOS 26</title>
+    <title>AutoMatch Infinite</title>
     
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
     <style>
+        /* --- iOS 26 SYSTEM --- */
         :root {
             --ios-accent: #007AFF;
             --ios-bg: #F2F2F7;
             --ios-card: #FFFFFF;
             --ios-text: #000000;
             --ios-sub: #8E8E93;
-            --ios-blur: blur(25px);
-            --ios-shadow: 0 8px 30px rgba(0,0,0,0.06);
+            --ios-blur: blur(30px);
             --spring: cubic-bezier(0.34, 1.56, 0.64, 1);
         }
 
@@ -31,51 +31,58 @@
             --ios-card: #1C1C1E;
             --ios-text: #FFFFFF;
             --ios-sub: #98989D;
-            --ios-shadow: 0 8px 30px rgba(0,0,0,0.4);
         }
 
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        body, html { margin: 0; padding: 0; height: 100%; font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", Roboto, sans-serif; background: var(--ios-bg); color: var(--ios-text); overflow-x: hidden; scroll-behavior: smooth; }
-        
-        /* DYNAMIC ISLAND (Hidden by default) */
+        body, html { margin: 0; padding: 0; height: 100%; font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif; background: var(--ios-bg); color: var(--ios-text); overflow-x: hidden; scroll-behavior: smooth; }
+
+        /* ISLAND */
         #island-wrap { position: fixed; top: -100px; left:0; width:100%; display:flex; justify-content:center; z-index:9999; transition: top 0.5s var(--spring); pointer-events:none; }
         #island-wrap.show { top: 12px; }
-        #dynamic-island { background: #000; color: #fff; padding: 0 25px; height: 46px; border-radius: 23px; display: flex; align-items: center; gap: 12px; box-shadow: 0 5px 20px rgba(0,0,0,0.3); pointer-events:auto; }
-        
+        #dynamic-island { background: #000; color: #fff; padding: 0 25px; height: 46px; border-radius: 23px; display: flex; align-items: center; gap: 12px; box-shadow: 0 5px 20px rgba(0,0,0,0.3); pointer-events:auto; transform: scale(0.9); transition: transform 0.3s; }
+        #island-wrap.show #dynamic-island { transform: scale(1); }
+
         /* NAVBAR */
         .nav-bar { position: fixed; top: 0; left: 0; width: 100%; height: 60px; padding: 0 20px; display: flex; justify-content: space-between; align-items: center; z-index: 2000; background: rgba(255,255,255,0.01); backdrop-filter: var(--ios-blur); -webkit-backdrop-filter: var(--ios-blur); }
-        .logo { font-weight: 800; font-size: 1.4rem; letter-spacing: -0.5px; display:flex; align-items:center; gap:5px; cursor: pointer; }
-
-        /* UI COMPONENTS */
+        
+        /* COMPONENTS */
         .btn-scale { transition: transform 0.2s var(--spring); cursor: pointer; }
         .btn-scale:active { transform: scale(0.94); }
-        
-        .btn-main { padding: 18px 35px; font-size: 1.1rem; font-weight: 600; background: var(--ios-accent); color: #fff; border-radius: 40px; border:none; box-shadow: 0 8px 25px rgba(0, 122, 255, 0.3); }
-        .btn-pri { background: var(--ios-accent); color: #fff; padding: 16px; border-radius: 16px; width: 100%; border:none; font-weight: 600; font-size: 1rem; }
+        .btn-main { padding: 18px 40px; font-weight: 600; background: var(--ios-accent); color: #fff; border-radius: 40px; border:none; box-shadow: 0 10px 30px rgba(0, 122, 255, 0.3); }
+        .btn-pri { background: var(--ios-accent); color: #fff; padding: 16px; border-radius: 16px; width: 100%; border:none; font-weight: 600; }
         .btn-sec { background: rgba(120,120,128,0.1); color: var(--ios-accent); padding: 16px; border-radius: 16px; width: 100%; border:none; font-weight: 600; }
         .icon-btn { width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: rgba(120,120,128,0.1); font-size: 1.2rem; }
 
-        /* INPUTS & LISTS */
-        .ios-list { background: var(--ios-card); border-radius: 18px; margin-bottom: 25px; box-shadow: var(--ios-shadow); position: relative; z-index: 10; }
-        .ios-item { display: flex; align-items: center; padding: 18px 20px; border-bottom: 0.5px solid rgba(120,120,128,0.2); position: relative; }
+        /* LISTS & INPUTS */
+        .ios-list { background: var(--ios-card); border-radius: 18px; margin-bottom: 25px; position: relative; z-index: 10; }
+        .ios-item { display: flex; align-items: center; padding: 18px 20px; border-bottom: 0.5px solid rgba(120,120,128,0.2); }
         .ios-item:last-child { border-bottom: none; }
         .ios-item i { font-size: 1.4rem; color: var(--ios-accent); margin-right: 15px; width: 24px; text-align: center; }
         .ios-content { flex: 1; position: relative; }
         input, select { width: 100%; border: none; background: transparent; font-size: 1.1rem; color: var(--ios-text); outline: none; margin-top: 2px; font-family: inherit; }
-        label { font-size: 0.75rem; color: var(--ios-sub); font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; display: block; margin-bottom: 4px; }
+        label { font-size: 0.75rem; color: var(--ios-sub); font-weight: 700; text-transform: uppercase; display: block; margin-bottom: 4px; }
 
-        .suggestions { background: var(--ios-card); border-radius: 16px; position: absolute; top: 100%; left: -20px; width: calc(100% + 40px); max-height: 250px; overflow-y: auto; display: none; box-shadow: 0 15px 40px rgba(0,0,0,0.15); z-index: 9999; margin-top: 10px; }
-        .s-item { padding: 15px 20px; border-bottom: 0.5px solid rgba(120,120,128,0.1); cursor: pointer; }
+        /* SUGGESTIONS (SCROLLABLE & FAST) */
+        .suggestions { 
+            background: var(--ios-card); border-radius: 16px; 
+            position: absolute; top: 100%; left: -20px; width: calc(100% + 40px); 
+            max-height: 250px; overflow-y: auto; display: none; 
+            box-shadow: 0 15px 50px rgba(0,0,0,0.15); z-index: 9999; margin-top: 10px;
+            border: 1px solid rgba(0,0,0,0.05);
+        }
+        .s-item { padding: 15px 20px; border-bottom: 0.5px solid rgba(120,120,128,0.1); cursor: pointer; transition: background 0.1s; }
+        .s-item:active { background: rgba(120,120,128,0.1); }
+        .s-type { font-size: 0.7rem; color: var(--ios-accent); float: right; font-weight: 600; text-transform: uppercase; }
 
-        /* HOME BENTO */
+        /* BENTO HOME */
         .bento-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; width: 100%; margin-top: 40px; }
-        .bento-card { background: var(--ios-card); border-radius: 24px; padding: 25px 20px; text-align: center; box-shadow: var(--ios-shadow); transition: 0.2s; }
+        .bento-card { background: var(--ios-card); border-radius: 24px; padding: 25px 20px; text-align: center; transition: 0.2s; }
         .bento-card.wide { grid-column: span 2; text-align: left; display: flex; justify-content: space-between; align-items: center; padding: 25px; }
         .bento-icon { font-size: 2rem; color: var(--ios-accent); margin-bottom: 10px; }
         .bento-card.wide .bento-icon { margin-bottom: 0; font-size: 2.5rem; }
 
         /* APP FLOW */
-        #app-section { display: none; padding-top: 100px; min-height: 100vh; flex-direction: column; align-items: center; opacity: 0; transition: 0.5s; padding-bottom: 100px; }
+        #app-section { display: none; padding-top: 100px; padding-bottom: 100px; min-height: 100vh; flex-direction: column; align-items: center; opacity: 0; transition: 0.5s; }
         .wizard-container { width: 100%; max-width: 600px; padding: 0 20px; }
         .step { display: none; animation: slideUp 0.4s var(--spring) forwards; }
         .step.active { display: block; }
@@ -83,26 +90,22 @@
 
         /* RESULTS */
         #results-container { width: 100%; max-width: 1000px; display: none; padding: 0 20px 80px 20px; }
-        .map-box { height: 350px; border-radius: 24px; overflow: hidden; margin-bottom: 20px; position: relative; z-index: 1; box-shadow: var(--ios-shadow); }
+        .map-box { height: 350px; border-radius: 24px; overflow: hidden; margin-bottom: 20px; position: relative; z-index: 1; }
         #map { width: 100%; height: 100%; }
-
-        .trans-card { background: var(--ios-card); padding: 20px; border-radius: 22px; display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; box-shadow: var(--ios-shadow); cursor: pointer; }
-        .weather-card { background: linear-gradient(135deg, #007AFF, #5856D6); color: white; position: relative; overflow: hidden; }
-        .weather-bg { position: absolute; top: -20px; right: -20px; font-size: 8rem; opacity: 0.2; transform: rotate(10deg); }
-
-        /* CAR GRID */
+        .trans-card { background: var(--ios-card); padding: 20px; border-radius: 22px; display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; cursor: pointer; }
+        
         .car-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 15px; margin-top: 15px; }
-        .car-card { background: var(--ios-card); border-radius: 20px; overflow: hidden; box-shadow: var(--ios-shadow); cursor: pointer; transition: 0.2s; }
+        .car-card { background: var(--ios-card); border-radius: 20px; overflow: hidden; cursor: pointer; transition: 0.2s; position: relative; }
         .car-card:active { transform: scale(0.97); }
         .car-img { width: 100%; height: 160px; object-fit: cover; }
-        
+        .car-badge { position: absolute; top:10px; right:10px; background:rgba(255,255,255,0.9); padding:4px 10px; border-radius:20px; font-size:0.7rem; font-weight:700; color:var(--ios-accent); backdrop-filter:blur(5px); }
+
         /* MODALS */
-        .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); backdrop-filter: blur(10px); z-index: 4000; display: none; align-items: flex-end; justify-content: center; opacity: 0; transition: opacity 0.3s; }
+        .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); backdrop-filter: blur(10px); z-index: 4000; display: none; align-items: flex-end; justify-content: center; }
         .sheet { background: var(--ios-card); width: 100%; max-width: 600px; border-radius: 35px 35px 0 0; padding: 30px; padding-bottom: 50px; transform: translateY(100%); transition: transform 0.4s var(--spring); }
         .handle { width: 40px; height: 5px; background: rgba(120,120,128,0.2); border-radius: 3px; margin: 0 auto 25px auto; }
         .list-btn { display: flex; align-items: center; gap: 15px; width: 100%; padding: 16px; margin-bottom: 8px; border-radius: 16px; background: rgba(120,120,128,0.08); text-align: left; font-weight: 600; font-size: 1.05rem; border: none; cursor: pointer; color: var(--ios-text); }
-
-        .disclaimer { font-size: 0.75rem; color: var(--ios-sub); text-align: center; margin-top: 40px; padding: 0 20px; line-height: 1.5; }
+        
         .ios-switch { appearance: none; width: 50px; height: 30px; background: #e9e9ea; border-radius: 25px; position: relative; outline:none; transition:0.3s; }
         .ios-switch:checked { background: var(--ios-accent); }
         .ios-switch::after { content: ''; position: absolute; top: 2px; left: 2px; width: 26px; height: 26px; border-radius: 50%; background: white; transition: 0.3s var(--spring); box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
@@ -114,7 +117,9 @@
     <div id="island-wrap"><div id="dynamic-island"><i class="ph-bold ph-bell di-icon"></i><span id="di-msg">Avviso</span></div></div>
 
     <nav class="nav-bar">
-        <div class="logo btn-scale" onclick="location.reload()"><i class="ph-fill ph-steering-wheel" style="color:var(--ios-accent); font-size:1.5rem;"></i><b style="font-size:1.3rem;">AutoMatch</b></div>
+        <div class="logo btn-scale" onclick="location.reload()" style="font-weight: 800; font-size: 1.4rem; display: flex; align-items: center; gap: 5px;">
+            <i class="ph-fill ph-steering-wheel" style="color:var(--ios-accent);"></i> AutoMatch
+        </div>
         <div style="display:flex; gap:10px;">
             <div class="icon-btn btn-scale" onclick="openShare()"><i class="ph-bold ph-share-network"></i></div>
             <div class="icon-btn btn-scale" onclick="document.body.classList.toggle('dark-mode')"><i class="ph-fill ph-moon-stars"></i></div>
@@ -124,13 +129,13 @@
     <div id="landing-page" style="padding-top:120px; text-align:center; padding-bottom: 40px;">
         <div style="max-width:800px; margin:0 auto; padding:20px;">
             <span style="color:var(--ios-accent); font-weight:700; letter-spacing:1px; font-size:0.8rem; text-transform:uppercase; margin-bottom:15px; display:block;">iOS 26 Concept</span>
-            <h1 style="font-size:3.5rem; line-height:1; margin-bottom:20px;">Viaggia nel<br>Futuro.</h1>
-            <p style="color:var(--ios-sub); font-size:1.2rem; margin-bottom:40px;">Confronta Auto, Treno e Aereo in tempo reale.</p>
+            <h1 style="font-size:3.5rem; line-height:1; margin-bottom:20px;">Il viaggio<br>reinventato.</h1>
+            <p style="color:var(--ios-sub); font-size:1.2rem; margin-bottom:40px;">Auto vs Treno vs Aereo. <br>Tutto in un tocco.</p>
             <button class="btn-main btn-scale" onclick="goToApp()">Inizia Ora</button>
             
             <div class="bento-grid">
                 <div class="bento-card wide">
-                    <div><div style="font-weight:700; font-size:1.1rem; margin-bottom:5px;">Smart Map</div><div style="font-size:0.9rem; color:var(--ios-sub);">Traffico e Pedaggi inclusi.</div></div>
+                    <div><div style="font-weight:700; font-size:1.1rem; margin-bottom:5px;">Smart Route</div><div style="font-size:0.9rem; color:var(--ios-sub);">Analisi traffico e pedaggi reali.</div></div>
                     <i class="ph-fill ph-map-trifold bento-icon"></i>
                 </div>
                 <div class="bento-card"><i class="ph-fill ph-train bento-icon" style="color:#AF52DE"></i><b>Treni</b></div>
@@ -141,6 +146,7 @@
 
     <section id="app-section">
         <div class="wizard-container">
+            
             <div class="step active" id="step-mode">
                 <h2 style="text-align:center; margin-bottom:30px;">Come ti sposti?</h2>
                 <div style="display:grid; grid-template-columns:1fr 1fr; gap:15px;">
@@ -160,7 +166,7 @@
                         <i class="ph-fill ph-navigation-arrow"></i>
                         <div class="ios-content">
                             <label>Partenza</label>
-                            <input type="text" id="originInput" placeholder="Città..." onfocus="showSug('originInput','l1')">
+                            <input type="text" id="originInput" placeholder="Digita città..." oninput="handleInput(this, 'l1')" onfocus="handleInput(this, 'l1')">
                             <div id="l1" class="suggestions"></div>
                         </div>
                     </div>
@@ -168,7 +174,7 @@
                         <i class="ph-fill ph-flag-checkered"></i>
                         <div class="ios-content">
                             <label>Destinazione</label>
-                            <input type="text" id="destInput" placeholder="Città..." onfocus="showSug('destInput','l2')">
+                            <input type="text" id="destInput" placeholder="Digita città..." oninput="handleInput(this, 'l2')" onfocus="handleInput(this, 'l2')">
                             <div id="l2" class="suggestions"></div>
                         </div>
                     </div>
@@ -184,7 +190,7 @@
             </div>
 
             <div class="step" id="step-2">
-                <h2 style="margin-bottom:20px;">La tua Auto</h2>
+                <h2 style="margin-bottom:20px;">Info Auto</h2>
                 <div class="ios-list">
                     <div class="ios-item"><i class="ph-fill ph-road-horizon"></i><div class="ios-content"><label>Km Totali</label><input type="number" id="kmInput" placeholder="--"></div></div>
                     <div class="ios-item"><i class="ph-fill ph-house-line"></i><div class="ios-content"><label>Garage?</label><select id="chargingInput"><option value="no">No</option><option value="yes">Sì</option></select></div></div>
@@ -198,13 +204,8 @@
             <div class="step" id="step-3">
                 <h2 style="margin-bottom:20px;">Opzioni</h2>
                 <div class="ios-list">
-                    <div class="ios-item">
-                        <div class="ios-content"><span style="font-weight:500;">Cerco auto nuova</span></div>
-                        <input type="checkbox" id="buyToggle" class="ios-switch" onchange="toggleBudget()">
-                    </div>
-                    <div class="ios-item" id="budgetRow" style="display:none;">
-                        <div class="ios-content"><label>Budget (€)</label><input type="number" id="budgetInput" value="35000"></div>
-                    </div>
+                    <div class="ios-item"><div class="ios-content"><span style="font-weight:500;">Cerco auto nuova</span></div><input type="checkbox" id="buyToggle" class="ios-switch" onchange="toggleBudget()"></div>
+                    <div class="ios-item" id="budgetRow" style="display:none;"><div class="ios-content"><label>Budget (€)</label><input type="number" id="budgetInput" value="35000"></div></div>
                 </div>
                 <div style="display:flex; gap:10px;">
                     <button class="btn-sec btn-scale" onclick="prevStep(2)">Indietro</button>
@@ -222,36 +223,26 @@
             <div class="map-box"><div id="map"></div></div>
 
             <div style="display:grid; grid-template-columns:1fr 1fr; gap:15px; margin-bottom:20px;">
-                <div class="trans-card weather-card" style="flex-direction:column; align-items:flex-start; margin:0;">
-                    <i class="ph-fill ph-cloud-sun weather-bg"></i>
-                    <label style="color:rgba(255,255,255,0.8)">Meteo</label>
+                <div class="trans-card" style="flex-direction:column; align-items:flex-start; margin:0; background:linear-gradient(135deg, #007AFF, #5856D6); color:white;">
+                    <i class="ph-fill ph-cloud-sun" style="font-size:1.5rem; margin-bottom:5px;"></i>
                     <div style="font-size:1.8rem; font-weight:800;" id="w-temp">--°</div>
+                    <div style="font-size:0.8rem; opacity:0.8;">Meteo Arrivo</div>
                 </div>
-                <div class="trans-card" style="flex-direction:column; align-items:flex-start; margin:0; background:var(--ios-card);">
-                    <i class="ph-fill ph-music-notes" style="color:#FF2D55; font-size:1.5rem; margin-bottom:5px;"></i>
-                    <label>Playlist</label>
-                    <div style="font-size:1.1rem; font-weight:700;" id="si-music">-- Album</div>
+                <div class="trans-card" style="flex-direction:column; align-items:flex-start; margin:0;">
+                    <i class="ph-fill ph-tree" style="color:var(--ios-green); font-size:1.5rem; margin-bottom:5px;"></i>
+                    <div style="font-size:1.1rem; font-weight:800;" id="si-tree">--</div>
+                    <div style="font-size:0.8rem; color:var(--ios-sub);">Eco Impact</div>
                 </div>
-            </div>
-            
-            <div class="trans-card" style="margin-bottom:30px;">
-                <div style="display:flex; align-items:center; gap:15px;">
-                    <i class="ph-fill ph-tree" style="font-size:1.8rem; color:var(--ios-green);"></i>
-                    <div><div style="font-weight:700;">Eco Impact</div><div style="font-size:0.85rem; color:var(--ios-sub);">Alberi salvati (vs Diesel)</div></div>
-                </div>
-                <div style="font-weight:800; font-size:1.2rem;" id="si-tree">--</div>
             </div>
 
             <div id="res-car" style="display:none;">
-                <h3 style="margin-bottom:15px; font-size:0.9rem; text-transform:uppercase; color:var(--ios-sub);">La tua guida</h3>
                 <div class="trans-card">
                     <div style="display:flex; align-items:center; gap:15px;">
-                        <i class="ph-fill ph-car" style="font-size:1.8rem; color:var(--ios-accent);"></i>
+                        <div style="background:#EBF2FF; width:45px; height:45px; border-radius:12px; display:flex; align-items:center; justify-content:center; color:var(--ios-accent);"><i class="ph-fill ph-car" style="font-size:1.5rem;"></i></div>
                         <div><div style="font-weight:700;">In Auto</div><div style="font-size:0.85rem; color:var(--ios-sub);">Carburante + Pedaggi</div></div>
                     </div>
                     <div style="font-weight:700; font-size:1.2rem;" id="drive-cost">--</div>
                 </div>
-                
                 <div id="car-buy-section" style="display:none; margin-top:30px;">
                     <h3 style="margin-bottom:15px;">Auto Consigliate</h3>
                     <div id="car-grid" class="car-grid"></div>
@@ -259,24 +250,23 @@
             </div>
 
             <div id="res-public" style="display:none;">
-                <h3 style="margin-bottom:15px; font-size:0.9rem; text-transform:uppercase; color:var(--ios-sub);">Migliori Opzioni</h3>
                 <div class="trans-card btn-scale" onclick="openLink('train')">
                     <div style="display:flex; align-items:center; gap:15px;">
-                        <i class="ph-fill ph-train" style="font-size:1.8rem; color:#AF52DE;"></i>
+                        <div style="background:#F2E6FF; width:45px; height:45px; border-radius:12px; display:flex; align-items:center; justify-content:center; color:#AF52DE;"><i class="ph-fill ph-train" style="font-size:1.5rem;"></i></div>
                         <div><div style="font-weight:700;">Treno</div><div style="font-size:0.85rem; color:var(--ios-sub);" id="train-time">--</div></div>
                     </div>
-                    <div style="text-align:right;"><div style="font-weight:700; font-size:1.1rem;" id="train-cost">--</div><small style="color:var(--ios-accent); font-weight:600;">Offerte ›</small></div>
+                    <div style="text-align:right;"><div style="font-weight:700; font-size:1.1rem;" id="train-cost">--</div><small style="color:var(--ios-accent);">Orari ›</small></div>
                 </div>
                 <div class="trans-card btn-scale" onclick="openLink('plane')" id="card-plane">
                     <div style="display:flex; align-items:center; gap:15px;">
-                        <i class="ph-fill ph-airplane-tilt" style="font-size:1.8rem; color:var(--ios-orange);"></i>
+                        <div style="background:#FFF3E0; width:45px; height:45px; border-radius:12px; display:flex; align-items:center; justify-content:center; color:#FF9500;"><i class="ph-fill ph-airplane-tilt" style="font-size:1.5rem;"></i></div>
                         <div><div style="font-weight:700;">Aereo</div><div style="font-size:0.85rem; color:var(--ios-sub);" id="plane-time">--</div></div>
                     </div>
-                    <div style="text-align:right;"><div style="font-weight:700; font-size:1.1rem;" id="plane-cost">--</div><small style="color:var(--ios-accent); font-weight:600;">Voli ›</small></div>
+                    <div style="text-align:right;"><div style="font-weight:700; font-size:1.1rem;" id="plane-cost">--</div><small style="color:var(--ios-accent);">Voli ›</small></div>
                 </div>
             </div>
-
-            <p class="disclaimer">I prezzi indicati sono stime basate su medie di mercato (Carburante Italia, Pedaggi Autostrade, Tariffe Low Cost). Il costo reale può variare. AutoMatch non è responsabile per discrepanze.</p>
+            
+            <p style="text-align:center; font-size:0.75rem; color:var(--ios-sub); margin-top:30px;">*Prezzi stimati. Verifica sempre sui siti ufficiali.</p>
         </div>
     </section>
 
@@ -292,7 +282,7 @@
                 <div class="ios-item"><div class="ios-content">Pedaggio</div><b id="m-toll">--</b></div>
             </div>
             <div style="background:var(--ios-bg); padding:25px; border-radius:20px; text-align:center;">
-                <label>Totale Viaggio</label><div id="m-total" style="font-size:2.5rem; font-weight:800; letter-spacing:-1px;">--</div>
+                <label>Costo Viaggio</label><div id="m-total" style="font-size:2.5rem; font-weight:800; letter-spacing:-1px;">--</div>
             </div>
             <button class="btn-sec btn-scale" style="margin-top:20px;" onclick="closeModal('car')">Chiudi</button>
         </div>
@@ -308,70 +298,97 @@
     </div>
 
     <script>
-        // DATA
-        const CITIES = ["Roma", "Milano", "Napoli", "Torino", "Bologna", "Firenze", "Venezia", "Bari", "Palermo", "Genova"];
+        // --- EXPANDED DB ---
+        const CITIES = ["Roma","Milano","Napoli","Torino","Bologna","Firenze","Venezia","Bari","Palermo","Genova","Verona","Trieste","Perugia","Cagliari","Trento","Ancona","Aosta","Potenza","Catanzaro","L'Aquila","Paris","London","Madrid","Berlin","Vienna","Zurich","Munich","Barcelona","Amsterdam","Brussels","Prague","Budapest","Lisbon","Warsaw","Dublin","Copenhagen","Oslo","Stockholm","Helsinki","Athens"];
+        
         const CARS = [
             {b:"Tesla",m:"Model 3",p:42990,t:"Elettrica",i:"https://upload.wikimedia.org/wikipedia/commons/thumb/8/82/2019_Tesla_Model_3_Long_Range_AWD_Front.jpg/800px-2019_Tesla_Model_3_Long_Range_AWD_Front.jpg"},
+            {b:"Tesla",m:"Model Y",p:46990,t:"Elettrica",i:"https://upload.wikimedia.org/wikipedia/commons/thumb/7/73/Tesla_Model_Y_Performance_IMG_4905.jpg/800px-Tesla_Model_Y_Performance_IMG_4905.jpg"},
             {b:"Fiat",m:"500e",p:29950,t:"Elettrica",i:"https://upload.wikimedia.org/wikipedia/commons/thumb/7/7f/Fiat_500_Electric_La_Prima_Genf_2020_1X7A5372.jpg/800px-Fiat_500_Electric_La_Prima_Genf_2020_1X7A5372.jpg"},
+            {b:"Fiat",m:"600e",p:35950,t:"Elettrica",i:"https://upload.wikimedia.org/wikipedia/commons/thumb/4/46/Fiat_600e_IAA_2023_1X7A0168.jpg/800px-Fiat_600e_IAA_2023_1X7A0168.jpg"},
+            {b:"Jeep",m:"Avenger",p:24300,t:"Benzina",i:"https://upload.wikimedia.org/wikipedia/commons/thumb/2/27/Jeep_Avenger_1.2_Turbo_Summit_%E2%80%93_f_%E2%80%93_16042023.jpg/800px-Jeep_Avenger_1.2_Turbo_Summit_%E2%80%93_f_%E2%80%93_16042023.jpg"},
             {b:"VW",m:"Golf 8",p:34500,t:"Diesel",i:"https://upload.wikimedia.org/wikipedia/commons/thumb/c/c9/2020_Volkswagen_Golf_Style_2.0_Front.jpg/800px-2020_Volkswagen_Golf_Style_2.0_Front.jpg"},
-            {b:"Jeep",m:"Avenger",p:24300,t:"Benzina",i:"https://upload.wikimedia.org/wikipedia/commons/thumb/2/27/Jeep_Avenger_1.2_Turbo_Summit_%E2%80%93_f_%E2%80%93_16042023.jpg/800px-Jeep_Avenger_1.2_Turbo_Summit_%E2%80%93_f_%E2%80%93_16042023.jpg"}
+            {b:"VW",m:"ID.3",p:41900,t:"Elettrica",i:"https://upload.wikimedia.org/wikipedia/commons/thumb/8/87/VW_ID.3_1st_Max_IMG_3683.jpg/800px-VW_ID.3_1st_Max_IMG_3683.jpg"},
+            {b:"Toyota",m:"Yaris Hybrid",p:24000,t:"Benzina",i:"https://upload.wikimedia.org/wikipedia/commons/thumb/9/9d/Toyota_Yaris_Hybrid_%28XP210%29_IMG_3655.jpg/800px-Toyota_Yaris_Hybrid_%28XP210%29_IMG_3655.jpg"},
+            {b:"MG",m:"MG4",p:30790,t:"Elettrica",i:"https://upload.wikimedia.org/wikipedia/commons/thumb/6/64/MG4_EV_Dabok.jpg/800px-MG4_EV_Dabok.jpg"},
+            {b:"Dacia",m:"Spring",p:21000,t:"Elettrica",i:"https://upload.wikimedia.org/wikipedia/commons/thumb/5/53/Dacia_Spring_2022.jpg/800px-Dacia_Spring_2022.jpg"},
+            {b:"Volvo",m:"EX30",p:35900,t:"Elettrica",i:"https://upload.wikimedia.org/wikipedia/commons/thumb/1/14/Volvo_EX30_IAA_2023_1X7A0337.jpg/800px-Volvo_EX30_IAA_2023_1X7A0337.jpg"},
+            {b:"BYD",m:"Atto 3",p:38000,t:"Elettrica",i:"https://upload.wikimedia.org/wikipedia/commons/thumb/2/23/BYD_Atto_3_IAA_2023_1X7A0456.jpg/800px-BYD_Atto_3_IAA_2023_1X7A0456.jpg"},
+            {b:"Audi",m:"Q4 e-tron",p:56000,t:"Elettrica",i:"https://upload.wikimedia.org/wikipedia/commons/thumb/5/59/Audi_Q4_e-tron_IMG_4803.jpg/800px-Audi_Q4_e-tron_IMG_4803.jpg"},
+            {b:"BMW",m:"i4",p:59000,t:"Elettrica",i:"https://upload.wikimedia.org/wikipedia/commons/thumb/4/4b/BMW_i4_M50_IMG_5330.jpg/800px-BMW_i4_M50_IMG_5330.jpg"},
+            {b:"Peugeot",m:"e-208",p:35000,t:"Elettrica",i:"https://upload.wikimedia.org/wikipedia/commons/thumb/f/f6/Peugeot_e-208_GT_IMG_3688.jpg/800px-Peugeot_e-208_GT_IMG_3688.jpg"},
+            {b:"Renault",m:"Megane E-Tech",p:42000,t:"Elettrica",i:"https://upload.wikimedia.org/wikipedia/commons/thumb/e/e3/Renault_Megane_E-Tech_Electric_IMG_5296.jpg/800px-Renault_Megane_E-Tech_Electric_IMG_5296.jpg"},
+            {b:"Ford",m:"Mustang Mach-E",p:55000,t:"Elettrica",i:"https://upload.wikimedia.org/wikipedia/commons/thumb/d/d7/Ford_Mustang_Mach-E_GT_IAA_2021_1X7A0198.jpg/800px-Ford_Mustang_Mach-E_GT_IAA_2021_1X7A0198.jpg"},
+            {b:"Porsche",m:"Taycan",p:95000,t:"Elettrica",i:"https://upload.wikimedia.org/wikipedia/commons/thumb/2/26/Porsche_Taycan_Turbo_S_IMG_3179.jpg/800px-Porsche_Taycan_Turbo_S_IMG_3179.jpg"},
+            {b:"Hyundai",m:"Ioniq 5",p:47000,t:"Elettrica",i:"https://upload.wikimedia.org/wikipedia/commons/thumb/1/1a/Hyundai_Ioniq_5_IMG_4833.jpg/800px-Hyundai_Ioniq_5_IMG_4833.jpg"},
+            {b:"Polestar",m:"2",p:52000,t:"Elettrica",i:"https://upload.wikimedia.org/wikipedia/commons/thumb/3/37/Polestar_2_BST_Edition_270_Goodwood_Festival_of_Speed_2022_%282%29.jpg/800px-Polestar_2_BST_Edition_270_Goodwood_Festival_of_Speed_2022_%282%29.jpg"}
         ];
-        
-        // STATE
+
         let state = { mode: 'car', start: null, end: null, km: 0 };
 
         // --- ISLAND ---
         function notify(msg, type='neutral') {
-            const w=document.getElementById('island-wrap'), d=document.getElementById('dynamic-island'), m=document.getElementById('di-msg');
-            const icon = type==='error'?'ph-warning-circle':(type==='success'?'ph-check-circle':'ph-info');
-            const color = type==='error'?'#FF3B30':(type==='success'?'#34C759':'#fff');
-            d.innerHTML = `<i class="ph-fill ${icon}" style="color:${color};font-size:1.4rem;"></i><span style="font-weight:600;">${msg}</span>`;
+            const w=document.getElementById('island-wrap'), d=document.getElementById('dynamic-island'), i=d.querySelector('i');
+            d.innerHTML = `<i class="ph-fill ${type=='error'?'ph-warning-circle':(type=='success'?'ph-check-circle':'ph-info')} di-icon" style="color:${type=='error'?'#FF3B30':(type=='success'?'#34C759':'#fff')};font-size:1.4rem;"></i><span style="font-weight:600;">${msg}</span>`;
             w.classList.add('show'); setTimeout(()=>w.classList.remove('show'), 3000);
         }
 
         // --- CORE ---
         window.onload = function() {
             document.getElementById('tripDate').valueAsDate = new Date();
-            initMap();
+            const map = L.map('map', {zoomControl:false}).setView([41.9, 12.5], 5);
+            L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png').addTo(map);
+            window.map = map; window.markers = L.layerGroup().addTo(map); window.route = L.layerGroup().addTo(map);
             document.addEventListener('click', e => { if(!e.target.closest('.ios-content')) document.querySelectorAll('.suggestions').forEach(s=>s.style.display='none'); });
         }
 
-        function initMap() {
-            window.map = L.map('map', {zoomControl:false}).setView([41.9, 12.5], 5);
-            L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png').addTo(window.map);
-            window.layers = L.layerGroup().addTo(window.map);
+        // --- AUTOCOMPLETE LOGIC ---
+        function handleInput(inp, listId) {
+            const list = document.getElementById(listId);
+            const val = inp.value.toLowerCase();
+            list.innerHTML = '';
+            
+            if(val.length === 0) {
+                // Show Top Cities
+                CITIES.slice(0,5).forEach(c => addSugItem(c, list, inp, "Popolare"));
+                list.style.display = 'block';
+            } else {
+                // Filter Local
+                const matches = CITIES.filter(c => c.toLowerCase().includes(val));
+                matches.forEach(c => addSugItem(c, list, inp, "Città"));
+                
+                // If API needed (Debounce usually, simplified here)
+                if(matches.length < 3 && val.length > 2) {
+                    fetch(`https://nominatim.openstreetmap.org/search?q=${val}&format=json&limit=3`)
+                    .then(r=>r.json()).then(d=>{
+                        d.forEach(x => {
+                            if(!matches.includes(x.display_name.split(',')[0])) addSugItem(x.display_name.split(',')[0], list, inp, "Mondo");
+                        });
+                    });
+                }
+                list.style.display = 'block';
+            }
         }
 
-        function showSug(id, listId) {
-            const list = document.getElementById(listId); list.innerHTML='';
-            CITIES.forEach(c => {
-                const d = document.createElement('div'); d.className='s-item'; d.innerText=c;
-                d.onclick=()=>{ document.getElementById(id).value=c; list.style.display='none'; };
-                list.appendChild(d);
-            });
-            list.style.display='block';
+        function addSugItem(text, list, inp, type) {
+            const div = document.createElement('div');
+            div.className = 's-item';
+            div.innerHTML = `${text} <span class="s-type">${type}</span>`;
+            div.onclick = () => { inp.value = text; list.style.display = 'none'; };
+            list.appendChild(div);
         }
 
         // --- FLOW ---
         function goToApp(){ document.getElementById('landing-page').style.display='none'; document.getElementById('app-section').style.display='flex'; setTimeout(()=>document.getElementById('app-section').style.opacity='1',50); }
         function nextStep(s){ document.querySelectorAll('.step').forEach(e=>e.classList.remove('active')); document.getElementById('step-'+s).classList.add('active'); }
         function prevStep(s){ nextStep(s==='mode'?'mode':s); }
-        
-        function selectMode(m) {
-            state.mode = m;
-            const di = document.getElementById('tripDate'); const lb = document.getElementById('lbl-date');
-            if(m==='car') { di.type='date'; lb.innerText="Data Partenza"; }
-            else { di.type='datetime-local'; lb.innerText="Data e Ora"; const n=new Date(); n.setMinutes(n.getMinutes()-n.getTimezoneOffset()); di.value=n.toISOString().slice(0,16); }
-            nextStep(1);
-        }
-
-        function toggleBudget() { document.getElementById('budgetRow').style.display = document.getElementById('buyToggle').checked ? 'flex' : 'none'; }
+        function selectMode(m) { state.mode=m; const d=document.getElementById('tripDate'), l=document.getElementById('lbl-date'); if(m==='car'){d.type='date';l.innerText="Data Partenza";}else{d.type='datetime-local';l.innerText="Data e Ora"; const n=new Date(); n.setMinutes(n.getMinutes()-n.getTimezoneOffset()); d.value=n.toISOString().slice(0,16);} nextStep(1); }
+        function toggleBudget(){ document.getElementById('budgetRow').style.display = document.getElementById('buyToggle').checked ? 'flex' : 'none'; }
 
         // --- VALIDATION ---
         async function validateStep1() {
             const o = document.getElementById('originInput').value, d = document.getElementById('destInput').value;
             if(!o) return notify("Manca Partenza", "error");
-            
             notify("Cerco Percorso...");
             if(!state.start) state.start = await resolve(o);
             if(d && !state.end) state.end = await resolve(d);
@@ -389,6 +406,7 @@
             state.mode === 'public' ? runAnalysis() : nextStep(2);
         }
 
+        // --- ANALYSIS ---
         async function runAnalysis() {
             const km = state.mode==='car' ? parseFloat(document.getElementById('kmInput').value) : state.km;
             if(!km) return notify("Inserisci KM", "error");
@@ -396,26 +414,25 @@
             document.getElementById('wizard-box').style.display='none';
             document.getElementById('results-container').style.display='block';
             
-            // Async Weather
-            if(state.end) fetchWeather(state.end.lat, state.end.lon);
+            // WEATHER FIX (After Render)
+            if(state.end) fetch(`https://api.open-meteo.com/v1/forecast?latitude=${state.end.lat}&longitude=${state.end.lon}&current_weather=true`).then(r=>r.json()).then(d=>{
+                document.getElementById('w-temp').innerText = Math.round(d.current_weather.temperature)+"°";
+            });
 
-            // Update Map
+            // MAP
             setTimeout(() => {
-                window.map.invalidateSize(); window.layers.clearLayers();
+                window.map.invalidateSize(); window.markers.clearLayers(); window.route.clearLayers();
                 if(state.start && state.end) {
-                    L.polyline([state.start, state.end], {color:'#007AFF', dashArray: state.geo?null:'10,10'}).addTo(window.layers);
-                    if(state.geo) L.geoJSON(state.geo).addTo(window.layers);
+                    L.polyline([state.start, state.end], {color:'#007AFF', dashArray: state.geo?null:'10,10'}).addTo(window.route);
+                    if(state.geo) L.geoJSON(state.geo).addTo(window.route);
                     window.map.fitBounds(L.latLngBounds([state.start, state.end]), {padding:[50,50]});
                 }
             }, 200);
 
-            // Fill Data
+            // DATA
             document.getElementById('t-km').innerText = km + " km";
-            
-            // Insights
-            const trees = ((km * 120) / 20000).toFixed(1); // 120g/km diesel vs tree 20kg/y
+            const trees = ((km * 120) / 20000).toFixed(1);
             document.getElementById('si-tree').innerText = trees > 0.1 ? trees + " Alberi" : "< 1 Albero";
-            document.getElementById('si-music').innerText = Math.max(1, Math.round((km/90)/0.75)) + " Album"; // 45min avg album
 
             if(state.mode === 'car') {
                 document.getElementById('res-car').style.display='block';
@@ -429,7 +446,8 @@
                     grid.innerHTML = CARS.filter(c=>c.p<=budget*1.3).map(c=> {
                         const fc = (c.t==='Elettrica') ? (km/100)*16*0.6 : (km/100)*6*1.8;
                         return `<div class="car-card" onclick="openCarModal('${c.b}','${c.m}',${c.p},${fc.toFixed(0)},${km})">
-                            <img src="${c.i}" class="car-img">
+                            <img src="${c.i}" class="car-img" loading="lazy">
+                            <div class="car-badge">${c.t}</div>
                             <div style="padding:15px;"><b>${c.b} ${c.m}</b><br><small style="color:var(--ios-sub)">€${c.p.toLocaleString()}</small></div>
                         </div>`
                     }).join('') || "<p>Nessuna auto trovata.</p>";
@@ -447,7 +465,7 @@
             }
         }
 
-        // --- MODALS ---
+        // --- ACTIONS ---
         function openCarModal(b, m, p, f, k) {
             document.getElementById('m-brand').innerText = b; document.getElementById('m-model').innerText = m;
             document.getElementById('m-price').innerText = "€" + p.toLocaleString();
@@ -457,28 +475,22 @@
             document.getElementById('m-total').innerText = "€" + (parseFloat(f)+parseFloat(t)).toFixed(0);
             openModal('car');
         }
-        function openModal(id){ const e=document.getElementById(id+'-modal'); e.style.display='flex'; setTimeout(()=>e.querySelector('.sheet').style.transform='translateY(0)',10); }
-        function closeModal(id){ const e=document.getElementById(id+'-modal'); e.querySelector('.sheet').style.transform='translateY(100%)'; setTimeout(()=>e.style.display='none',300); }
         
-        // --- SHARE ---
-        function getShareText() {
-            const km = document.getElementById('t-km').innerText;
-            const o = document.getElementById('originInput').value; const d = document.getElementById('destInput').value;
-            let det = state.mode==='car' ? `🚗 Auto: ${document.getElementById('drive-cost').innerText}` : `🚆 Treno: ${document.getElementById('train-cost').innerText}`;
-            return `*Viaggio AutoMatch* 🌍\n${o} ➡️ ${d}\n📏 ${km}\n💰 ${det}\n🌱 Eco: ${document.getElementById('si-tree').innerText}\n\n🔗 https://chrii2612.github.io/trovaauto/`;
-        }
         function openShare() { if(!state.km) return notify("Crea prima un viaggio", "error"); openModal('share'); }
         function shareWa() { window.open(`https://wa.me/?text=${encodeURIComponent(getShareText())}`); closeModal('share'); }
         function shareMail() { window.open(`mailto:?subject=Plan AutoMatch&body=${encodeURIComponent(getShareText())}`); closeModal('share'); }
+        function getShareText() { return `*Viaggio AutoMatch* 🌍\n${document.getElementById('originInput').value} ➡️ ${document.getElementById('destInput').value}\n📏 ${document.getElementById('t-km').innerText}\n🔗 https://chrii2612.github.io/trovaauto/`; }
 
-        // --- LINKS & UTILS ---
+        function openModal(id){ const e=document.getElementById(id+'-modal'); e.style.display='flex'; setTimeout(()=>e.querySelector('.sheet').style.transform='translateY(0)',10); }
+        function closeModal(id){ const e=document.getElementById(id+'-modal'); e.querySelector('.sheet').style.transform='translateY(100%)'; setTimeout(()=>e.style.display='none',300); }
         function openLink(t) {
-            const q = t==='train' ? `Treno ${document.getElementById('originInput').value} ${document.getElementById('destInput').value}` : `Voli ${document.getElementById('originInput').value} ${document.getElementById('destInput').value}`;
-            window.open(`https://www.google.com/search?q=${q}`);
+            const o = document.getElementById('originInput').value; const d = document.getElementById('destInput').value;
+            window.open(`https://www.google.com/search?q=${t==='train'?'Treno':'Voli'}+da+${o}+a+${d}`);
         }
+
+        // --- GEO UTILS ---
         async function resolve(n){ try{const r=await fetch(`https://nominatim.openstreetmap.org/search?q=${n}&format=json&limit=1`);const d=await r.json();return {lat:parseFloat(d[0].lat),lon:parseFloat(d[0].lon)};}catch{return null;} }
         function dist(p1,p2){var R=6371;var dLat=(p2.lat-p1.lat)*Math.PI/180;var dLon=(p2.lon-p1.lon)*Math.PI/180;var a=Math.sin(dLat/2)*Math.sin(dLat/2)+Math.cos(p1.lat*Math.PI/180)*Math.cos(p2.lat*Math.PI/180)*Math.sin(dLon/2)*Math.sin(dLon/2);return R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a))*1.3;}
-        async function fetchWeather(lat,lon){try{const r=await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true`);const d=await r.json();document.getElementById('w-temp').innerText=Math.round(d.current_weather.temperature)+"°";}catch{}}
     </script>
 </body>
 </html>
