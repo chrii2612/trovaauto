@@ -22,7 +22,7 @@
             --ios-text: #000000;
             --ios-sub: #8E8E93;
             --ios-blur: blur(25px);
-            --ios-shadow: 0 8px 32px rgba(0,0,0,0.08);
+            --ios-shadow: 0 8px 30px rgba(0,0,0,0.06);
             --spring: cubic-bezier(0.34, 1.56, 0.64, 1);
         }
 
@@ -31,56 +31,51 @@
             --ios-card: #1C1C1E;
             --ios-text: #FFFFFF;
             --ios-sub: #98989D;
-            --ios-shadow: 0 8px 32px rgba(0,0,0,0.4);
+            --ios-shadow: 0 8px 30px rgba(0,0,0,0.4);
         }
 
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        body, html { margin: 0; padding: 0; height: 100%; font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif; background: var(--ios-bg); color: var(--ios-text); overflow-x: hidden; scroll-behavior: smooth; }
-
-        /* BACKGROUND */
-        .ios-wallpaper { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; background: radial-gradient(circle at 50% 0%, #a1c4fd 0%, #c2e9fb 50%, var(--ios-bg) 100%); opacity: 1; transition: opacity 0.5s; }
-        body.dark-mode .ios-wallpaper { background: radial-gradient(circle at 50% 0%, #1a2a6c 0%, #b21f1f 50%, #fdbb2d 100%); opacity: 0.3; }
-
-        /* ISLAND */
+        body, html { margin: 0; padding: 0; height: 100%; font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", Roboto, sans-serif; background: var(--ios-bg); color: var(--ios-text); overflow-x: hidden; scroll-behavior: smooth; }
+        
+        /* DYNAMIC ISLAND (Hidden by default) */
         #island-wrap { position: fixed; top: -100px; left:0; width:100%; display:flex; justify-content:center; z-index:9999; transition: top 0.5s var(--spring); pointer-events:none; }
         #island-wrap.show { top: 12px; }
-        #dynamic-island { background: #000; color: #fff; padding: 0 25px; height: 46px; border-radius: 23px; display: flex; align-items: center; gap: 12px; box-shadow: 0 5px 20px rgba(0,0,0,0.3); pointer-events:auto; transform: scale(0.9); transition: transform 0.3s; }
-        #island-wrap.show #dynamic-island { transform: scale(1); }
-
-        /* NAV */
+        #dynamic-island { background: #000; color: #fff; padding: 0 25px; height: 46px; border-radius: 23px; display: flex; align-items: center; gap: 12px; box-shadow: 0 5px 20px rgba(0,0,0,0.3); pointer-events:auto; }
+        
+        /* NAVBAR */
         .nav-bar { position: fixed; top: 0; left: 0; width: 100%; height: 60px; padding: 0 20px; display: flex; justify-content: space-between; align-items: center; z-index: 2000; background: rgba(255,255,255,0.01); backdrop-filter: var(--ios-blur); -webkit-backdrop-filter: var(--ios-blur); }
-        .btn-scale { transition: transform 0.2s; cursor: pointer; }
-        .btn-scale:active { transform: scale(0.94); }
-        .icon-btn { width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: rgba(120,120,128,0.15); font-size: 1.2rem; backdrop-filter: blur(10px); }
+        .logo { font-weight: 800; font-size: 1.4rem; letter-spacing: -0.5px; display:flex; align-items:center; gap:5px; cursor: pointer; }
 
-        /* INPUTS */
+        /* UI COMPONENTS */
+        .btn-scale { transition: transform 0.2s var(--spring); cursor: pointer; }
+        .btn-scale:active { transform: scale(0.94); }
+        
+        .btn-main { padding: 18px 35px; font-size: 1.1rem; font-weight: 600; background: var(--ios-accent); color: #fff; border-radius: 40px; border:none; box-shadow: 0 8px 25px rgba(0, 122, 255, 0.3); }
+        .btn-pri { background: var(--ios-accent); color: #fff; padding: 16px; border-radius: 16px; width: 100%; border:none; font-weight: 600; font-size: 1rem; }
+        .btn-sec { background: rgba(120,120,128,0.1); color: var(--ios-accent); padding: 16px; border-radius: 16px; width: 100%; border:none; font-weight: 600; }
+        .icon-btn { width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: rgba(120,120,128,0.1); font-size: 1.2rem; }
+
+        /* INPUTS & LISTS */
         .ios-list { background: var(--ios-card); border-radius: 18px; margin-bottom: 25px; box-shadow: var(--ios-shadow); position: relative; z-index: 10; }
         .ios-item { display: flex; align-items: center; padding: 18px 20px; border-bottom: 0.5px solid rgba(120,120,128,0.2); position: relative; }
         .ios-item:last-child { border-bottom: none; }
         .ios-item i { font-size: 1.4rem; color: var(--ios-accent); margin-right: 15px; width: 24px; text-align: center; }
         .ios-content { flex: 1; position: relative; }
         input, select { width: 100%; border: none; background: transparent; font-size: 1.1rem; color: var(--ios-text); outline: none; margin-top: 2px; font-family: inherit; }
-        label { font-size: 0.75rem; color: var(--ios-sub); font-weight: 700; text-transform: uppercase; display: block; margin-bottom: 4px; }
+        label { font-size: 0.75rem; color: var(--ios-sub); font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; display: block; margin-bottom: 4px; }
 
-        /* SUGGESTIONS */
-        .suggestions { background: var(--ios-card); border-radius: 16px; position: absolute; top: 100%; left: -20px; width: calc(100% + 40px); max-height: 250px; overflow-y: auto; display: none; box-shadow: 0 15px 40px rgba(0,0,0,0.2); z-index: 9999; margin-top: 10px; border: 1px solid rgba(0,0,0,0.05); }
-        .s-item { padding: 15px 20px; border-bottom: 0.5px solid rgba(120,120,128,0.1); cursor: pointer; transition: background 0.1s; }
-        .s-item:active { background: rgba(120,120,128,0.1); }
-        .s-pop { float: right; font-size: 0.7rem; color: var(--ios-accent); background: rgba(0,122,255,0.1); padding: 2px 6px; border-radius: 6px; font-weight: 600; }
+        .suggestions { background: var(--ios-card); border-radius: 16px; position: absolute; top: 100%; left: -20px; width: calc(100% + 40px); max-height: 250px; overflow-y: auto; display: none; box-shadow: 0 15px 40px rgba(0,0,0,0.15); z-index: 9999; margin-top: 10px; }
+        .s-item { padding: 15px 20px; border-bottom: 0.5px solid rgba(120,120,128,0.1); cursor: pointer; }
 
-        /* HOME */
+        /* HOME BENTO */
         .bento-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; width: 100%; margin-top: 40px; }
-        .bento-card { background: rgba(255,255,255,0.6); backdrop-filter: blur(20px); border-radius: 24px; padding: 25px 20px; text-align: center; box-shadow: var(--ios-shadow); transition: 0.2s; border:1px solid rgba(255,255,255,0.2); }
+        .bento-card { background: var(--ios-card); border-radius: 24px; padding: 25px 20px; text-align: center; box-shadow: var(--ios-shadow); transition: 0.2s; }
         .bento-card.wide { grid-column: span 2; text-align: left; display: flex; justify-content: space-between; align-items: center; padding: 25px; }
         .bento-icon { font-size: 2rem; color: var(--ios-accent); margin-bottom: 10px; }
         .bento-card.wide .bento-icon { margin-bottom: 0; font-size: 2.5rem; }
-        
-        .btn-main { padding: 18px 40px; font-weight: 600; background: var(--ios-accent); color: #fff; border-radius: 40px; border:none; box-shadow: 0 10px 30px rgba(0, 122, 255, 0.3); font-size: 1.1rem; }
-        .btn-pri { background: var(--ios-accent); color: #fff; padding: 16px; border-radius: 16px; width: 100%; border:none; font-weight: 600; font-size: 1rem; }
-        .btn-sec { background: rgba(120,120,128,0.1); color: var(--ios-accent); padding: 16px; border-radius: 16px; width: 100%; border:none; font-weight: 600; }
 
-        /* WIZARD */
-        #app-section { display: none; padding-top: 100px; padding-bottom: 100px; min-height: 100vh; flex-direction: column; align-items: center; opacity: 0; transition: 0.5s; }
+        /* APP FLOW */
+        #app-section { display: none; padding-top: 100px; min-height: 100vh; flex-direction: column; align-items: center; opacity: 0; transition: 0.5s; padding-bottom: 100px; }
         .wizard-container { width: 100%; max-width: 600px; padding: 0 20px; }
         .step { display: none; animation: slideUp 0.4s var(--spring) forwards; }
         .step.active { display: block; }
@@ -88,24 +83,26 @@
 
         /* RESULTS */
         #results-container { width: 100%; max-width: 1000px; display: none; padding: 0 20px 80px 20px; }
-        .map-box { height: 350px; border-radius: 24px; overflow: hidden; margin-bottom: 20px; position: relative; z-index: 1; box-shadow: var(--ios-shadow); background: #eee; }
+        .map-box { height: 350px; border-radius: 24px; overflow: hidden; margin-bottom: 20px; position: relative; z-index: 1; box-shadow: var(--ios-shadow); }
         #map { width: 100%; height: 100%; }
-        
+
         .trans-card { background: var(--ios-card); padding: 20px; border-radius: 22px; display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; box-shadow: var(--ios-shadow); cursor: pointer; }
         .weather-card { background: linear-gradient(135deg, #007AFF, #5856D6); color: white; position: relative; overflow: hidden; }
         .weather-bg { position: absolute; top: -20px; right: -20px; font-size: 8rem; opacity: 0.2; transform: rotate(10deg); }
 
+        /* CAR GRID */
         .car-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 15px; margin-top: 15px; }
-        .car-card { background: var(--ios-card); border-radius: 20px; overflow: hidden; box-shadow: var(--ios-shadow); cursor: pointer; position: relative; }
+        .car-card { background: var(--ios-card); border-radius: 20px; overflow: hidden; box-shadow: var(--ios-shadow); cursor: pointer; transition: 0.2s; }
+        .car-card:active { transform: scale(0.97); }
         .car-img { width: 100%; height: 160px; object-fit: cover; }
-        .car-badge { position: absolute; top:10px; right:10px; background:rgba(255,255,255,0.95); padding:4px 10px; border-radius:20px; font-size:0.7rem; font-weight:800; color:var(--ios-accent); backdrop-filter:blur(10px); }
-
+        
         /* MODALS */
-        .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); backdrop-filter: blur(10px); z-index: 4000; display: none; align-items: flex-end; justify-content: center; }
+        .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); backdrop-filter: blur(10px); z-index: 4000; display: none; align-items: flex-end; justify-content: center; opacity: 0; transition: opacity 0.3s; }
         .sheet { background: var(--ios-card); width: 100%; max-width: 600px; border-radius: 35px 35px 0 0; padding: 30px; padding-bottom: 50px; transform: translateY(100%); transition: transform 0.4s var(--spring); }
         .handle { width: 40px; height: 5px; background: rgba(120,120,128,0.2); border-radius: 3px; margin: 0 auto 25px auto; }
         .list-btn { display: flex; align-items: center; gap: 15px; width: 100%; padding: 16px; margin-bottom: 8px; border-radius: 16px; background: rgba(120,120,128,0.08); text-align: left; font-weight: 600; font-size: 1.05rem; border: none; cursor: pointer; color: var(--ios-text); }
-        
+
+        .disclaimer { font-size: 0.75rem; color: var(--ios-sub); text-align: center; margin-top: 40px; padding: 0 20px; line-height: 1.5; }
         .ios-switch { appearance: none; width: 50px; height: 30px; background: #e9e9ea; border-radius: 25px; position: relative; outline:none; transition:0.3s; }
         .ios-switch:checked { background: var(--ios-accent); }
         .ios-switch::after { content: ''; position: absolute; top: 2px; left: 2px; width: 26px; height: 26px; border-radius: 50%; background: white; transition: 0.3s var(--spring); box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
@@ -114,14 +111,10 @@
 </head>
 <body>
 
-    <div class="ios-wallpaper"></div>
-
     <div id="island-wrap"><div id="dynamic-island"><i class="ph-bold ph-bell di-icon"></i><span id="di-msg">Avviso</span></div></div>
 
     <nav class="nav-bar">
-        <div class="logo btn-scale" onclick="location.reload()" style="font-weight: 800; font-size: 1.4rem; display: flex; align-items: center; gap: 5px;">
-            <i class="ph-fill ph-steering-wheel" style="color:var(--ios-accent);"></i> AutoMatch
-        </div>
+        <div class="logo btn-scale" onclick="location.reload()"><i class="ph-fill ph-steering-wheel" style="color:var(--ios-accent); font-size:1.5rem;"></i><b style="font-size:1.3rem;">AutoMatch</b></div>
         <div style="display:flex; gap:10px;">
             <div class="icon-btn btn-scale" onclick="openShare()"><i class="ph-bold ph-share-network"></i></div>
             <div class="icon-btn btn-scale" onclick="document.body.classList.toggle('dark-mode')"><i class="ph-fill ph-moon-stars"></i></div>
@@ -137,7 +130,7 @@
             
             <div class="bento-grid">
                 <div class="bento-card wide">
-                    <div><div style="font-weight:700; font-size:1.1rem; margin-bottom:5px;">Smart Map</div><div style="font-size:0.9rem; color:var(--ios-sub);">Analisi traffico e pedaggi.</div></div>
+                    <div><div style="font-weight:700; font-size:1.1rem; margin-bottom:5px;">Smart Map</div><div style="font-size:0.9rem; color:var(--ios-sub);">Traffico e Pedaggi inclusi.</div></div>
                     <i class="ph-fill ph-map-trifold bento-icon"></i>
                 </div>
                 <div class="bento-card"><i class="ph-fill ph-train bento-icon" style="color:#AF52DE"></i><b>Treni</b></div>
@@ -148,7 +141,6 @@
 
     <section id="app-section">
         <div class="wizard-container">
-            
             <div class="step active" id="step-mode">
                 <h2 style="text-align:center; margin-bottom:30px;">Come ti sposti?</h2>
                 <div style="display:grid; grid-template-columns:1fr 1fr; gap:15px;">
@@ -168,7 +160,7 @@
                         <i class="ph-fill ph-navigation-arrow"></i>
                         <div class="ios-content">
                             <label>Partenza</label>
-                            <input type="text" id="originInput" placeholder="Seleziona..." onfocus="showSug('originInput','l1')" oninput="filterSug('originInput','l1')">
+                            <input type="text" id="originInput" placeholder="Città..." onfocus="showSug('originInput','l1')">
                             <div id="l1" class="suggestions"></div>
                         </div>
                     </div>
@@ -176,7 +168,7 @@
                         <i class="ph-fill ph-flag-checkered"></i>
                         <div class="ios-content">
                             <label>Destinazione</label>
-                            <input type="text" id="destInput" placeholder="Seleziona..." onfocus="showSug('destInput','l2')" oninput="filterSug('destInput','l2')">
+                            <input type="text" id="destInput" placeholder="Città..." onfocus="showSug('destInput','l2')">
                             <div id="l2" class="suggestions"></div>
                         </div>
                     </div>
@@ -192,7 +184,7 @@
             </div>
 
             <div class="step" id="step-2">
-                <h2 style="margin-bottom:20px;">Info Auto</h2>
+                <h2 style="margin-bottom:20px;">La tua Auto</h2>
                 <div class="ios-list">
                     <div class="ios-item"><i class="ph-fill ph-road-horizon"></i><div class="ios-content"><label>Km Totali</label><input type="number" id="kmInput" placeholder="--"></div></div>
                     <div class="ios-item"><i class="ph-fill ph-house-line"></i><div class="ios-content"><label>Garage?</label><select id="chargingInput"><option value="no">No</option><option value="yes">Sì</option></select></div></div>
@@ -206,8 +198,13 @@
             <div class="step" id="step-3">
                 <h2 style="margin-bottom:20px;">Opzioni</h2>
                 <div class="ios-list">
-                    <div class="ios-item"><div class="ios-content"><span style="font-weight:500;">Cerco auto nuova</span></div><input type="checkbox" id="buyToggle" class="ios-switch" onchange="toggleBudget()"></div>
-                    <div class="ios-item" id="budgetRow" style="display:none;"><div class="ios-content"><label>Budget (€)</label><input type="number" id="budgetInput" value="35000"></div></div>
+                    <div class="ios-item">
+                        <div class="ios-content"><span style="font-weight:500;">Cerco auto nuova</span></div>
+                        <input type="checkbox" id="buyToggle" class="ios-switch" onchange="toggleBudget()">
+                    </div>
+                    <div class="ios-item" id="budgetRow" style="display:none;">
+                        <div class="ios-content"><label>Budget (€)</label><input type="number" id="budgetInput" value="35000"></div>
+                    </div>
                 </div>
                 <div style="display:flex; gap:10px;">
                     <button class="btn-sec btn-scale" onclick="prevStep(2)">Indietro</button>
@@ -230,18 +227,26 @@
                     <label style="color:rgba(255,255,255,0.8)">Meteo</label>
                     <div style="font-size:1.8rem; font-weight:800;" id="w-temp">--°</div>
                 </div>
-                <div class="trans-card" style="flex-direction:column; align-items:flex-start; margin:0;">
-                    <i class="ph-fill ph-tree" style="color:var(--ios-green); font-size:1.5rem; margin-bottom:5px;"></i>
-                    <div style="font-size:1.1rem; font-weight:800;" id="si-tree">--</div>
-                    <div style="font-size:0.8rem; color:var(--ios-sub);">Eco Impact</div>
+                <div class="trans-card" style="flex-direction:column; align-items:flex-start; margin:0; background:var(--ios-card);">
+                    <i class="ph-fill ph-music-notes" style="color:#FF2D55; font-size:1.5rem; margin-bottom:5px;"></i>
+                    <label>Playlist</label>
+                    <div style="font-size:1.1rem; font-weight:700;" id="si-music">-- Album</div>
                 </div>
+            </div>
+            
+            <div class="trans-card" style="margin-bottom:30px;">
+                <div style="display:flex; align-items:center; gap:15px;">
+                    <i class="ph-fill ph-tree" style="font-size:1.8rem; color:var(--ios-green);"></i>
+                    <div><div style="font-weight:700;">Eco Impact</div><div style="font-size:0.85rem; color:var(--ios-sub);">Alberi salvati (vs Diesel)</div></div>
+                </div>
+                <div style="font-weight:800; font-size:1.2rem;" id="si-tree">--</div>
             </div>
 
             <div id="res-car" style="display:none;">
-                <h3 style="margin-bottom:15px; font-size:0.9rem; text-transform:uppercase; color:var(--ios-sub);">Costi di Guida</h3>
+                <h3 style="margin-bottom:15px; font-size:0.9rem; text-transform:uppercase; color:var(--ios-sub);">La tua guida</h3>
                 <div class="trans-card">
                     <div style="display:flex; align-items:center; gap:15px;">
-                        <div style="background:#EBF2FF; width:45px; height:45px; border-radius:12px; display:flex; align-items:center; justify-content:center; color:var(--ios-accent);"><i class="ph-fill ph-car" style="font-size:1.5rem;"></i></div>
+                        <i class="ph-fill ph-car" style="font-size:1.8rem; color:var(--ios-accent);"></i>
                         <div><div style="font-weight:700;">In Auto</div><div style="font-size:0.85rem; color:var(--ios-sub);">Carburante + Pedaggi</div></div>
                     </div>
                     <div style="font-weight:700; font-size:1.2rem;" id="drive-cost">--</div>
@@ -254,24 +259,24 @@
             </div>
 
             <div id="res-public" style="display:none;">
-                <h3 style="margin-bottom:15px; font-size:0.9rem; text-transform:uppercase; color:var(--ios-sub);">Opzioni Migliori</h3>
+                <h3 style="margin-bottom:15px; font-size:0.9rem; text-transform:uppercase; color:var(--ios-sub);">Migliori Opzioni</h3>
                 <div class="trans-card btn-scale" onclick="openLink('train')">
                     <div style="display:flex; align-items:center; gap:15px;">
-                        <div style="background:#F2E6FF; width:45px; height:45px; border-radius:12px; display:flex; align-items:center; justify-content:center; color:#AF52DE;"><i class="ph-fill ph-train" style="font-size:1.5rem;"></i></div>
+                        <i class="ph-fill ph-train" style="font-size:1.8rem; color:#AF52DE;"></i>
                         <div><div style="font-weight:700;">Treno</div><div style="font-size:0.85rem; color:var(--ios-sub);" id="train-time">--</div></div>
                     </div>
-                    <div style="text-align:right;"><div style="font-weight:700; font-size:1.1rem;" id="train-cost">--</div><small style="color:var(--ios-accent);">Orari ›</small></div>
+                    <div style="text-align:right;"><div style="font-weight:700; font-size:1.1rem;" id="train-cost">--</div><small style="color:var(--ios-accent); font-weight:600;">Offerte ›</small></div>
                 </div>
                 <div class="trans-card btn-scale" onclick="openLink('plane')" id="card-plane">
                     <div style="display:flex; align-items:center; gap:15px;">
-                        <div style="background:#FFF3E0; width:45px; height:45px; border-radius:12px; display:flex; align-items:center; justify-content:center; color:#FF9500;"><i class="ph-fill ph-airplane-tilt" style="font-size:1.5rem;"></i></div>
+                        <i class="ph-fill ph-airplane-tilt" style="font-size:1.8rem; color:var(--ios-orange);"></i>
                         <div><div style="font-weight:700;">Aereo</div><div style="font-size:0.85rem; color:var(--ios-sub);" id="plane-time">--</div></div>
                     </div>
-                    <div style="text-align:right;"><div style="font-weight:700; font-size:1.1rem;" id="plane-cost">--</div><small style="color:var(--ios-accent);">Voli ›</small></div>
+                    <div style="text-align:right;"><div style="font-weight:700; font-size:1.1rem;" id="plane-cost">--</div><small style="color:var(--ios-accent); font-weight:600;">Voli ›</small></div>
                 </div>
             </div>
-            
-            <p style="text-align:center; font-size:0.7rem; color:var(--ios-sub); margin-top:30px; opacity:0.7;">*Stime basate su medie di mercato. AutoMatch non è responsabile per variazioni reali.</p>
+
+            <p class="disclaimer">I prezzi indicati sono stime basate su medie di mercato (Carburante Italia, Pedaggi Autostrade, Tariffe Low Cost). Il costo reale può variare. AutoMatch non è responsabile per discrepanze.</p>
         </div>
     </section>
 
@@ -287,7 +292,7 @@
                 <div class="ios-item"><div class="ios-content">Pedaggio</div><b id="m-toll">--</b></div>
             </div>
             <div style="background:var(--ios-bg); padding:25px; border-radius:20px; text-align:center;">
-                <label>Costo Viaggio</label><div id="m-total" style="font-size:2.5rem; font-weight:800; letter-spacing:-1px;">--</div>
+                <label>Totale Viaggio</label><div id="m-total" style="font-size:2.5rem; font-weight:800; letter-spacing:-1px;">--</div>
             </div>
             <button class="btn-sec btn-scale" style="margin-top:20px;" onclick="closeModal('car')">Chiudi</button>
         </div>
@@ -303,165 +308,114 @@
     </div>
 
     <script>
-        // --- CONSTANTS ---
-        // Predefined popular cities with coordinates to avoid API failures
-        const LOCALS = {
-            "Roma": {lat:41.9028, lon:12.4964}, "Milano": {lat:45.4642, lon:9.1900}, "Napoli": {lat:40.8518, lon:14.2681},
-            "Torino": {lat:45.0703, lon:7.6869}, "Palermo": {lat:38.1157, lon:13.3615}, "Genova": {lat:44.4056, lon:8.9463},
-            "Bologna": {lat:44.4949, lon:11.3426}, "Firenze": {lat:43.7696, lon:11.2558}, "Bari": {lat:41.1171, lon:16.8719},
-            "Catania": {lat:37.5079, lon:15.0830}, "Venezia": {lat:45.4408, lon:12.3155}, "Verona": {lat:45.4384, lon:10.9916},
-            "Parigi": {lat:48.8566, lon:2.3522}, "Londra": {lat:51.5074, lon:-0.1278}, "Berlino": {lat:52.5200, lon:13.4050}
-        };
-        const CITIES = Object.keys(LOCALS);
+        // DATA
+        const CITIES = ["Roma", "Milano", "Napoli", "Torino", "Bologna", "Firenze", "Venezia", "Bari", "Palermo", "Genova"];
         const CARS = [
             {b:"Tesla",m:"Model 3",p:42990,t:"Elettrica",i:"https://upload.wikimedia.org/wikipedia/commons/thumb/8/82/2019_Tesla_Model_3_Long_Range_AWD_Front.jpg/800px-2019_Tesla_Model_3_Long_Range_AWD_Front.jpg"},
             {b:"Fiat",m:"500e",p:29950,t:"Elettrica",i:"https://upload.wikimedia.org/wikipedia/commons/thumb/7/7f/Fiat_500_Electric_La_Prima_Genf_2020_1X7A5372.jpg/800px-Fiat_500_Electric_La_Prima_Genf_2020_1X7A5372.jpg"},
             {b:"VW",m:"Golf 8",p:34500,t:"Diesel",i:"https://upload.wikimedia.org/wikipedia/commons/thumb/c/c9/2020_Volkswagen_Golf_Style_2.0_Front.jpg/800px-2020_Volkswagen_Golf_Style_2.0_Front.jpg"},
-            {b:"Jeep",m:"Avenger",p:24300,t:"Benzina",i:"https://upload.wikimedia.org/wikipedia/commons/thumb/2/27/Jeep_Avenger_1.2_Turbo_Summit_%E2%80%93_f_%E2%80%93_16042023.jpg/800px-Jeep_Avenger_1.2_Turbo_Summit_%E2%80%93_f_%E2%80%93_16042023.jpg"},
-            {b:"MG",m:"MG4",p:30790,t:"Elettrica",i:"https://upload.wikimedia.org/wikipedia/commons/thumb/6/64/MG4_EV_Dabok.jpg/800px-MG4_EV_Dabok.jpg"},
-            {b:"Audi",m:"Q4 e-tron",p:56000,t:"Elettrica",i:"https://upload.wikimedia.org/wikipedia/commons/thumb/5/59/Audi_Q4_e-tron_IMG_4803.jpg/800px-Audi_Q4_e-tron_IMG_4803.jpg"},
-            {b:"BYD",m:"Atto 3",p:38000,t:"Elettrica",i:"https://upload.wikimedia.org/wikipedia/commons/thumb/2/23/BYD_Atto_3_IAA_2023_1X7A0456.jpg/800px-BYD_Atto_3_IAA_2023_1X7A0456.jpg"},
-            {b:"Dacia",m:"Spring",p:21000,t:"Elettrica",i:"https://upload.wikimedia.org/wikipedia/commons/thumb/5/53/Dacia_Spring_2022.jpg/800px-Dacia_Spring_2022.jpg"},
-            {b:"Porsche",m:"Taycan",p:95000,t:"Elettrica",i:"https://upload.wikimedia.org/wikipedia/commons/thumb/2/26/Porsche_Taycan_Turbo_S_IMG_3179.jpg/800px-Porsche_Taycan_Turbo_S_IMG_3179.jpg"}
+            {b:"Jeep",m:"Avenger",p:24300,t:"Benzina",i:"https://upload.wikimedia.org/wikipedia/commons/thumb/2/27/Jeep_Avenger_1.2_Turbo_Summit_%E2%80%93_f_%E2%80%93_16042023.jpg/800px-Jeep_Avenger_1.2_Turbo_Summit_%E2%80%93_f_%E2%80%93_16042023.jpg"}
         ];
         
-        let state = { mode: 'car', start: null, end: null, km: 0, geo: null };
+        // STATE
+        let state = { mode: 'car', start: null, end: null, km: 0 };
 
         // --- ISLAND ---
         function notify(msg, type='neutral') {
-            const w=document.getElementById('island-wrap'), d=document.getElementById('dynamic-island');
+            const w=document.getElementById('island-wrap'), d=document.getElementById('dynamic-island'), m=document.getElementById('di-msg');
             const icon = type==='error'?'ph-warning-circle':(type==='success'?'ph-check-circle':'ph-info');
             const color = type==='error'?'#FF3B30':(type==='success'?'#34C759':'#fff');
-            d.innerHTML = `<i class="ph-fill ${icon} di-icon" style="color:${color};font-size:1.4rem;"></i><span id="di-msg" style="font-weight:600;">${msg}</span>`;
+            d.innerHTML = `<i class="ph-fill ${icon}" style="color:${color};font-size:1.4rem;"></i><span style="font-weight:600;">${msg}</span>`;
             w.classList.add('show'); setTimeout(()=>w.classList.remove('show'), 3000);
         }
 
-        // --- INIT ---
+        // --- CORE ---
         window.onload = function() {
             document.getElementById('tripDate').valueAsDate = new Date();
-            const map = L.map('map', {zoomControl:false}).setView([41.9, 12.5], 5);
-            L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png').addTo(map);
-            window.map = map; window.markers = L.layerGroup().addTo(map); window.route = L.layerGroup().addTo(map);
+            initMap();
             document.addEventListener('click', e => { if(!e.target.closest('.ios-content')) document.querySelectorAll('.suggestions').forEach(s=>s.style.display='none'); });
         }
 
-        // --- AUTOCOMPLETE ---
+        function initMap() {
+            window.map = L.map('map', {zoomControl:false}).setView([41.9, 12.5], 5);
+            L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png').addTo(window.map);
+            window.layers = L.layerGroup().addTo(window.map);
+        }
+
         function showSug(id, listId) {
             const list = document.getElementById(listId); list.innerHTML='';
-            CITIES.forEach(c => addSug(c, list, id, 'Popolare'));
+            CITIES.forEach(c => {
+                const d = document.createElement('div'); d.className='s-item'; d.innerText=c;
+                d.onclick=()=>{ document.getElementById(id).value=c; list.style.display='none'; };
+                list.appendChild(d);
+            });
             list.style.display='block';
-        }
-        function filterSug(id, listId) {
-            const list = document.getElementById(listId), val = document.getElementById(id).value.toLowerCase();
-            list.innerHTML='';
-            if(!val) { showSug(id, listId); return; }
-            
-            const local = CITIES.filter(c=>c.toLowerCase().includes(val));
-            local.forEach(c => addSug(c, list, id, 'Città'));
-            
-            // Only query API if necessary and not already found locally
-            if(local.length<3 && val.length>3) {
-                // Simplified API call (optional for robustness)
-            }
-            list.style.display='block';
-        }
-        function addSug(txt, list, id, type) {
-            const d=document.createElement('div'); d.className='s-item'; 
-            d.innerHTML = `${txt} <span class="s-pop">${type}</span>`;
-            d.onclick=()=>{ document.getElementById(id).value=txt; list.style.display='none'; };
-            list.appendChild(d);
         }
 
         // --- FLOW ---
         function goToApp(){ document.getElementById('landing-page').style.display='none'; document.getElementById('app-section').style.display='flex'; setTimeout(()=>document.getElementById('app-section').style.opacity='1',50); }
         function nextStep(s){ document.querySelectorAll('.step').forEach(e=>e.classList.remove('active')); document.getElementById('step-'+s).classList.add('active'); }
         function prevStep(s){ nextStep(s==='mode'?'mode':s); }
-        function selectMode(m) { state.mode=m; const d=document.getElementById('tripDate'), l=document.getElementById('lbl-date'); if(m==='car'){d.type='date';l.innerText="Data Partenza";}else{d.type='datetime-local';l.innerText="Data e Ora";} nextStep(1); }
-        function toggleBudget(){ document.getElementById('budgetRow').style.display = document.getElementById('buyToggle').checked ? 'flex' : 'none'; }
-
-        // --- VALIDATION & FALLBACK LOGIC ---
-        async function resolveCitySafe(name) {
-            // 1. Try Local DB first (Instant)
-            const cleanName = name.split(',')[0].trim();
-            if(LOCALS[cleanName]) return LOCALS[cleanName];
-            
-            // 2. Try API with Timeout
-            const controller = new AbortController();
-            const id = setTimeout(() => controller.abort(), 2000); // 2s max timeout
-            try {
-                const r = await fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(name)}&format=json&limit=1`, {signal: controller.signal});
-                clearTimeout(id);
-                const d = await r.json();
-                if(d.length > 0) return {lat:parseFloat(d[0].lat),lon:parseFloat(d[0].lon)};
-            } catch(e) { console.log("API Fail, skipping"); }
-            return null;
+        
+        function selectMode(m) {
+            state.mode = m;
+            const di = document.getElementById('tripDate'); const lb = document.getElementById('lbl-date');
+            if(m==='car') { di.type='date'; lb.innerText="Data Partenza"; }
+            else { di.type='datetime-local'; lb.innerText="Data e Ora"; const n=new Date(); n.setMinutes(n.getMinutes()-n.getTimezoneOffset()); di.value=n.toISOString().slice(0,16); }
+            nextStep(1);
         }
 
+        function toggleBudget() { document.getElementById('budgetRow').style.display = document.getElementById('buyToggle').checked ? 'flex' : 'none'; }
+
+        // --- VALIDATION ---
         async function validateStep1() {
             const o = document.getElementById('originInput').value, d = document.getElementById('destInput').value;
             if(!o) return notify("Manca Partenza", "error");
             
             notify("Cerco Percorso...");
+            if(!state.start) state.start = await resolve(o);
+            if(d && !state.end) state.end = await resolve(d);
             
-            state.start = await resolveCitySafe(o);
-            if(d) state.end = await resolveCitySafe(d);
-            
-            // Critical Fix: Even if coords fail, allow manual proceed for CAR
             if(state.end) {
                 try {
                     const r = await fetch(`https://router.project-osrm.org/route/v1/driving/${state.start.lon},${state.start.lat};${state.end.lon},${state.end.lat}?overview=full`);
                     const json = await r.json();
-                    if(!json.routes) throw new Error();
                     state.km = Math.round(json.routes[0].distance/1000);
                     state.geo = json.routes[0].geometry;
                     notify("Percorso Trovato", "success");
-                } catch { 
-                    state.km = Math.round(dist(state.start, state.end)); 
-                    state.geo = null;
-                    notify("Stima Attiva", "neutral");
-                }
+                } catch { state.km = Math.round(dist(state.start, state.end)); notify("Stima Lineare Attiva"); }
                 document.getElementById('kmInput').value = state.km;
-            } else {
-                // Fallback if destination not found but user typed something
-                if(d) notify("Città non trovata, inserisci KM manualmente", "error");
             }
-            
-            if(state.mode === 'public') runAnalysis();
-            else nextStep(2);
+            state.mode === 'public' ? runAnalysis() : nextStep(2);
         }
 
         async function runAnalysis() {
-            // Robust check: use calculated KM or Manual Input
-            let km = state.km;
-            if(state.mode === 'car') {
-                const manualKm = parseFloat(document.getElementById('kmInput').value);
-                if(manualKm > 0) km = manualKm;
-            }
-            
-            if(!km || km <= 0) return notify("Inserisci KM validi", "error");
+            const km = state.mode==='car' ? parseFloat(document.getElementById('kmInput').value) : state.km;
+            if(!km) return notify("Inserisci KM", "error");
 
             document.getElementById('wizard-box').style.display='none';
             document.getElementById('results-container').style.display='block';
             
-            // Map Update (Safe check)
+            // Async Weather
+            if(state.end) fetchWeather(state.end.lat, state.end.lon);
+
+            // Update Map
             setTimeout(() => {
-                window.map.invalidateSize(); window.markers.clearLayers(); window.route.clearLayers();
+                window.map.invalidateSize(); window.layers.clearLayers();
                 if(state.start && state.end) {
-                    L.polyline([state.start, state.end], {color:'#007AFF', dashArray: state.geo?null:'10,10', weight:4}).addTo(window.route);
-                    if(state.geo) L.geoJSON(state.geo).addTo(window.route);
+                    L.polyline([state.start, state.end], {color:'#007AFF', dashArray: state.geo?null:'10,10'}).addTo(window.layers);
+                    if(state.geo) L.geoJSON(state.geo).addTo(window.layers);
                     window.map.fitBounds(L.latLngBounds([state.start, state.end]), {padding:[50,50]});
                 }
-            }, 300);
+            }, 200);
 
-            // Weather (Async, don't block)
-            if(state.end) {
-                fetch(`https://api.open-meteo.com/v1/forecast?latitude=${state.end.lat}&longitude=${state.end.lon}&current_weather=true`)
-                .then(r=>r.json()).then(d=>{ document.getElementById('w-temp').innerText = Math.round(d.current_weather.temperature)+"°"; })
-                .catch(()=>{ document.getElementById('w-temp').innerText = "--"; });
-            }
-
+            // Fill Data
             document.getElementById('t-km').innerText = km + " km";
-            document.getElementById('si-tree').innerText = ((km * 120) / 20000).toFixed(1) + " Alberi";
+            
+            // Insights
+            const trees = ((km * 120) / 20000).toFixed(1); // 120g/km diesel vs tree 20kg/y
+            document.getElementById('si-tree').innerText = trees > 0.1 ? trees + " Alberi" : "< 1 Albero";
+            document.getElementById('si-music').innerText = Math.max(1, Math.round((km/90)/0.75)) + " Album"; // 45min avg album
 
             if(state.mode === 'car') {
                 document.getElementById('res-car').style.display='block';
@@ -475,17 +429,16 @@
                     grid.innerHTML = CARS.filter(c=>c.p<=budget*1.3).map(c=> {
                         const fc = (c.t==='Elettrica') ? (km/100)*16*0.6 : (km/100)*6*1.8;
                         return `<div class="car-card" onclick="openCarModal('${c.b}','${c.m}',${c.p},${fc.toFixed(0)},${km})">
-                            <img src="${c.i}" class="car-img" loading="lazy">
-                            <div class="car-badge">${c.t}</div>
+                            <img src="${c.i}" class="car-img">
                             <div style="padding:15px;"><b>${c.b} ${c.m}</b><br><small style="color:var(--ios-sub)">€${c.p.toLocaleString()}</small></div>
                         </div>`
-                    }).join('') || "<p style='text-align:center; color:#999;'>Nessuna auto trovata.</p>";
+                    }).join('') || "<p>Nessuna auto trovata.</p>";
                 }
             } else {
                 document.getElementById('res-public').style.display='block';
                 const tCost = (km*0.15).toFixed(0);
                 document.getElementById('train-cost').innerText = "€"+tCost;
-                document.getElementById('train-time').innerText = (km/110).toFixed(1)+"h";
+                document.getElementById('train-time').innerText = (km/120).toFixed(1)+"h";
                 
                 if(km>300) {
                     document.getElementById('plane-cost').innerText = "€"+(40+km*0.05).toFixed(0);
@@ -494,7 +447,7 @@
             }
         }
 
-        // --- MODALS & SHARE ---
+        // --- MODALS ---
         function openCarModal(b, m, p, f, k) {
             document.getElementById('m-brand').innerText = b; document.getElementById('m-model').innerText = m;
             document.getElementById('m-price').innerText = "€" + p.toLocaleString();
@@ -504,23 +457,28 @@
             document.getElementById('m-total').innerText = "€" + (parseFloat(f)+parseFloat(t)).toFixed(0);
             openModal('car');
         }
+        function openModal(id){ const e=document.getElementById(id+'-modal'); e.style.display='flex'; setTimeout(()=>e.querySelector('.sheet').style.transform='translateY(0)',10); }
+        function closeModal(id){ const e=document.getElementById(id+'-modal'); e.querySelector('.sheet').style.transform='translateY(100%)'; setTimeout(()=>e.style.display='none',300); }
         
+        // --- SHARE ---
         function getShareText() {
             const km = document.getElementById('t-km').innerText;
             const o = document.getElementById('originInput').value; const d = document.getElementById('destInput').value;
             let det = state.mode==='car' ? `🚗 Auto: ${document.getElementById('drive-cost').innerText}` : `🚆 Treno: ${document.getElementById('train-cost').innerText}`;
             return `*Viaggio AutoMatch* 🌍\n${o} ➡️ ${d}\n📏 ${km}\n💰 ${det}\n🌱 Eco: ${document.getElementById('si-tree').innerText}\n\n🔗 https://chrii2612.github.io/trovaauto/`;
         }
-        function openShare() { if(!document.getElementById('t-km').innerText.includes('km')) return notify("Crea prima un viaggio", "error"); openModal('share'); }
+        function openShare() { if(!state.km) return notify("Crea prima un viaggio", "error"); openModal('share'); }
         function shareWa() { window.open(`https://wa.me/?text=${encodeURIComponent(getShareText())}`); closeModal('share'); }
         function shareMail() { window.open(`mailto:?subject=Plan AutoMatch&body=${encodeURIComponent(getShareText())}`); closeModal('share'); }
 
-        function openModal(id){ const e=document.getElementById(id+'-modal'); e.style.display='flex'; setTimeout(()=>e.querySelector('.sheet').style.transform='translateY(0)',10); }
-        function closeModal(id){ const e=document.getElementById(id+'-modal'); e.querySelector('.sheet').style.transform='translateY(100%)'; setTimeout(()=>e.style.display='none',300); }
-        
-        // --- UTILS ---
-        function openLink(t) { window.open(`https://www.google.com/search?q=${t==='train'?'Treno':'Voli'}+da+${document.getElementById('originInput').value}+a+${document.getElementById('destInput').value}`); }
+        // --- LINKS & UTILS ---
+        function openLink(t) {
+            const q = t==='train' ? `Treno ${document.getElementById('originInput').value} ${document.getElementById('destInput').value}` : `Voli ${document.getElementById('originInput').value} ${document.getElementById('destInput').value}`;
+            window.open(`https://www.google.com/search?q=${q}`);
+        }
+        async function resolve(n){ try{const r=await fetch(`https://nominatim.openstreetmap.org/search?q=${n}&format=json&limit=1`);const d=await r.json();return {lat:parseFloat(d[0].lat),lon:parseFloat(d[0].lon)};}catch{return null;} }
         function dist(p1,p2){var R=6371;var dLat=(p2.lat-p1.lat)*Math.PI/180;var dLon=(p2.lon-p1.lon)*Math.PI/180;var a=Math.sin(dLat/2)*Math.sin(dLat/2)+Math.cos(p1.lat*Math.PI/180)*Math.cos(p2.lat*Math.PI/180)*Math.sin(dLon/2)*Math.sin(dLon/2);return R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a))*1.3;}
+        async function fetchWeather(lat,lon){try{const r=await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true`);const d=await r.json();document.getElementById('w-temp').innerText=Math.round(d.current_weather.temperature)+"°";}catch{}}
     </script>
 </body>
 </html>
