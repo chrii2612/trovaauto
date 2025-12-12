@@ -7,6 +7,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="theme-color" content="#F2F2F7" media="(prefers-color-scheme: light)">
+    <meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)">
     
     <title>AutoMatch iOS 26</title>
     
@@ -37,17 +38,28 @@
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body, html { margin: 0; padding: 0; height: 100%; font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif; background: var(--ios-bg); color: var(--ios-text); overflow-x: hidden; scroll-behavior: smooth; }
 
+        /* WALLPAPER BACKGROUND */
+        .ios-wallpaper {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1;
+            background: radial-gradient(circle at 50% 0%, #a1c4fd 0%, #c2e9fb 50%, var(--ios-bg) 100%);
+            opacity: 1; transition: opacity 0.5s;
+        }
+        body.dark-mode .ios-wallpaper {
+            background: radial-gradient(circle at 50% 0%, #1a2a6c 0%, #b21f1f 50%, #fdbb2d 100%);
+            opacity: 0.3; 
+        }
+
         /* ISLAND */
         #island-wrap { position: fixed; top: -100px; left:0; width:100%; display:flex; justify-content:center; z-index:9999; transition: top 0.5s var(--spring); pointer-events:none; }
         #island-wrap.show { top: 12px; }
         #dynamic-island { background: #000; color: #fff; padding: 0 25px; height: 46px; border-radius: 23px; display: flex; align-items: center; gap: 12px; box-shadow: 0 5px 20px rgba(0,0,0,0.3); pointer-events:auto; transform: scale(0.9); transition: transform 0.3s; }
         #island-wrap.show #dynamic-island { transform: scale(1); }
 
-        /* NAV */
+        /* NAVBAR */
         .nav-bar { position: fixed; top: 0; left: 0; width: 100%; height: 60px; padding: 0 20px; display: flex; justify-content: space-between; align-items: center; z-index: 2000; background: rgba(255,255,255,0.01); backdrop-filter: var(--ios-blur); -webkit-backdrop-filter: var(--ios-blur); }
         .btn-scale { transition: transform 0.2s; cursor: pointer; }
         .btn-scale:active { transform: scale(0.94); }
-        .icon-btn { width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: rgba(120,120,128,0.1); font-size: 1.2rem; }
+        .icon-btn { width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: rgba(120,120,128,0.15); font-size: 1.2rem; backdrop-filter: blur(10px); }
 
         /* INPUTS */
         .ios-list { background: var(--ios-card); border-radius: 18px; margin-bottom: 25px; box-shadow: var(--ios-shadow); position: relative; z-index: 10; }
@@ -66,7 +78,7 @@
 
         /* HOME */
         .bento-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; width: 100%; margin-top: 40px; }
-        .bento-card { background: var(--ios-card); border-radius: 24px; padding: 25px 20px; text-align: center; box-shadow: var(--ios-shadow); transition: 0.2s; }
+        .bento-card { background: rgba(255,255,255,0.6); backdrop-filter: blur(20px); border-radius: 24px; padding: 25px 20px; text-align: center; box-shadow: var(--ios-shadow); transition: 0.2s; border:1px solid rgba(255,255,255,0.2); }
         .bento-card.wide { grid-column: span 2; text-align: left; display: flex; justify-content: space-between; align-items: center; padding: 25px; }
         .bento-icon { font-size: 2rem; color: var(--ios-accent); margin-bottom: 10px; }
         .bento-card.wide .bento-icon { margin-bottom: 0; font-size: 2.5rem; }
@@ -76,14 +88,14 @@
         .btn-sec { background: rgba(120,120,128,0.1); color: var(--ios-accent); padding: 16px; border-radius: 16px; width: 100%; border:none; font-weight: 600; }
 
         /* WIZARD */
-        #app-section { display: none; padding-top: 100px; padding-bottom: 100px; min-height: 100vh; flex-direction: column; align-items: center; opacity: 0; transition: 0.5s; }
+        #app-section { display: none; padding-top: 100px; padding-bottom: 100px; min-height: 100vh; flex-direction: column; align-items: center; opacity: 0; transition: 0.5s; position: relative; z-index: 2; }
         .wizard-container { width: 100%; max-width: 600px; padding: 0 20px; }
         .step { display: none; animation: slideUp 0.4s var(--spring) forwards; }
         .step.active { display: block; }
         @keyframes slideUp { from {opacity:0; transform:translateY(30px);} to {opacity:1; transform:translateY(0);} }
 
         /* RESULTS */
-        #results-container { width: 100%; max-width: 1000px; display: none; padding: 0 20px 80px 20px; }
+        #results-container { width: 100%; max-width: 1000px; display: none; padding: 0 20px 80px 20px; position: relative; z-index: 2; }
         .map-box { height: 350px; border-radius: 24px; overflow: hidden; margin-bottom: 20px; position: relative; z-index: 1; box-shadow: var(--ios-shadow); background: #eee; }
         #map { width: 100%; height: 100%; }
         
@@ -110,6 +122,8 @@
 </head>
 <body>
 
+    <div class="ios-wallpaper"></div>
+
     <div id="island-wrap"><div id="dynamic-island"><i class="ph-bold ph-bell di-icon"></i><span id="di-msg">Avviso</span></div></div>
 
     <nav class="nav-bar">
@@ -125,13 +139,13 @@
     <div id="landing-page" style="padding-top:120px; text-align:center; padding-bottom: 40px;">
         <div style="max-width:800px; margin:0 auto; padding:20px;">
             <span style="color:var(--ios-accent); font-weight:700; letter-spacing:1px; font-size:0.8rem; text-transform:uppercase; margin-bottom:15px; display:block;">iOS 26 Concept</span>
-            <h1 style="font-size:3.5rem; line-height:1; margin-bottom:20px;">Viaggia nel<br>Futuro.</h1>
-            <p style="color:var(--ios-sub); font-size:1.2rem; margin-bottom:40px;">Confronta Auto, Treno e Aereo in tempo reale.</p>
+            <h1 style="font-size:3.5rem; line-height:1; margin-bottom:20px;">Il viaggio<br>reinventato.</h1>
+            <p style="color:var(--ios-sub); font-size:1.2rem; margin-bottom:40px;">Confronta Auto, Treno e Aereo in un attimo.</p>
             <button class="btn-main btn-scale" onclick="goToApp()">Inizia Ora</button>
             
             <div class="bento-grid">
                 <div class="bento-card wide">
-                    <div><div style="font-weight:700; font-size:1.1rem; margin-bottom:5px;">Smart Map</div><div style="font-size:0.9rem; color:var(--ios-sub);">Analisi traffico e pedaggi reali.</div></div>
+                    <div><div style="font-weight:700; font-size:1.1rem; margin-bottom:5px;">Smart Map</div><div style="font-size:0.9rem; color:var(--ios-sub);">Analisi traffico e pedaggi.</div></div>
                     <i class="ph-fill ph-map-trifold bento-icon"></i>
                 </div>
                 <div class="bento-card"><i class="ph-fill ph-train bento-icon" style="color:#AF52DE"></i><b>Treni</b></div>
@@ -281,7 +295,7 @@
                 <div class="ios-item"><div class="ios-content">Pedaggio</div><b id="m-toll">--</b></div>
             </div>
             <div style="background:var(--ios-bg); padding:25px; border-radius:20px; text-align:center;">
-                <label>Totale Viaggio</label><div id="m-total" style="font-size:2.5rem; font-weight:800; letter-spacing:-1px;">--</div>
+                <label>Costo Viaggio</label><div id="m-total" style="font-size:2.5rem; font-weight:800; letter-spacing:-1px;">--</div>
             </div>
             <button class="btn-sec btn-scale" style="margin-top:20px;" onclick="closeModal('car')">Chiudi</button>
         </div>
@@ -328,8 +342,6 @@
             const map = L.map('map', {zoomControl:false}).setView([41.9, 12.5], 5);
             L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png').addTo(map);
             window.map = map; window.markers = L.layerGroup().addTo(map); window.route = L.layerGroup().addTo(map);
-            
-            // Suggestion click outside handler
             document.addEventListener('click', e => { if(!e.target.closest('.ios-content')) document.querySelectorAll('.suggestions').forEach(s=>s.style.display='none'); });
         }
 
@@ -343,12 +355,8 @@
             const list = document.getElementById(listId), val = document.getElementById(id).value.toLowerCase();
             list.innerHTML='';
             if(!val) { showSug(id, listId); return; }
-            
-            // Local
             const local = CITIES.filter(c=>c.toLowerCase().includes(val));
             local.forEach(c => addSug(c, list, id, 'Città'));
-            
-            // API
             if(local.length<3 && val.length>2) {
                 fetch(`https://nominatim.openstreetmap.org/search?q=${val}&format=json&limit=3`)
                 .then(r=>r.json()).then(d=>{ d.forEach(x=>addSug(x.display_name.split(',')[0], list, id, 'Mondo')) });
@@ -369,44 +377,49 @@
         function selectMode(m) { state.mode=m; const d=document.getElementById('tripDate'), l=document.getElementById('lbl-date'); if(m==='car'){d.type='date';l.innerText="Data Partenza";}else{d.type='datetime-local';l.innerText="Data e Ora";} nextStep(1); }
         function toggleBudget(){ document.getElementById('budgetRow').style.display = document.getElementById('buyToggle').checked ? 'flex' : 'none'; }
 
-        // --- VALIDATION ---
+        // --- VALIDATION & ANALYSIS (Robust Fallback) ---
         async function validateStep1() {
             const o = document.getElementById('originInput').value, d = document.getElementById('destInput').value;
             if(!o) return notify("Manca Partenza", "error");
             
             notify("Cerco Percorso...");
+            
             try {
-                if(!state.start) state.start = await resolve(o);
-                if(d && !state.end) state.end = await resolve(d);
-            } catch(e) { return notify("Indirizzo non trovato", "error"); }
+                if(!state.start) state.start = await resolveWithTimeout(o);
+                if(d && !state.end) state.end = await resolveWithTimeout(d);
+            } catch(e) { console.log(e); } // Ignore initial fail, try proceed
             
             if(state.end) {
-                // Try Route, Fallback Math
                 try {
                     const r = await fetch(`https://router.project-osrm.org/route/v1/driving/${state.start.lon},${state.start.lat};${state.end.lon},${state.end.lat}?overview=full`);
                     const json = await r.json();
-                    if(!json.routes) throw new Error();
+                    if(!json.routes || json.routes.length === 0) throw new Error("No Route");
                     state.km = Math.round(json.routes[0].distance/1000);
                     state.geo = json.routes[0].geometry;
                     notify("Percorso Trovato", "success");
                 } catch { 
+                    // CRITICAL FALLBACK
                     state.km = Math.round(dist(state.start, state.end)); 
                     state.geo = null;
                     notify("Stima Lineare Attiva", "neutral");
                 }
                 document.getElementById('kmInput').value = state.km;
+            } else {
+                return notify("Città non trovate", "error");
             }
-            state.mode === 'public' ? runAnalysis() : nextStep(2);
+            
+            if(state.mode === 'public') runAnalysis();
+            else nextStep(2);
         }
 
         async function runAnalysis() {
             const km = state.mode==='car' ? parseFloat(document.getElementById('kmInput').value) : state.km;
-            if(!km) return notify("Inserisci KM", "error");
+            if(!km || isNaN(km)) return notify("Inserisci KM", "error");
 
             document.getElementById('wizard-box').style.display='none';
             document.getElementById('results-container').style.display='block';
             
-            // Map
+            // Map Update
             setTimeout(() => {
                 window.map.invalidateSize(); window.markers.clearLayers(); window.route.clearLayers();
                 if(state.start && state.end) {
@@ -416,10 +429,12 @@
                 }
             }, 300);
 
-            // Weather
-            if(state.end) fetch(`https://api.open-meteo.com/v1/forecast?latitude=${state.end.lat}&longitude=${state.end.lon}&current_weather=true`).then(r=>r.json()).then(d=>{
-                document.getElementById('w-temp').innerText = Math.round(d.current_weather.temperature)+"°";
-            });
+            // Weather (Async)
+            if(state.end) {
+                fetch(`https://api.open-meteo.com/v1/forecast?latitude=${state.end.lat}&longitude=${state.end.lon}&current_weather=true`)
+                .then(r=>r.json()).then(d=>{ document.getElementById('w-temp').innerText = Math.round(d.current_weather.temperature)+"°"; })
+                .catch(()=>{ document.getElementById('w-temp').innerText = "--"; });
+            }
 
             document.getElementById('t-km').innerText = km + " km";
             document.getElementById('si-tree').innerText = ((km * 120) / 20000).toFixed(1) + " Alberi";
@@ -472,7 +487,7 @@
             let det = state.mode==='car' ? `🚗 Auto: ${document.getElementById('drive-cost').innerText}` : `🚆 Treno: ${document.getElementById('train-cost').innerText}`;
             return `*Viaggio AutoMatch* 🌍\n${o} ➡️ ${d}\n📏 ${km}\n💰 ${det}\n🌱 Eco: ${document.getElementById('si-tree').innerText}\n\n🔗 https://chrii2612.github.io/trovaauto/`;
         }
-        function openShare() { if(!state.km) return notify("Crea prima un viaggio", "error"); openModal('share'); }
+        function openShare() { if(!document.getElementById('t-km').innerText.includes('km')) return notify("Crea prima un viaggio", "error"); openModal('share'); }
         function shareWa() { window.open(`https://wa.me/?text=${encodeURIComponent(getShareText())}`); closeModal('share'); }
         function shareMail() { window.open(`mailto:?subject=Plan AutoMatch&body=${encodeURIComponent(getShareText())}`); closeModal('share'); }
 
@@ -481,7 +496,19 @@
         
         // --- UTILS ---
         function openLink(t) { window.open(`https://www.google.com/search?q=${t==='train'?'Treno':'Voli'}+da+${document.getElementById('originInput').value}+a+${document.getElementById('destInput').value}`); }
-        async function resolve(n){ const r=await fetch(`https://nominatim.openstreetmap.org/search?q=${n}&format=json&limit=1`);const d=await r.json();if(!d.length)throw new Error(); return {lat:parseFloat(d[0].lat),lon:parseFloat(d[0].lon)}; }
+        
+        async function resolveWithTimeout(n) {
+            const controller = new AbortController();
+            const id = setTimeout(() => controller.abort(), 2000); // 2s timeout
+            try {
+                const r = await fetch(`https://nominatim.openstreetmap.org/search?q=${n}&format=json&limit=1`, {signal: controller.signal});
+                clearTimeout(id);
+                const d = await r.json();
+                if(d.length > 0) return {lat:parseFloat(d[0].lat),lon:parseFloat(d[0].lon)};
+                else throw new Error("No results");
+            } catch(e) { return null; }
+        }
+
         function dist(p1,p2){var R=6371;var dLat=(p2.lat-p1.lat)*Math.PI/180;var dLon=(p2.lon-p1.lon)*Math.PI/180;var a=Math.sin(dLat/2)*Math.sin(dLat/2)+Math.cos(p1.lat*Math.PI/180)*Math.cos(p2.lat*Math.PI/180)*Math.sin(dLon/2)*Math.sin(dLon/2);return R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a))*1.3;}
     </script>
 </body>
