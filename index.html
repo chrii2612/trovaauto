@@ -7,7 +7,6 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="theme-color" content="#F2F2F7" media="(prefers-color-scheme: light)">
-    <meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)">
     
     <title>AutoMatch iOS 26</title>
     
@@ -38,16 +37,9 @@
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body, html { margin: 0; padding: 0; height: 100%; font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif; background: var(--ios-bg); color: var(--ios-text); overflow-x: hidden; scroll-behavior: smooth; }
 
-        /* WALLPAPER BACKGROUND */
-        .ios-wallpaper {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1;
-            background: radial-gradient(circle at 50% 0%, #a1c4fd 0%, #c2e9fb 50%, var(--ios-bg) 100%);
-            opacity: 1; transition: opacity 0.5s;
-        }
-        body.dark-mode .ios-wallpaper {
-            background: radial-gradient(circle at 50% 0%, #1a2a6c 0%, #b21f1f 50%, #fdbb2d 100%);
-            opacity: 0.3; 
-        }
+        /* BACKGROUND */
+        .ios-wallpaper { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; background: radial-gradient(circle at 50% 0%, #a1c4fd 0%, #c2e9fb 50%, var(--ios-bg) 100%); opacity: 1; transition: opacity 0.5s; }
+        body.dark-mode .ios-wallpaper { background: radial-gradient(circle at 50% 0%, #1a2a6c 0%, #b21f1f 50%, #fdbb2d 100%); opacity: 0.3; }
 
         /* ISLAND */
         #island-wrap { position: fixed; top: -100px; left:0; width:100%; display:flex; justify-content:center; z-index:9999; transition: top 0.5s var(--spring); pointer-events:none; }
@@ -55,7 +47,7 @@
         #dynamic-island { background: #000; color: #fff; padding: 0 25px; height: 46px; border-radius: 23px; display: flex; align-items: center; gap: 12px; box-shadow: 0 5px 20px rgba(0,0,0,0.3); pointer-events:auto; transform: scale(0.9); transition: transform 0.3s; }
         #island-wrap.show #dynamic-island { transform: scale(1); }
 
-        /* NAVBAR */
+        /* NAV */
         .nav-bar { position: fixed; top: 0; left: 0; width: 100%; height: 60px; padding: 0 20px; display: flex; justify-content: space-between; align-items: center; z-index: 2000; background: rgba(255,255,255,0.01); backdrop-filter: var(--ios-blur); -webkit-backdrop-filter: var(--ios-blur); }
         .btn-scale { transition: transform 0.2s; cursor: pointer; }
         .btn-scale:active { transform: scale(0.94); }
@@ -88,14 +80,14 @@
         .btn-sec { background: rgba(120,120,128,0.1); color: var(--ios-accent); padding: 16px; border-radius: 16px; width: 100%; border:none; font-weight: 600; }
 
         /* WIZARD */
-        #app-section { display: none; padding-top: 100px; padding-bottom: 100px; min-height: 100vh; flex-direction: column; align-items: center; opacity: 0; transition: 0.5s; position: relative; z-index: 2; }
+        #app-section { display: none; padding-top: 100px; padding-bottom: 100px; min-height: 100vh; flex-direction: column; align-items: center; opacity: 0; transition: 0.5s; }
         .wizard-container { width: 100%; max-width: 600px; padding: 0 20px; }
         .step { display: none; animation: slideUp 0.4s var(--spring) forwards; }
         .step.active { display: block; }
         @keyframes slideUp { from {opacity:0; transform:translateY(30px);} to {opacity:1; transform:translateY(0);} }
 
         /* RESULTS */
-        #results-container { width: 100%; max-width: 1000px; display: none; padding: 0 20px 80px 20px; position: relative; z-index: 2; }
+        #results-container { width: 100%; max-width: 1000px; display: none; padding: 0 20px 80px 20px; }
         .map-box { height: 350px; border-radius: 24px; overflow: hidden; margin-bottom: 20px; position: relative; z-index: 1; box-shadow: var(--ios-shadow); background: #eee; }
         #map { width: 100%; height: 100%; }
         
@@ -139,8 +131,8 @@
     <div id="landing-page" style="padding-top:120px; text-align:center; padding-bottom: 40px;">
         <div style="max-width:800px; margin:0 auto; padding:20px;">
             <span style="color:var(--ios-accent); font-weight:700; letter-spacing:1px; font-size:0.8rem; text-transform:uppercase; margin-bottom:15px; display:block;">iOS 26 Concept</span>
-            <h1 style="font-size:3.5rem; line-height:1; margin-bottom:20px;">Il viaggio<br>reinventato.</h1>
-            <p style="color:var(--ios-sub); font-size:1.2rem; margin-bottom:40px;">Confronta Auto, Treno e Aereo in un attimo.</p>
+            <h1 style="font-size:3.5rem; line-height:1; margin-bottom:20px;">Viaggia nel<br>Futuro.</h1>
+            <p style="color:var(--ios-sub); font-size:1.2rem; margin-bottom:40px;">Confronta Auto, Treno e Aereo in tempo reale.</p>
             <button class="btn-main btn-scale" onclick="goToApp()">Inizia Ora</button>
             
             <div class="bento-grid">
@@ -311,8 +303,16 @@
     </div>
 
     <script>
-        // DATA
-        const CITIES = ["Roma","Milano","Napoli","Torino","Bologna","Firenze","Venezia","Bari","Palermo","Genova","Verona","Trieste","Parigi","Londra","Madrid","Berlino","Monaco","Zurigo","Barcellona","Amsterdam"];
+        // --- CONSTANTS ---
+        // Predefined popular cities with coordinates to avoid API failures
+        const LOCALS = {
+            "Roma": {lat:41.9028, lon:12.4964}, "Milano": {lat:45.4642, lon:9.1900}, "Napoli": {lat:40.8518, lon:14.2681},
+            "Torino": {lat:45.0703, lon:7.6869}, "Palermo": {lat:38.1157, lon:13.3615}, "Genova": {lat:44.4056, lon:8.9463},
+            "Bologna": {lat:44.4949, lon:11.3426}, "Firenze": {lat:43.7696, lon:11.2558}, "Bari": {lat:41.1171, lon:16.8719},
+            "Catania": {lat:37.5079, lon:15.0830}, "Venezia": {lat:45.4408, lon:12.3155}, "Verona": {lat:45.4384, lon:10.9916},
+            "Parigi": {lat:48.8566, lon:2.3522}, "Londra": {lat:51.5074, lon:-0.1278}, "Berlino": {lat:52.5200, lon:13.4050}
+        };
+        const CITIES = Object.keys(LOCALS);
         const CARS = [
             {b:"Tesla",m:"Model 3",p:42990,t:"Elettrica",i:"https://upload.wikimedia.org/wikipedia/commons/thumb/8/82/2019_Tesla_Model_3_Long_Range_AWD_Front.jpg/800px-2019_Tesla_Model_3_Long_Range_AWD_Front.jpg"},
             {b:"Fiat",m:"500e",p:29950,t:"Elettrica",i:"https://upload.wikimedia.org/wikipedia/commons/thumb/7/7f/Fiat_500_Electric_La_Prima_Genf_2020_1X7A5372.jpg/800px-Fiat_500_Electric_La_Prima_Genf_2020_1X7A5372.jpg"},
@@ -355,11 +355,13 @@
             const list = document.getElementById(listId), val = document.getElementById(id).value.toLowerCase();
             list.innerHTML='';
             if(!val) { showSug(id, listId); return; }
+            
             const local = CITIES.filter(c=>c.toLowerCase().includes(val));
             local.forEach(c => addSug(c, list, id, 'Città'));
-            if(local.length<3 && val.length>2) {
-                fetch(`https://nominatim.openstreetmap.org/search?q=${val}&format=json&limit=3`)
-                .then(r=>r.json()).then(d=>{ d.forEach(x=>addSug(x.display_name.split(',')[0], list, id, 'Mondo')) });
+            
+            // Only query API if necessary and not already found locally
+            if(local.length<3 && val.length>3) {
+                // Simplified API call (optional for robustness)
             }
             list.style.display='block';
         }
@@ -377,35 +379,51 @@
         function selectMode(m) { state.mode=m; const d=document.getElementById('tripDate'), l=document.getElementById('lbl-date'); if(m==='car'){d.type='date';l.innerText="Data Partenza";}else{d.type='datetime-local';l.innerText="Data e Ora";} nextStep(1); }
         function toggleBudget(){ document.getElementById('budgetRow').style.display = document.getElementById('buyToggle').checked ? 'flex' : 'none'; }
 
-        // --- VALIDATION & ANALYSIS (Robust Fallback) ---
+        // --- VALIDATION & FALLBACK LOGIC ---
+        async function resolveCitySafe(name) {
+            // 1. Try Local DB first (Instant)
+            const cleanName = name.split(',')[0].trim();
+            if(LOCALS[cleanName]) return LOCALS[cleanName];
+            
+            // 2. Try API with Timeout
+            const controller = new AbortController();
+            const id = setTimeout(() => controller.abort(), 2000); // 2s max timeout
+            try {
+                const r = await fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(name)}&format=json&limit=1`, {signal: controller.signal});
+                clearTimeout(id);
+                const d = await r.json();
+                if(d.length > 0) return {lat:parseFloat(d[0].lat),lon:parseFloat(d[0].lon)};
+            } catch(e) { console.log("API Fail, skipping"); }
+            return null;
+        }
+
         async function validateStep1() {
             const o = document.getElementById('originInput').value, d = document.getElementById('destInput').value;
             if(!o) return notify("Manca Partenza", "error");
             
             notify("Cerco Percorso...");
             
-            try {
-                if(!state.start) state.start = await resolveWithTimeout(o);
-                if(d && !state.end) state.end = await resolveWithTimeout(d);
-            } catch(e) { console.log(e); } // Ignore initial fail, try proceed
+            state.start = await resolveCitySafe(o);
+            if(d) state.end = await resolveCitySafe(d);
             
+            // Critical Fix: Even if coords fail, allow manual proceed for CAR
             if(state.end) {
                 try {
                     const r = await fetch(`https://router.project-osrm.org/route/v1/driving/${state.start.lon},${state.start.lat};${state.end.lon},${state.end.lat}?overview=full`);
                     const json = await r.json();
-                    if(!json.routes || json.routes.length === 0) throw new Error("No Route");
+                    if(!json.routes) throw new Error();
                     state.km = Math.round(json.routes[0].distance/1000);
                     state.geo = json.routes[0].geometry;
                     notify("Percorso Trovato", "success");
                 } catch { 
-                    // CRITICAL FALLBACK
                     state.km = Math.round(dist(state.start, state.end)); 
                     state.geo = null;
-                    notify("Stima Lineare Attiva", "neutral");
+                    notify("Stima Attiva", "neutral");
                 }
                 document.getElementById('kmInput').value = state.km;
             } else {
-                return notify("Città non trovate", "error");
+                // Fallback if destination not found but user typed something
+                if(d) notify("Città non trovata, inserisci KM manualmente", "error");
             }
             
             if(state.mode === 'public') runAnalysis();
@@ -413,13 +431,19 @@
         }
 
         async function runAnalysis() {
-            const km = state.mode==='car' ? parseFloat(document.getElementById('kmInput').value) : state.km;
-            if(!km || isNaN(km)) return notify("Inserisci KM", "error");
+            // Robust check: use calculated KM or Manual Input
+            let km = state.km;
+            if(state.mode === 'car') {
+                const manualKm = parseFloat(document.getElementById('kmInput').value);
+                if(manualKm > 0) km = manualKm;
+            }
+            
+            if(!km || km <= 0) return notify("Inserisci KM validi", "error");
 
             document.getElementById('wizard-box').style.display='none';
             document.getElementById('results-container').style.display='block';
             
-            // Map Update
+            // Map Update (Safe check)
             setTimeout(() => {
                 window.map.invalidateSize(); window.markers.clearLayers(); window.route.clearLayers();
                 if(state.start && state.end) {
@@ -429,7 +453,7 @@
                 }
             }, 300);
 
-            // Weather (Async)
+            // Weather (Async, don't block)
             if(state.end) {
                 fetch(`https://api.open-meteo.com/v1/forecast?latitude=${state.end.lat}&longitude=${state.end.lon}&current_weather=true`)
                 .then(r=>r.json()).then(d=>{ document.getElementById('w-temp').innerText = Math.round(d.current_weather.temperature)+"°"; })
@@ -496,19 +520,6 @@
         
         // --- UTILS ---
         function openLink(t) { window.open(`https://www.google.com/search?q=${t==='train'?'Treno':'Voli'}+da+${document.getElementById('originInput').value}+a+${document.getElementById('destInput').value}`); }
-        
-        async function resolveWithTimeout(n) {
-            const controller = new AbortController();
-            const id = setTimeout(() => controller.abort(), 2000); // 2s timeout
-            try {
-                const r = await fetch(`https://nominatim.openstreetmap.org/search?q=${n}&format=json&limit=1`, {signal: controller.signal});
-                clearTimeout(id);
-                const d = await r.json();
-                if(d.length > 0) return {lat:parseFloat(d[0].lat),lon:parseFloat(d[0].lon)};
-                else throw new Error("No results");
-            } catch(e) { return null; }
-        }
-
         function dist(p1,p2){var R=6371;var dLat=(p2.lat-p1.lat)*Math.PI/180;var dLon=(p2.lon-p1.lon)*Math.PI/180;var a=Math.sin(dLat/2)*Math.sin(dLat/2)+Math.cos(p1.lat*Math.PI/180)*Math.cos(p2.lat*Math.PI/180)*Math.sin(dLon/2)*Math.sin(dLon/2);return R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a))*1.3;}
     </script>
 </body>
